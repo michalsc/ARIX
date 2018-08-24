@@ -16,7 +16,7 @@ main-build: pre-build
 $(TARGETDIR)/DebugTest: $(addprefix $(OBJDIR)/,$(OBJS))
 	@echo "Linking DebugTest"
 	@$(CC) -o $@ $(foreach f,$(OBJS),$(OBJDIR)/$(f)) -Wl,-unresolved-symbols=ignore-in-shared-libs \
-	 -l:$(BIN_DIR)/Libs/exec.library
+	 $(BIN_DIR)/Libs/exec.library
 
 .PHONY: all
 .SECONDARY: main-build pre-build
