@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "name": "ARIX",
+            "includePath": [
+                "${workspaceFolder}/include"
+            ],
+            "defines": [],
+            "macFrameworkPath": [],
+            "compilerPath": "/usr/local/bin/x86_64-unknown-linux-gnu-gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}
