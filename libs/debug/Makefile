@@ -16,7 +16,7 @@ main-build: pre-build
 $(TARGETDIR)/debug.library: $(addprefix $(OBJDIR)/,$(OBJS))
 	@echo "Linking debug.library"
 	@$(CC) -fpic -shared -Wl,-soname,debug.library -Wl,--version-script=version.script \
-	 -fvisibility=hidden -o $@ $(foreach f,$(OBJS),$(OBJDIR)/$(f)) -lc -ldl
+	 -fvisibility=hidden -o $@ $(foreach f,$(OBJS),$(OBJDIR)/$(f)) -lc
 
 .PHONY: all
 .SECONDARY: main-build pre-build
