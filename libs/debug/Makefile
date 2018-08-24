@@ -1,5 +1,5 @@
-FILES := execbase openlibrary allocmem freemem
-OBJDIR := $(BUILD_DIR)/libs/exec
+FILES := debugbase vbug
+OBJDIR := $(BUILD_DIR)/libs/debug
 TARGETDIR := $(BIN_DIR)/Libs
 OBJS := $(foreach f,$(FILES),$(f).o)
 
@@ -10,12 +10,12 @@ pre-build:
 	@mkdir -p $(OBJDIR) >/dev/null
 
 main-build: pre-build
-	@echo "Building exec.library"
-	@make --no-print-directory $(TARGETDIR)/exec.library
+	@echo "Building debug.library"
+	@make --no-print-directory $(TARGETDIR)/debug.library
 
-$(TARGETDIR)/exec.library: $(addprefix $(OBJDIR)/,$(OBJS))
-	@echo "Linking exec.library"
-	@$(CC) -fpic -shared -Wl,-soname,exec.library -Wl,--version-script=version.script \
+$(TARGETDIR)/debug.library: $(addprefix $(OBJDIR)/,$(OBJS))
+	@echo "Linking debug.library"
+	@$(CC) -fpic -shared -Wl,-soname,debug.library -Wl,--version-script=version.script \
 	 -fvisibility=hidden -o $@ $(foreach f,$(OBJS),$(OBJDIR)/$(f)) -lc -ldl
 
 .PHONY: all

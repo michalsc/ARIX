@@ -1,4 +1,4 @@
-LIBS := exec
+LIBS := exec debug
 OBJDIR := $(BUILD_DIR)/$(CURDIR)
 
 all: $(LIBS)

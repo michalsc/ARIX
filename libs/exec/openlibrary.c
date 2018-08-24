@@ -3,6 +3,7 @@
 #include <dlfcn.h>
 
 // Full path resolving not implemented yet
+// Idea: use separate namespace for all arix libraries?
 struct Library * OpenLibrary(const char * name, uint32_t minVersion)
 {
     struct Library *retval = NULL;

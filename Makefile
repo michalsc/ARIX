@@ -8,7 +8,7 @@ export MAKE := make
 export INCLUDE_DIR := $(shell pwd)/include
 export CFLAGS := -Os -I$(INCLUDE_DIR)
 
-SUBDIRS := libs
+SUBDIRS := libs test
 
 all: $(SUBDIRS)
 

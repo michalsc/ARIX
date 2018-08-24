@@ -3,15 +3,17 @@
 #define NO_INLINES
 #include <proto/exec.h>
 
-static const char __idString[] = "\0$VER: exec.library 60.0 (24.08.2018)";
+static const char __idString[] = "\0$VER: exec.library 60.0 (24.08.2018)\0";
 
+void * AllocMem(size_t byteSize, uint32_t requirements);
+void FreeMem(void *ptr);
 struct Library * OpenLibrary(const char * name, uint32_t minVersion);
 struct Library * OldOpenLibrary(const char * name);
 
 static const struct ExecBaseLVO __lvo = {
-    NULL,
-    NULL,
-    NULL,
+    AllocMem,
+    FreeMem,
+    NULL,   // AvailMem
     OldOpenLibrary,
     OpenLibrary
 };

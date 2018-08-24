@@ -1,6 +1,6 @@
-FILES := execbase openlibrary allocmem freemem
-OBJDIR := $(BUILD_DIR)/libs/exec
-TARGETDIR := $(BIN_DIR)/Libs
+FILES := main
+OBJDIR := $(BUILD_DIR)/test/debug
+TARGETDIR := $(BIN_DIR)/Test
 OBJS := $(foreach f,$(FILES),$(f).o)
 
 all: pre-build main-build
@@ -10,13 +10,12 @@ pre-build:
 	@mkdir -p $(OBJDIR) >/dev/null
 
 main-build: pre-build
-	@echo "Building exec.library"
-	@make --no-print-directory $(TARGETDIR)/exec.library
+	@echo "Building DebugTest"
+	@make --no-print-directory $(TARGETDIR)/DebugTest
 
-$(TARGETDIR)/exec.library: $(addprefix $(OBJDIR)/,$(OBJS))
-	@echo "Linking exec.library"
-	@$(CC) -fpic -shared -Wl,-soname,exec.library -Wl,--version-script=version.script \
-	 -fvisibility=hidden -o $@ $(foreach f,$(OBJS),$(OBJDIR)/$(f)) -lc -ldl
+$(TARGETDIR)/DebugTest: $(addprefix $(OBJDIR)/,$(OBJS))
+	@echo "Linking DebugTest"
+	@$(CC) -o $@ $(foreach f,$(OBJS),$(OBJDIR)/$(f)) $(BIN_DIR)/Libs/exec.library
 
 .PHONY: all
 .SECONDARY: main-build pre-build
@@ -24,12 +23,12 @@ $(TARGETDIR)/exec.library: $(addprefix $(OBJDIR)/,$(OBJS))
 $(OBJDIR)/%.o: %.cpp
 	@mkdir -p $(@D)
 	@echo "Compiling: $*.cpp"
-	@$(CXX) -c -fpic $(CXXFLAGS) $< -o $@
+	@$(CXX) -c $(CXXFLAGS) $< -o $@
 
 $(OBJDIR)/%.o: %.c
 	@mkdir -p $(@D)
 	@echo "Compiling: $*.c"
-	@$(CC) -c -fpic $(CFLAGS) $< -o $@
+	@$(CC) -c $(CFLAGS) $< -o $@
 
 $(OBJDIR)/%.d: %.cpp
 	@mkdir -p $(@D)

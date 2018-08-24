@@ -223,6 +223,21 @@ static inline size_t AvailMem(uint32_t attributes)
     return ((struct ExecBaseLVO *)ExecBase->lib_LVOTable)->AvailMem(attributes);
 }
 
+static inline struct Library * OldOpenLibrary(const char *libName)
+{
+    return ((struct ExecBaseLVO *)ExecBase->lib_LVOTable)->OldOpenLibrary(libName);
+}
+
+static inline struct Library * OpenLibrary(const char *libName, uint32_t version)
+{
+    return ((struct ExecBaseLVO *)ExecBase->lib_LVOTable)->OpenLibrary(libName, version);
+}
+
+static inline void CloseLibrary(struct Library *libBase)
+{
+    ((struct ExecBaseLVO *)ExecBase->lib_LVOTable)->CloseLibrary(libBase);
+}
+
 #endif // NO_INLINES
 
 #endif // _PROTO_EXEC_H
