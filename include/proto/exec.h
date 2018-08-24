@@ -67,8 +67,8 @@ struct ExecBaseLVO {
 // struct MsgPort *FindPort(CONST_STRPTR name) (A1)
 // void AddLibrary(struct Library *library) (A1)
 // void RemLibrary(struct Library *library) (A1)
-    struct Library *(*OldOpenLibrary)(char *libName);
-    struct Library *(*OpenLibrary)(char *libName, uint32_t version);
+    struct Library *(*OldOpenLibrary)(const char *libName);
+    struct Library *(*OpenLibrary)(const char *libName, uint32_t version);
     void (*CloseLibrary)(struct Library *libBase);
 // APTR SetFunction(struct Library *library, LONG funcOffset, APTR newFunction) (A1, A0, D0)
 // void SumLibrary(struct Library *library) (A1)

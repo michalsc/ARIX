@@ -1,4 +1,4 @@
-FILES := execbase
+FILES := execbase openlibrary
 OBJDIR := $(BUILD_DIR)/libs/exec
 TARGETDIR := $(BIN_DIR)/Libs
 OBJS := $(foreach f,$(FILES),$(f).o)
@@ -16,7 +16,7 @@ main-build: pre-build
 $(TARGETDIR)/exec.library: $(addprefix $(OBJDIR)/,$(OBJS))
 	@echo "Linking exec.library"
 	@$(CC) -fpic -shared -Wl,-soname,exec.library -Wl,--version-script=version.script \
-	 -fvisibility=hidden -o $@ $(foreach f,$(OBJS),$(OBJDIR)/$(f))
+	 -fvisibility=hidden -o $@ $(foreach f,$(OBJS),$(OBJDIR)/$(f)) -lc -ldl
 
 .PHONY: all
 .SECONDARY: main-build pre-build

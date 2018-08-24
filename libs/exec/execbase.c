@@ -5,8 +5,15 @@
 
 static const char __idString[] = "\0$VER: exec.library 60.0 (24.08.2018)";
 
-static const struct ExecBaseLVO __lvo = {
+struct Library * OpenLibrary(const char * name, uint32_t minVersion);
+struct Library * OldOpenLibrary(const char * name);
 
+static const struct ExecBaseLVO __lvo = {
+    NULL,
+    NULL,
+    NULL,
+    OldOpenLibrary,
+    OpenLibrary
 };
 
 static const struct Library _ExecBase = {
