@@ -1,3 +1,7 @@
+
+#define NOLIBINLINE
+#define NOLIBDEFINES
+
 #include <exec/lists.h>
 #include <proto/exec.h>
 

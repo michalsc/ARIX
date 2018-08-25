@@ -9,12 +9,13 @@ struct Library {
     UWORD       lib_Revision;
     const APTR  lib_IdString;
 };
-/*
+
 // Default functions which shall be implemented by every library!
 struct LibraryLVO {
     struct Library *    (*Open)(void * handle, uint32_t version);
     void *              (*Close)();
-    
-}
-*/
+    void *              (*Expunge)();
+    int32_t             (*ExtFunc)();
+};
+
 #endif // _EXEC_LIBRARIES_H

@@ -1,0 +1,54 @@
+{
+    "configuration": {
+        "name": "exec",
+        "type": "library",
+        "version.major": 60,
+        "version.minor": 1,
+        "base.type": "Library",
+        "base.name": "ExecBase"
+    },
+    "cdef": [
+        "#include <exec/nodes.h>",
+        "#include <exec/lists.h>",
+        "#include <stddef.h>",
+        "#include <stdint.h>"
+    ],
+    "functions": [
+        [ "struct Library *",   "Open", "void * handle", "uint32_t version" ],
+        [ "void *",             "Close" ],
+        [ "void *",             "Expunge" ],
+        [ "int32_t",            "ExtFunc" ],
+
+        [ "void",               "Reschedule" ],
+
+        [ "struct Library *",   "OldOpenLibrary", "const char * libName" ],
+        [ "struct Library *",   "OpenLibrary", "const char * libName", "uint32_t version" ],
+        [ "void",               "CloseLibrary", "struct Library * library" ],
+
+        [ "void",               "Insert", "struct List * list", "struct Node * node", "struct Node * pred" ],
+        [ "void",               "AddHead", "struct List * list", "struct Node * node" ],
+        [ "void",               "AddTail", "struct List * list", "struct Node * node" ],
+        [ "void",               "Remove", "struct Node * node" ],
+        [ "struct Node *",      "RemHead", "struct List * list" ],
+        [ "struct Node *",      "RemTail", "struct List * list" ],
+        [ "void",               "Enqueue", "struct List * list", "struct Node * node" ],
+        [ "struct Node *",      "FindName", "struct List * list", "const char * name" ],
+
+        [ "void *",             "AllocMem", "size_t byteSize", "uint32_t requirements" ],
+        [ "void *",             "AllocVec", "size_t byteSize", "uint32_t requirements" ],
+        [ "void",               "FreeMem", "void * memoryBlock", "size_t byteSize" ],
+        [ "void",               "FreeVec", "void * memoryBlock" ],
+        [ "size_t",             "AvailMem", "uint32_t attributes" ],
+        [ "void *",             "CreatePool", "uint32_t requirement", "size_t puddleSize", "size_t threshSize" ],
+        [ "void",               "DeletePool", "void * pool" ],
+        [ "void *",             "AllocPooled", "void * pool", "size_t byteSize" ],
+        [ "void *",             "AllocVecPooled", "void * pool", "size_t byteSize" ],
+        [ "void",               "FreePooled", "void * pool", "void * memoryBlock", "size_t byteSize" ],
+        [ "void",               "FreeVecPooled", "void * pool", "void * memoryBlock" ],
+
+        [ "void",               "CopyMem", "const void * source", "void * dest", "size_t size" ],
+        [ "void",               "CopyMemQuick", "const void * source", "void * dest", "size_t size" ]
+
+        
+    ]
+}

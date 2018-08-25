@@ -5,7 +5,15 @@
 
 #include <stdio.h>
 
-struct Library * DebugBase = NULL;
+struct Library *DebugBase = NULL;
+
+static inline void Bug(const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    VBug(format, args);
+    va_end(args);
+}
 
 int main(int argc, char **argv)
 {
@@ -16,6 +24,6 @@ int main(int argc, char **argv)
     DebugBase = OpenLibrary("debug.library", 0);
 
     printf("After attempting to open debug.library\nDebugBase = %p\n", DebugBase);
-
+    
     Bug("Hello, world!\n");
 }

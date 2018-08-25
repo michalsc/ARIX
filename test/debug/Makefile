@@ -31,6 +31,13 @@ $(OBJDIR)/%.o: %.c
 	@echo "Compiling: $*.c"
 	@$(CC) -c $(CFLAGS) $< -o $@
 
+$(OBJDIR)/%.d: %.c
+	@mkdir -p $(@D)
+	@set -e; rm -f $@; \
+	 $(CC) -MM -MT $(basename $@).o $(CFLAGS) $< > $@.$$$$; \
+	 sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+	 rm -f $@.$$$$
+
 $(OBJDIR)/%.d: %.cpp
 	@mkdir -p $(@D)
 	@set -e; rm -f $@; \
