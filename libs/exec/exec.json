@@ -11,7 +11,8 @@
         "#include <exec/nodes.h>",
         "#include <exec/lists.h>",
         "#include <stddef.h>",
-        "#include <stdint.h>"
+        "#include <stdint.h>",
+        "#include <unistd.h>"
     ],
     "functions": [
         [ "struct Library *",   "Open", "void * handle", "uint32_t version" ],
@@ -20,6 +21,7 @@
         [ "int32_t",            "ExtFunc" ],
 
         [ "void",               "Reschedule" ],
+        [ "void",               "Spawn" ],
 
         [ "struct Library *",   "OldOpenLibrary", "const char * libName" ],
         [ "struct Library *",   "OpenLibrary", "const char * libName", "uint32_t version" ],

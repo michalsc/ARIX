@@ -2,7 +2,6 @@ TARGET_DIR := $(BIN_DIR)/Development/include
 
 includes:
 	@mkdir -p $(TARGET_DIR)
-	@cp -r . $(TARGET_DIR)/
-	@rm $(TARGET_DIR)/Makefile
+	@rsync -a --exclude=Makefile . $(TARGET_DIR)/
 
 .PHONY: includes

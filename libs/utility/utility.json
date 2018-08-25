@@ -1,0 +1,20 @@
+{
+    "configuration": {
+        "name": "utility",
+        "type": "library",
+        "version.major": 60,
+        "version.minor": 0,
+        "base.type": "Library",
+        "base.name": "UtilityBase"
+    },
+    "cdef": [
+        "#include <utility/hooks.h>"
+    ],
+    "functions": [
+        [ "struct Library *",   "Open", "void * handle", "uint32_t version" ],
+        [ "void *",             "Close" ],
+        [ "void *",             "Expunge" ],
+        [ "int32_t",            "ExtFunc" ],
+        [ "uintptr_t",          "CallHookPkt", "struct Hook * hook", "void * object", "void * paramPacket" ]
+    ]
+}

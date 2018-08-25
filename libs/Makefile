@@ -1,4 +1,4 @@
-LIBS := exec debug
+LIBS := exec debug utility
 OBJDIR := $(BUILD_DIR)/$(CURDIR)
 
 includes:
