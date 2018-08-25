@@ -1,4 +1,4 @@
-FILES := execbase openlibrary allocmem freemem
+FILES := execbase openlibrary allocmem freemem reschedule addhead addtail insert remhead remtail enqueue
 OBJDIR := $(BUILD_DIR)/libs/exec
 TARGETDIR := $(BIN_DIR)/Libs
 OBJS := $(foreach f,$(FILES),$(f).o)

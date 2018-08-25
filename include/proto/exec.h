@@ -3,14 +3,14 @@
 
 #include <exec/types.h>
 #include <exec/libraries.h>
+#include <exec/nodes.h>
+#include <exec/lists.h>
 #include <stdint.h>
 #include <stddef.h>
 
 struct ExecBaseLVO {
+    void    (*Reschedule)();
 // void Schedule()()
-// void Reschedule()()
-// void Switch()()
-// void Dispatch()()
 // void Exception()() 
 // void InitCode(ULONG startClass, ULONG version)(D0, D1) 
 // void InitStruct(CONST_APTR initTable, APTR memory, ULONG size)(A1, A2, D0) 
@@ -20,10 +20,7 @@ struct ExecBaseLVO {
 // APTR InitResident(struct Resident *resident, BPTR segList)(A1, D1) 
 // void Alert(ULONG alertNum)(D7) 
 // void Debug(unsigned long flags)(D0) 
-// void Disable()() 
-// void Enable()() 
-// void Forbid()() 
-// void Permit()()
+
 // ULONG SetSR(ULONG newSR, ULONG mask)(D0, D1)
 // APTR SuperState()() void UserState(APTR sysStack)(D0) 
 // struct Interrupt *SetIntVector(ULONG intNumber, struct Interrupt *interrupt)(D0, A1) 
@@ -38,14 +35,14 @@ struct ExecBaseLVO {
     size_t          (*AvailMem)(uint32_t attributes);
 // struct MemList *AllocEntry(struct MemList *entry) (A0)
 // void FreeEntry(struct MemList *entry) (A0)
-// void Insert(struct List *list, struct Node *node, struct Node *pred) (A0, A1, A2)
-// void AddHead(struct List *list, struct Node *node) (A0, A1)
-// void AddTail(struct List *list, struct Node *node) (A0, A1)
-// void Remove(struct Node *node) (A1)
-// struct Node *RemHead(struct List *list) (A0)
-// struct Node *RemTail(struct List *list) (A0)
-// void Enqueue(struct List *list, struct Node *node) (A0, A1)
-//struct Node *FindName(struct List *list, CONST_STRPTR name) (A0, A1)
+    void            (*Insert)(struct List *list, struct Node *node, struct Node *pred);
+    void            (*AddHead)(struct List *list, struct Node *node);
+    void            (*AddTail)(struct List *list, struct Node *node);
+    void            (*Remove)(struct Node *node);
+    struct Node *   (*RemHead)(struct List *list);
+    struct Node *   (*RemTail)(struct List *list);
+    void            (*Enqueue)(struct List *list, struct Node *node);
+//    struct Node *   (*FindName)(struct List *list, const char * name);
 // APTR AddTask(struct Task *task, APTR initialPC, APTR finalPC) (A1, A2, A3)
 // void RemTask(struct Task *task) (A1)
 // struct Task *FindTask(CONST_STRPTR name) (A1)
@@ -107,10 +104,7 @@ struct ExecBaseLVO {
 // void AddMemList(IPTR size, ULONG attributes, LONG pri, APTR base, STRPTR name) (D0, D1, D2, A0, A1)
     void (*CopyMem)(const void *source, void *dest, size_t size);
     void (*CopyMemQuick)(const void *source, void *dest, size_t size);
-    /*
-    void CacheClearU() ()
-void CacheClearE(APTR address, IPTR length, ULONG caches) (A0, D0, D1)
-ULONG CacheControl(ULONG cacheBits, ULONG cacheMask) (D0, D1)
+/*
 APTR CreateIORequest(struct MsgPort *ioReplyPort, ULONG size) (A0, D0)
 void DeleteIORequest(APTR iorequest) (A0)
 struct MsgPort *CreateMsgPort() ()
@@ -208,33 +202,22 @@ IPTR GetParentTaskStorageSlot(LONG id) (D0)
 
 extern struct Library *ExecBase;
 
-static inline void *AllocMem(size_t byteSize, uint32_t requirements)
-{
+static inline void *AllocMem(size_t byteSize, uint32_t requirements) {
     return ((struct ExecBaseLVO *)ExecBase->lib_LVOTable)->AllocMem(byteSize, requirements);
 }
-
-static inline void FreeMem(void *memoryBlock)
-{
+static inline void FreeMem(void *memoryBlock) {
     ((struct ExecBaseLVO *)ExecBase->lib_LVOTable)->FreeMem(memoryBlock);
 }
-
-static inline size_t AvailMem(uint32_t attributes)
-{
+static inline size_t AvailMem(uint32_t attributes) {
     return ((struct ExecBaseLVO *)ExecBase->lib_LVOTable)->AvailMem(attributes);
 }
-
-static inline struct Library * OldOpenLibrary(const char *libName)
-{
+static inline struct Library * OldOpenLibrary(const char *libName) {
     return ((struct ExecBaseLVO *)ExecBase->lib_LVOTable)->OldOpenLibrary(libName);
 }
-
-static inline struct Library * OpenLibrary(const char *libName, uint32_t version)
-{
+static inline struct Library * OpenLibrary(const char *libName, uint32_t version) {
     return ((struct ExecBaseLVO *)ExecBase->lib_LVOTable)->OpenLibrary(libName, version);
 }
-
-static inline void CloseLibrary(struct Library *libBase)
-{
+static inline void CloseLibrary(struct Library *libBase) {
     ((struct ExecBaseLVO *)ExecBase->lib_LVOTable)->CloseLibrary(libBase);
 }
 
