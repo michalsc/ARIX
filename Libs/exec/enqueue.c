@@ -3,7 +3,7 @@
 #define NOLIBDEFINES
 
 #include <exec/lists.h>
-#include <proto/exec.h>
+#include <clib/exec_protos.h>
 
 void Enqueue(struct List * list, struct Node * node)
 {

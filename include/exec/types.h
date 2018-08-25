@@ -15,6 +15,8 @@ typedef int64_t     QUAD;
 typedef uintptr_t   IPTR;
 typedef intptr_t    SIPTR;
 
+#ifndef NULL
 #define NULL    ((APTR)0)
+#endif // NULL
 
 #endif // _EXEC_TYPES_H

@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <strings.h>
+#include <clib/exec_protos.h>
 
 void * AllocMem(size_t byteSize, uint32_t requirements)
 {

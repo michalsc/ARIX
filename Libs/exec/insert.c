@@ -10,7 +10,7 @@
 #define NOLIBDEFINES
 
 #include <exec/lists.h>
-#include <proto/exec.h>
+#include <clib/exec_protos.h>
 
 void Insert(struct List *list, struct Node *node, struct Node *pred)
 {

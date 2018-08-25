@@ -1,4 +1,5 @@
-FILES := openlibrary allocmem freemem reschedule addhead addtail insert remhead remtail enqueue
+FILES := openlibrary allocmem freemem reschedule addhead addtail insert remhead remtail enqueue \
+         findname remove closelibrary exec_init
 OBJDIR := $(BUILD_DIR)/libs/exec
 TARGETDIR := $(BIN_DIR)/Libs
 OBJS := $(foreach f,$(FILES),$(f).o)

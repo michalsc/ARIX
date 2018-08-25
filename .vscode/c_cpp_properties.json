@@ -3,7 +3,7 @@
         {
             "name": "ARIX",
             "includePath": [
-                "${workspaceFolder}/include"
+                "${workspaceFolder}/Build/ARIX/Development/include"
             ],
             "defines": [],
             "macFrameworkPath": [],
