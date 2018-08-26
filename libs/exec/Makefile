@@ -1,6 +1,7 @@
 FILES := openlibrary allocmem freemem reschedule addhead addtail insert remhead remtail enqueue \
          findname remove closelibrary exec_init allocvec freevec availmem spawn copymem tlsf \
-         createpool deletepool allocpooled freepooled reallocmem allocmemaligned allocvecaligned
+         createpool deletepool allocpooled freepooled reallocmem allocmemaligned allocvecaligned \
+         getsymboladdress
 
 OBJDIR := $(BUILD_DIR)/libs/exec
 TARGETDIR := $(BIN_DIR)/Libs
