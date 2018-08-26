@@ -1089,6 +1089,7 @@ static APTR fetch_more_ram_mmap(void *data, IPTR *size)
 
 static void release_ram_mmap(void *data, APTR ptr, IPTR size)
 {
+    D(nbug("[TLSF] release_ram_mmap(%p, %p, %ld)\n", data, ptr, size));
     munmap(ptr, size);
 }
 
