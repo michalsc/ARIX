@@ -114,6 +114,7 @@ def generate_inline(cfg):
     Automatically generated file. do not edit!
 */
 
+#include <exec/libraries.h>
 """.format(cfg["configuration"]["name"].upper()))
     for cdef in cfg["cdef"]:
         print(cdef)
@@ -132,9 +133,10 @@ def generate_inline(cfg):
         params = func[2:]
         params[:] = [s[s.rfind(" ")+1:] for s in params]
         func_lvo = func[2:]
-        func_lvo.append("APTR LVOTable")
+        func_lvo.append("APTR Base")
         print("""static inline __attribute__((always_inline)) {0} __inline_{1}({2}) {{
-    {3} ((struct {4}LVO *)LVOTable)->{1}({5});
+    struct Library * lib = (struct Library *)Base;
+    {3} ((struct {4}LVO *)lib->lib_LVOTable)->{1}({5});
 }}""".format(
     func[0], 
     func[1], 
@@ -162,6 +164,7 @@ def generate_defines(cfg):
     Automatically generated file. do not edit!
 */
 
+#include <exec/libraries.h>
 """.format(cfg["configuration"]["name"].upper()))
     for cdef in cfg["cdef"]:
         print(cdef)
@@ -180,8 +183,9 @@ def generate_defines(cfg):
         params = func[2:]
         params[:] = [s[s.rfind(" ")+1:] for s in params]
         params_p = ["({0})".format(s) for s in params]
-        print("""#define __define_{1}_WB({2}, LVOTable) ({{ \\
-    ((struct {4}LVO *)LVOTable)->{1}({5});  \\
+        print("""#define __define_{1}_WB({2}, Base) ({{ \\
+    struct Library * lib = (struct Library *)Base; \\
+    ((struct {4}LVO *)lib->lib_LVOTable)->{1}({5});  \\
 }})""".format(
     func[0], 
     func[1], 
