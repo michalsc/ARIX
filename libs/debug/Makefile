@@ -1,4 +1,4 @@
-FILES := vbug
+FILES := debug_init vbug
 OBJDIR := $(BUILD_DIR)/libs/debug
 TARGETDIR := $(BIN_DIR)/Libs
 OBJS := $(foreach f,$(FILES),$(f).o)
