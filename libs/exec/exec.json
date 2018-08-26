@@ -38,7 +38,10 @@
         [ "struct Node *",      "FindName", "struct List * list", "const char * name" ],
 
         [ "void *",             "AllocMem", "size_t byteSize", "uint32_t requirements" ],
+        [ "void *",             "AllocMemAligned", "size_t byteSize", "size_t align", "uint32_t requirements" ],
         [ "void *",             "AllocVec", "size_t byteSize", "uint32_t requirements" ],
+        [ "void *",             "AllocVecAligned", "size_t byteSize", "size_t align", "uint32_t requirements" ],
+        [ "void *",             "ReallocMem", "void * memoryBlock", "size_t newSize" ],
         [ "void",               "FreeMem", "void * memoryBlock", "size_t byteSize" ],
         [ "void",               "FreeVec", "void * memoryBlock" ],
         [ "size_t",             "AvailMem", "uint32_t attributes" ],

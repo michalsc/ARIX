@@ -4,8 +4,10 @@
 #include <stdlib.h>
 #include <clib/exec_protos.h>
 
+#include "exec_intern.h"
+#include "tlsf.h"
+
 void FreeMem(void * ptr, size_t byteSize)
 {
-    (void)byteSize;
-    free(ptr);
+    tlsf_freemem(local_memory_pool, ptr, byteSize);
 }

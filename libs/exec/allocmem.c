@@ -5,15 +5,12 @@
 #include <strings.h>
 #include <clib/exec_protos.h>
 
+#include "exec_intern.h"
+#include "tlsf.h"
+
 void * AllocMem(size_t byteSize, uint32_t requirements)
 {
-    void *ptr = malloc(byteSize);
-
-    if (ptr) {
-        if (requirements & MEMF_CLEAR) {
-            bzero(ptr, byteSize);
-        }
-    }
+    void *ptr = tlsf_malloc(local_memory_pool, byteSize, &requirements);
 
     return ptr;
 }

@@ -2,7 +2,8 @@
     "files.associations": {
         "memory.h": "c",
         "lists.h": "c",
-        "exec.h": "c"
+        "exec.h": "c",
+        "string.h": "c"
     },
     "python.pythonPath": "/usr/bin/python",
     "python.formatting.provider": "yapf"

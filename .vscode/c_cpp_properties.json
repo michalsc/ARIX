@@ -5,7 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/Build/ARIX/Development/include"
             ],
-            "defines": [],
+            "defines": [ "__USE_MISC=1" ],
             "macFrameworkPath": [],
             "compilerPath": "/usr/local/bin/x86_64-unknown-linux-gnu-gcc",
             "cStandard": "c11",

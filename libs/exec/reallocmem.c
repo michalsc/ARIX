@@ -2,12 +2,15 @@
 #include <exec/memory.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <strings.h>
 #include <clib/exec_protos.h>
 
 #include "exec_intern.h"
 #include "tlsf.h"
 
-void FreeVec(void *ptr)
+void *ReallocMem(void * memoryBlock, size_t newSize)
 {
-    tlsf_freevec(local_memory_pool, ptr);
+    void *ptr = tlsf_realloc(local_memory_pool, memoryBlock, newSize);
+
+    return ptr;
 }

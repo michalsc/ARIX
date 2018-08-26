@@ -8,9 +8,9 @@
 #include "exec_intern.h"
 #include "tlsf.h"
 
-void *AllocVec(size_t byteSize, uint32_t requirements)
+void *AllocVecAligned(size_t byteSize, size_t align, uint32_t requirements)
 {
-    void *ptr = tlsf_malloc(local_memory_pool, byteSize, &requirements);
+    void *ptr = tlsf_malloc_aligned(local_memory_pool, byteSize, align, &requirements);
 
     return ptr;
 }

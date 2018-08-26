@@ -48,7 +48,10 @@ struct Library * OpenLibrary(const char * name, uint32_t minVersion)
         struct LibraryLVO *lvo = retval->lib_LVOTable;
         struct Library * base = lvo->Open(handle, minVersion);
 
+        D(bug("[EXEC] Open function returned %p\n", base));
+
         if (base == NULL) {
+            D(bug("[EXEC] Open failed. Closing the library\n"));
             dlclose(handle);
         } else { retval = base; }
     }
