@@ -15,6 +15,11 @@
 #undef USE_MACROS
 
 #include <stddef.h>
+#include <stdio.h>
+
+#define nbug printf
+#define D(x) x
+
 /*
  * Minimal alignment as required by AROS. In contrary to the default
  * TLSF implementation, we do not allow smaller blocks here.
@@ -1060,7 +1065,9 @@ void bzero(void *ptr, IPTR len)
 
 void * tlsf_init()
 {
-    tlsf_t *tlsf = mmap(NULL, sizeof(tlsf_t), PROT_READ | PROT_WRITE, MAP_PRIVATE, 0, 0);
+    tlsf_t *tlsf = mmap(NULL, sizeof(tlsf_t), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+
+    D(nbug("[TLSF] tlsf_init.\n[TLSF] tlsf=%p\n", tlsf));
 
     if (tlsf)
     {
@@ -1073,7 +1080,7 @@ void * tlsf_init()
 
 static APTR fetch_more_ram_mmap(void *data, IPTR *size)
 {
-    APTR ptr = mmap(NULL, *size, PROT_READ | PROT_WRITE, MAP_PRIVATE, 0, 0);
+    APTR ptr = mmap(NULL, *size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
     return ptr;
 }
 
@@ -1085,6 +1092,8 @@ static void release_ram_mmap(void *data, APTR ptr, IPTR size)
 void *tlsf_init_autogrow(IPTR puddle_size, ULONG requirements, autogrow_get grow_function, autogrow_release release_function, APTR autogrow_data)
 {
     tlsf_t *tlsf = tlsf_init();
+
+    D(nbug("[TLSF] tlsf_init_autogrow\n"));
 
     if (tlsf)
     {
