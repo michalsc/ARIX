@@ -2,48 +2,25 @@
 #define _TLSF_H
 
 #include <stdint.h>
-
-/*
-#ifndef EXEC_TYPES_H
 #include <exec/types.h>
-#endif
-
-#ifndef EXEC_MEMHEADEREXT_H
-#include <exec/memheaderext.h>
-#endif
-*/
-
-typedef void *          APTR;
-typedef void            VOID;
-typedef uintptr_t       IPTR;
-typedef uint32_t        ULONG;
-typedef int             BOOL;
-typedef const char *    CONST_STRPTR;
-typedef char            BYTE;
-typedef unsigned char   UBYTE;
 
 typedef APTR (*autogrow_get)(APTR, IPTR *);
-typedef VOID (*autogrow_release)(APTR, APTR, IPTR);
+typedef void (*autogrow_release)(APTR, APTR, IPTR);
 
-/* Initialization and memory management */
-APTR tlsf_init(struct MemHeaderExt * mhe);
-VOID tlsf_destroy(struct MemHeaderExt * mhe);
-VOID tlsf_add_memory(struct MemHeaderExt * mhe, APTR memory, IPTR size);
-VOID tlsf_add_memory_and_merge(struct MemHeaderExt * mhe, APTR memory, IPTR size);
+void *tlsf_init();
+void *tlsf_init_autogrow(IPTR puddle_size, ULONG requirements, autogrow_get grow_function, autogrow_release release_function, APTR autogrow_data);
+void tlsf_destroy(void *handle);
+void tlsf_add_memory_and_merge(void *handle, APTR memory, IPTR size);
+void tlsf_add_memory(void *handle, void *memory, IPTR size);
 
-/* Allocation functions */
-APTR tlsf_malloc(struct MemHeaderExt * mhe, IPTR size, ULONG * flags);
-VOID tlsf_freemem(struct MemHeaderExt * mhe, APTR ptr, IPTR size);
-VOID tlsf_freevec(struct MemHeaderExt * mhe, APTR ptr);
-APTR tlsf_realloc(struct MemHeaderExt * mhe, APTR ptr, IPTR new_size);
-APTR tlsf_allocabs(struct MemHeaderExt * mhe, IPTR size, APTR ptr);
+void *tlsf_malloc(void *handle, IPTR size, ULONG *flags);
+void *tlsf_malloc_aligned(void *handle, IPTR size, IPTR align, ULONG *flags);
+void tlsf_freevec(void *handle, APTR ptr);
+void tlsf_freemem(void *handle, APTR ptr, IPTR size);
+void *tlsf_realloc(void *handle, APTR ptr, IPTR new_size);
+void *tlsf_allocabs(void *handle, IPTR size, void *ptr);
 
-/* Query functions */
-IPTR tlsf_avail(struct MemHeaderExt * mhe, ULONG requirements);
-BOOL tlsf_in_bounds(struct MemHeaderExt * mhe, APTR begin, APTR end);
-
-/* Initialization of MemHeader */
-void krnCreateTLSFMemHeader(CONST_STRPTR name, BYTE pri, APTR start, IPTR size, ULONG flags);
-struct MemHeader * krnConvertMemHeaderToTLSF(struct MemHeader * source);
+IPTR tlsf_avail(void *tlsf, ULONG requirements);
+int tlsf_in_bounds(void *tlsf, APTR begin, APTR end);
 
 #endif /* _TLSF_H */

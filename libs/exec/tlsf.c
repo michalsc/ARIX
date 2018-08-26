@@ -3,13 +3,12 @@
     $Id$
 */
 
-/*
 #include <exec/types.h>
 #include <exec/memory.h>
-#include <exec/memheaderext.h>
 #include <proto/exec.h>
-*/
+
 #include <string.h>
+#include <sys/mman.h>
 
 #include "tlsf.h"
 
@@ -94,7 +93,7 @@ typedef struct bhdr_s {
 typedef struct tlsf_area_s {
     struct tlsf_area_s *    next;       // Next memory area
     bhdr_t *                end;        // Pointer to "end-of-area" block header
-    LONG                    autogrown;  // Automatically allocated by TLSF pool
+    int                     autogrown;  // Automatically allocated by TLSF pool
 } tlsf_area_t;
 
 typedef struct {
@@ -340,9 +339,9 @@ static inline __attribute__((always_inline)) void INSERT_FREE_BLOCK(tlsf_t *tlsf
 
 #endif /* USE_MACROS */
 
-void * tlsf_malloc(struct MemHeaderExt *mhe, IPTR size, ULONG *flags)
+void * tlsf_malloc(void *t, IPTR size, ULONG *flags)
 {
-    tlsf_t *tlsf = (tlsf_t *)mhe->mhe_UserData;
+    tlsf_t *tlsf = t;
     int fl, sl;
     bhdr_t *b = NULL;
 
@@ -350,10 +349,10 @@ void * tlsf_malloc(struct MemHeaderExt *mhe, IPTR size, ULONG *flags)
 
     if (unlikely(!size)) return NULL;
 
-    D(nbug("[Kernel:TLSF] %s(%p, %ld)\n", __PRETTY_FUNCTION__, tlsf, size));
+    // D(nbug("[Kernel:TLSF] %s(%p, %ld)\n", __PRETTY_FUNCTION__, tlsf, size));
 
-    if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
-        ObtainSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
+    // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
+    //     ObtainSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
 
     /* Find the indices fl and sl for given size */
     MAPPING_SEARCH(&size, &fl, &sl);
@@ -361,12 +360,12 @@ void * tlsf_malloc(struct MemHeaderExt *mhe, IPTR size, ULONG *flags)
     /* Find block of either the right size or larger */
     b = FIND_SUITABLE_BLOCK(tlsf, &fl, &sl);
 
-    D(nbug("[Kernel:TLSF] %s: adjusted size %ld\n", __PRETTY_FUNCTION__, size));
+    // D(nbug("[Kernel:TLSF] %s: adjusted size %ld\n", __PRETTY_FUNCTION__, size));
 
     /* No block found? Either failure or tlsf will get more memory. */
     if (unlikely(!b))
     {
-        D(nbug("[Kernel:TLSF] %s: out of memory\n", __PRETTY_FUNCTION__));
+        // D(nbug("[Kernel:TLSF] %s: out of memory\n", __PRETTY_FUNCTION__));
 
         /* Do we have the autogrow feature? */
         if (tlsf->autogrow_get_fn)
@@ -378,7 +377,7 @@ void * tlsf_malloc(struct MemHeaderExt *mhe, IPTR size, ULONG *flags)
             if (sz < tlsf->autogrow_puddle_size)
                 sz = tlsf->autogrow_puddle_size;
 
-            D(nbug("[Kernel:TLSF] %s: querying for %u bytes\n", __PRETTY_FUNCTION__, sz));
+            // D(nbug("[Kernel:TLSF] %s: querying for %u bytes\n", __PRETTY_FUNCTION__, sz));
 
             /* Try to get some memory */
             void * ptr = tlsf->autogrow_get_fn(tlsf->autogrow_data, &sz);
@@ -386,7 +385,7 @@ void * tlsf_malloc(struct MemHeaderExt *mhe, IPTR size, ULONG *flags)
             /* Got it? Add to tlsf then */
             if (ptr)
             {
-                tlsf_add_memory(mhe, ptr, sz);
+                tlsf_add_memory(tlsf, ptr, sz);
 
                 /* We know the newly added memory is first in the list. Set the autogrown feature there */
                 tlsf->memory_area->autogrown = 1;
@@ -400,8 +399,8 @@ void * tlsf_malloc(struct MemHeaderExt *mhe, IPTR size, ULONG *flags)
         /* No block? FAILURE! */
         if (!b)
         {
-            if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
-                ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
+            // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
+            //     ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
 
             return NULL;
         }
@@ -432,7 +431,7 @@ void * tlsf_malloc(struct MemHeaderExt *mhe, IPTR size, ULONG *flags)
         /* Allocated block size truncated */
         SET_SIZE(b, size);
 
-        D(nbug("[Kernel:TLSF] %s: block split, %ld bytes remaining\n", __PRETTY_FUNCTION__, GET_SIZE(sb)));
+        // D(nbug("[Kernel:TLSF] %s: block split, %ld bytes remaining\n", __PRETTY_FUNCTION__, GET_SIZE(sb)));
         /* Free block is inserted to free list */
         INSERT_FREE_BLOCK(tlsf, sb);
     }
@@ -451,10 +450,10 @@ void * tlsf_malloc(struct MemHeaderExt *mhe, IPTR size, ULONG *flags)
 
     /* Update counters */
     tlsf->free_size -= GET_SIZE(b);
-    mhe->mhe_MemHeader.mh_Free = tlsf->free_size;
+    // mhe->mhe_MemHeader.mh_Free = tlsf->free_size;
 
-    if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
-        ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
+    // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
+    //     ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
 
     if (flags && (*flags & MEMF_CLEAR))
         bzero(&b->mem[0], size);
@@ -514,9 +513,8 @@ static inline __attribute__((always_inline)) bhdr_t * MERGE_NEXT(tlsf_t *tlsf, b
     return block;
 }
 
-static void tlsf_release_memory_area(struct MemHeaderExt * mhe, tlsf_area_t * area)
+static void tlsf_release_memory_area(tlsf_t *tlsf, tlsf_area_t * area)
 {
-    tlsf_t *tlsf = (tlsf_t *)mhe->mhe_UserData;
     tlsf_area_t *p = (tlsf_area_t *)(&tlsf->memory_area - offsetof(tlsf_area_t, next));
     bhdr_t *b;
     void *begin;
@@ -552,37 +550,37 @@ static void tlsf_release_memory_area(struct MemHeaderExt * mhe, tlsf_area_t * ar
         tlsf->autogrow_release_fn(tlsf->autogrow_data, begin, size);
 }
 
-void * tlsf_malloc_aligned(struct MemHeaderExt *mhe, IPTR size, IPTR align, ULONG *flags)
+void * tlsf_malloc_aligned(void *t, IPTR size, IPTR align, ULONG *flags)
 {
-    tlsf_t *tlsf = (tlsf_t *)mhe->mhe_UserData;
+    tlsf_t * tlsf = t;
     void * ptr;
     bhdr_t *b;
 
-    if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
-        ObtainSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
+    // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
+    //     ObtainSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
 
     size = ROUNDUP(size);
 
-    D(nbug("[Kernel:TLSF] %s(%p, %lx, %u)\n", __PRETTY_FUNCTION__, mhe, size, align));
+    // D(nbug("[Kernel:TLSF] %s(%p, %lx, %u)\n", __PRETTY_FUNCTION__, mhe, size, align));
 
     /* Adjust align to the top nearest power of two */
     align = 1 << MS(align);
 
-    D(nbug("[Kernel:TLSF] %s: adjusted align = %u\n", __PRETTY_FUNCTION__, align));
+    // D(nbug("[Kernel:TLSF] %s: adjusted align = %u\n", __PRETTY_FUNCTION__, align));
 
-    ptr = tlsf_malloc(mhe, size+align, flags);
+    ptr = tlsf_malloc(tlsf, size+align, flags);
 
     if (!ptr)
     {
-        if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
-            ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
+        // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
+        //     ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
 
         return ptr;
     }
 
     b = MEM_TO_BHDR(ptr);
 
-    D(nbug("[Kernel:TLSF] %s: allocated region @%p\n", __PRETTY_FUNCTION__, ptr));
+    // D(nbug("[Kernel:TLSF] %s: allocated region @%p\n", __PRETTY_FUNCTION__, ptr));
 
     if (align > SIZE_ALIGN)
     {
@@ -595,9 +593,9 @@ void * tlsf_malloc_aligned(struct MemHeaderExt *mhe, IPTR size, IPTR align, ULON
 
         if (aligned_ptr != ptr)
         {
-            D(nbug("[Kernel:TLSF] %s: aligned ptr: %p\n", __PRETTY_FUNCTION__, aligned_ptr));
-            D(nbug("[Kernel:TLSF] %s: difference begin: %d\n", __PRETTY_FUNCTION__, diff_begin));
-            D(nbug("[Kernel:TLSF] %s: difference end: %d\n", __PRETTY_FUNCTION__, diff_end));
+            // D(nbug("[Kernel:TLSF] %s: aligned ptr: %p\n", __PRETTY_FUNCTION__, aligned_ptr));
+            // D(nbug("[Kernel:TLSF] %s: difference begin: %d\n", __PRETTY_FUNCTION__, diff_begin));
+            // D(nbug("[Kernel:TLSF] %s: difference end: %d\n", __PRETTY_FUNCTION__, diff_end));
 
             if (diff_begin > 0)
             {
@@ -611,7 +609,7 @@ void * tlsf_malloc_aligned(struct MemHeaderExt *mhe, IPTR size, IPTR align, ULON
 
                 b = MERGE_PREV(tlsf, b);
 
-                D(nbug("[Kernel:TLSF] %s: block @%p, b->next %p\n", __PRETTY_FUNCTION__, b, GET_NEXT_BHDR(b, GET_SIZE(b))));
+                // D(nbug("[Kernel:TLSF] %s: block @%p, b->next %p\n", __PRETTY_FUNCTION__, b, GET_NEXT_BHDR(b, GET_SIZE(b))));
 
                 /* Insert free block into the proper list */
                 INSERT_FREE_BLOCK(tlsf, b);
@@ -641,27 +639,26 @@ void * tlsf_malloc_aligned(struct MemHeaderExt *mhe, IPTR size, IPTR align, ULON
         }
     }
 
-    D({
-        bhdr_t *b2 = b;
-        while(b2 && GET_SIZE(b2))
-        {
-            nbug("[Kernel:TLSF] %s: bhdr %p, mem %p, size=%08x, flags=%x, prev=%p\n",
-                    __PRETTY_FUNCTION__, b2, &b2->mem[0], GET_SIZE(b2), GET_FLAGS(b2), b2->header.prev);
+    // D({
+    //     bhdr_t *b2 = b;
+    //     while(b2 && GET_SIZE(b2))
+    //     {
+    //         nbug("[Kernel:TLSF] %s: bhdr %p, mem %p, size=%08x, flags=%x, prev=%p\n",
+    //                 __PRETTY_FUNCTION__, b2, &b2->mem[0], GET_SIZE(b2), GET_FLAGS(b2), b2->header.prev);
 
-            b2 = GET_NEXT_BHDR(b2, GET_SIZE(b2));
-        }
-    });
+    //         b2 = GET_NEXT_BHDR(b2, GET_SIZE(b2));
+    //     }
+    // });
 
-    if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
-        ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
+    // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
+    //     ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
 
     return ptr;
 }
 
-
-void tlsf_freevec(struct MemHeaderExt * mhe, APTR ptr)
+void tlsf_freevec(void *t, APTR ptr)
 {
-    tlsf_t *tlsf = (tlsf_t *)mhe->mhe_UserData;
+    tlsf_t *tlsf = t;
     bhdr_t *fb;
     bhdr_t *next;
     tlsf_area_t * area;
@@ -671,8 +668,8 @@ void tlsf_freevec(struct MemHeaderExt * mhe, APTR ptr)
 
     fb = MEM_TO_BHDR(ptr);
 
-    if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
-        ObtainSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
+    // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
+    //     ObtainSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
 
     /* Mark block as free */
     SET_FREE_BLOCK(fb);
@@ -692,26 +689,26 @@ void tlsf_freevec(struct MemHeaderExt * mhe, APTR ptr)
     /* Check if this was the last used block of an autogrown area */
     area = fb->header.prev->header.prev == NULL ? (tlsf_area_t *)fb->header.prev->mem : NULL;
     if (area != NULL && area->end == next && area->autogrown == 1)
-        tlsf_release_memory_area(mhe, area);
+        tlsf_release_memory_area(tlsf, area);
     else
     {
         /* Insert free block into the proper list */
         INSERT_FREE_BLOCK(tlsf, fb);
     }
 
-    if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
-        ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
+    // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
+    //     ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
 }
 
-void tlsf_freemem(struct MemHeaderExt * mhe, APTR ptr, IPTR size)
+void tlsf_freemem(void * tlsf, APTR ptr, IPTR size)
 {
     (void)size;
-    tlsf_freevec(mhe, ptr);
+    tlsf_freevec(tlsf, ptr);
 }
 
-void * tlsf_realloc(struct MemHeaderExt *mhe, APTR ptr, IPTR new_size)
+void *tlsf_realloc(void *t, APTR ptr, IPTR new_size)
 {
-    tlsf_t *tlsf = (tlsf_t *)mhe->mhe_UserData;
+    tlsf_t *tlsf = t;
     bhdr_t *b;
     bhdr_t *bnext;
     int fl;
@@ -719,12 +716,12 @@ void * tlsf_realloc(struct MemHeaderExt *mhe, APTR ptr, IPTR new_size)
 
     /* NULL pointer? just allocate the memory */
     if (unlikely(!ptr))
-        return tlsf_malloc(mhe, new_size, NULL);
+        return tlsf_malloc(tlsf, new_size, NULL);
 
     /* size = 0? free memory */
     if (unlikely(!new_size))
     {
-        tlsf_freevec(mhe, ptr);
+        tlsf_freevec(tlsf, ptr);
         return NULL;
     }
 
@@ -735,8 +732,8 @@ void * tlsf_realloc(struct MemHeaderExt *mhe, APTR ptr, IPTR new_size)
     if (unlikely(new_size == GET_SIZE(b)))
         return ptr;
 
-    if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
-        ObtainSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
+    // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
+    //     ObtainSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
 
     bnext = GET_NEXT_BHDR(b, GET_SIZE(b));
 
@@ -810,33 +807,32 @@ void * tlsf_realloc(struct MemHeaderExt *mhe, APTR ptr, IPTR new_size)
         else
         {
             /* Next block was not free. Create new buffer and copy old contents there */
-            void * p = tlsf_malloc(mhe, new_size, NULL);
+            void * p = tlsf_malloc(tlsf, new_size, NULL);
             if (p)
             {
                 CopyMemQuick(ptr, p, GET_SIZE(b));
-                tlsf_freevec(mhe, ptr);
+                tlsf_freevec(tlsf, ptr);
                 b = MEM_TO_BHDR(p);
             }
         }
     }
 
-    if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
-        ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
+    // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
+    //     ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
 
     return b->mem;
 }
 
-
-void * tlsf_allocabs(struct MemHeaderExt * mhe, IPTR size, void * ptr)
+void *tlsf_allocabs(void *t, IPTR size, void *ptr)
 {
-    tlsf_t *tlsf = (tlsf_t *)mhe->mhe_UserData;
+    tlsf_t *tlsf = t;
     UBYTE *region_start;
     UBYTE *region_end;
     IPTR region_size;
 
     int fl, sl;
 
-    D(nbug("[Kernel:TLSF] %s(%p, %ld)\n", __PRETTY_FUNCTION__, ptr, size));
+    // D(nbug("[Kernel:TLSF] %s(%p, %ld)\n", __PRETTY_FUNCTION__, ptr, size));
 
     /*
       Returned memory needs to meet two requirements:
@@ -846,8 +842,8 @@ void * tlsf_allocabs(struct MemHeaderExt * mhe, IPTR size, void * ptr)
     region_start = (UBYTE *)((IPTR)ptr & SIZE_MASK);
     region_size = (IPTR)ROUNDUP((IPTR)ptr - (IPTR)region_start + size);
 
-    if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
-        ObtainSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
+    // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
+    //     ObtainSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
 
     /* Start searching here. It doesn't make sense to go through regions which are smaller */
     MAPPING_SEARCH(&region_size, &fl, &sl);
@@ -958,8 +954,8 @@ void * tlsf_allocabs(struct MemHeaderExt * mhe, IPTR size, void * ptr)
 
                     tlsf->free_size -= GET_SIZE(breg);
 
-                    if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
-                        ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
+                    // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
+                    //     ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
 
                     return breg->mem;
                 }
@@ -971,8 +967,8 @@ void * tlsf_allocabs(struct MemHeaderExt * mhe, IPTR size, void * ptr)
         sl = 0;
     }
 
-    if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
-        ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
+    // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
+    //     ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
 
     return NULL;
 }
@@ -1015,18 +1011,18 @@ tlsf_area_t * init_memory_area(void * memory, IPTR size)
     return area;
 }
 
-void tlsf_add_memory(struct MemHeaderExt *mhe, void *memory, IPTR size)
+void tlsf_add_memory(void *t, void *memory, IPTR size)
 {
-    tlsf_t *tlsf = (tlsf_t *)mhe->mhe_UserData;
+    tlsf_t *tlsf = t;
 
-    D(nbug("[Kernel:TLSF] %s(%p, %p, %u)\n", __PRETTY_FUNCTION__, tlsf, memory, size));
+    // D(nbug("[Kernel:TLSF] %s(%p, %p, %u)\n", __PRETTY_FUNCTION__, tlsf, memory, size));
 
     if (memory && size > HEADERS_SIZE)
     {
         tlsf_area_t *area = init_memory_area(memory, size);
         bhdr_t *b;
 
-        D(nbug("[Kernel:TLSF] %s:  adding memory\n", __PRETTY_FUNCTION__));
+        // D(nbug("[Kernel:TLSF] %s:  adding memory\n", __PRETTY_FUNCTION__));
 
         area->next = tlsf->memory_area;
         tlsf->memory_area = area;
@@ -1039,38 +1035,16 @@ void tlsf_add_memory(struct MemHeaderExt *mhe, void *memory, IPTR size)
 
         tlsf->total_size += size;
 
-        D(nbug("[Kernel:TLSF] %s:  total_size=%08x\n", __PRETTY_FUNCTION__, tlsf->total_size));
-
-        /* adjust the memheader if necessary */
-#if 0
-        if (memory < mhe->mhe_MemHeader.mh_Lower)
-        {
-            if ((memory + size) >= mhe->mhe_MemHeader.mh_Lower)
-                mhe->mhe_MemHeader.mh_Free += (mhe->mhe_MemHeader.mh_Lower - memory);
-            else
-                mhe->mhe_MemHeader.mh_Free += size;
-            mhe->mhe_MemHeader.mh_Lower = memory;
-        }
-        else if ((memory + size) > mhe->mhe_MemHeader.mh_Upper)
-        {
-            if (memory <= mhe->mhe_MemHeader.mh_Upper)
-                mhe->mhe_MemHeader.mh_Free += ((memory + size) - mhe->mhe_MemHeader.mh_Upper);
-            else
-                mhe->mhe_MemHeader.mh_Free += size;
-            mhe->mhe_MemHeader.mh_Upper = memory + size;
-        }
-#endif
-
-        mhe->mhe_MemHeader.mh_Free += size;
+        // D(nbug("[Kernel:TLSF] %s:  total_size=%08x\n", __PRETTY_FUNCTION__, tlsf->total_size));
 
         /* Add the initialized memory */
-        tlsf_freevec(mhe, b->mem);
+        tlsf_freevec(tlsf, b->mem);
     }
 }
 
-void tlsf_add_memory_and_merge(struct MemHeaderExt *mhe, void *memory, IPTR size)
+void tlsf_add_memory_and_merge(void *tlsf, void *memory, IPTR size)
 {
-    tlsf_add_memory(mhe, memory, size);
+    tlsf_add_memory(tlsf, memory, size);
     // TODO: add memory and merge...
 }
 
@@ -1084,57 +1058,47 @@ void bzero(void *ptr, IPTR len)
 }
 #endif
 
-void * tlsf_init(struct MemHeaderExt * mhe)
+void * tlsf_init()
 {
-    tlsf_t *tlsf = NULL;
-    void * ptr = mhe->mhe_MemHeader.mh_Lower;
+    tlsf_t *tlsf = mmap(NULL, sizeof(tlsf_t), PROT_READ | PROT_WRITE, MAP_PRIVATE, 0, 0);
 
-    /* if MemHeaderExt starts at the beginning of handled memory, advance the ptr */
-    if (mhe == ptr)
-        ptr += ROUNDUP(sizeof(struct MemHeaderExt));
-
-    /* Is there enough room for tlsf in the mem header itself? */
-    if (mhe->mhe_MemHeader.mh_Free >= (ROUNDUP(sizeof(tlsf_t)) + 3 * ROUNDUP(sizeof(bhdr_t))))
+    if (tlsf)
     {
-        /* tlsf will be stored inside handled memory */
-        tlsf = (tlsf_t *)ptr;
-
-        ptr += ROUNDUP(sizeof(tlsf_t));
-
         bzero(tlsf, sizeof(tlsf_t));
-        tlsf->autodestroy_self = 0;
-    }
-    else
-    {
-        /* No place for tlsf header in MemHeaderExt? Allocate it separately */
-        tlsf = AllocMem(sizeof(tlsf_t), MEMF_ANY);
-
-        if (tlsf)
-        {
-            bzero(tlsf, sizeof(tlsf_t));
-            tlsf->autodestroy_self = 1;
-        }
-    }
-
-    /* Store the tlsf pointer in UserData field */
-    mhe->mhe_UserData = tlsf;
-
-    if (tlsf && ptr < mhe->mhe_MemHeader.mh_Upper)
-    {
-        tlsf_add_memory(mhe, ptr, (IPTR)mhe->mhe_MemHeader.mh_Upper - (IPTR)ptr);
+        tlsf->autodestroy_self = 1;
     }
 
     return tlsf;
 }
 
-static void * tlsf_init_autogrow(struct MemHeaderExt * mhe, IPTR puddle_size, ULONG requirements, autogrow_get grow_function, autogrow_release release_function, APTR autogrow_data)
+static APTR fetch_more_ram_mmap(void *data, IPTR *size)
 {
-    tlsf_t *tlsf = tlsf_init(mhe);
+    APTR ptr = mmap(NULL, *size, PROT_READ | PROT_WRITE, MAP_PRIVATE, 0, 0);
+    return ptr;
+}
+
+static void release_ram_mmap(void *data, APTR ptr, IPTR size)
+{
+    munmap(ptr, size);
+}
+
+void *tlsf_init_autogrow(IPTR puddle_size, ULONG requirements, autogrow_get grow_function, autogrow_release release_function, APTR autogrow_data)
+{
+    tlsf_t *tlsf = tlsf_init();
 
     if (tlsf)
     {
         if (puddle_size < 4096)
             puddle_size = 4096;
+
+        if (grow_function == NULL || release_function == NULL) {
+            grow_function = fetch_more_ram_mmap;
+            release_function = release_ram_mmap;
+        }
+
+        if (autogrow_data == NULL) {
+            autogrow_data = tlsf;
+        }
 
         tlsf->autogrow_puddle_size = puddle_size;
         tlsf->autogrow_requirements = requirements;
@@ -1146,11 +1110,10 @@ static void * tlsf_init_autogrow(struct MemHeaderExt * mhe, IPTR puddle_size, UL
     return tlsf;
 }
 
-void tlsf_destroy(struct MemHeaderExt * mhe)
+void tlsf_destroy(void *t)
 {
-    tlsf_t *tlsf = (tlsf_t *)mhe->mhe_UserData;
-
-    D(nbug("[Kernel:TLSF] %s(%p)\n", __PRETTY_FUNCTION__, tlsf));
+    tlsf_t * tlsf = t;
+    // D(nbug("[Kernel:TLSF] %s(%p)\n", __PRETTY_FUNCTION__, tlsf));
 
     if (tlsf)
     {
@@ -1167,20 +1130,22 @@ void tlsf_destroy(struct MemHeaderExt * mhe)
                  Otherwise it's the responsibility of add_memory_area caller
                  */
                 if (area->autogrown)
-                    tlsf_release_memory_area(mhe, area);
+                    tlsf_release_memory_area(tlsf, area);
 
                 area = next;
             }
         }
 
         if (tlsf->autodestroy_self)
-            FreeMem(tlsf, sizeof(tlsf_t));
+        {
+            munmap(tlsf, sizeof(tlsf_t));
+        }
     }
 }
 
-IPTR tlsf_avail(struct MemHeaderExt * mhe, ULONG requirements)
+IPTR tlsf_avail(void *t, ULONG requirements)
 {
-    tlsf_t *tlsf = (tlsf_t *)mhe->mhe_UserData;
+    tlsf_t *tlsf = t;
     IPTR ret = 0;
 
     if (requirements & MEMF_TOTAL)
@@ -1215,25 +1180,25 @@ IPTR tlsf_avail(struct MemHeaderExt * mhe, ULONG requirements)
     return ret;
 }
 
-BOOL tlsf_in_bounds(struct MemHeaderExt * mhe, void * begin, void * end)
+int tlsf_in_bounds(void *t, void *begin, void *end)
 {
-    tlsf_t *tlsf = (tlsf_t *)mhe->mhe_UserData;
+    tlsf_t *tlsf = t;
     tlsf_area_t *area;
 
     area = tlsf->memory_area;
 
-    D(nbug("[Kernel:TLSF] %s(%p, %p, %p)\n", __PRETTY_FUNCTION__, tlsf, begin, end));
+    // D(nbug("[Kernel:TLSF] %s(%p, %p, %p)\n", __PRETTY_FUNCTION__, tlsf, begin, end));
 
     while (area)
     {
-        D(nbug("[Kernel:TLSF] %s:  area %p\n", __PRETTY_FUNCTION__));
+        // D(nbug("[Kernel:TLSF] %s:  area %p\n", __PRETTY_FUNCTION__));
         /*
          * Do checks only if questioned memory ends before the end (sentinel bhdr)
          * of area
          */
         if ((IPTR)end <= (IPTR)area->end)
         {
-            D(nbug("[Kernel:TLSF] %s  end <= area->end (%p <= %p)\n", __PRETTY_FUNCTION__, end, area->end));
+            // D(nbug("[Kernel:TLSF] %s  end <= area->end (%p <= %p)\n", __PRETTY_FUNCTION__, end, area->end));
 
             /* Get the bhdr of this area */
             bhdr_t *b = MEM_TO_BHDR(area);
@@ -1244,124 +1209,18 @@ BOOL tlsf_in_bounds(struct MemHeaderExt * mhe, void * begin, void * end)
             /* requested memory starts at begin or after begin of the area */
             if ((IPTR)begin >= (IPTR)b->mem)
             {
-                D(nbug("[Kernel:TLSF] %s  begin >= b->mem (%p >= %p)\n", __PRETTY_FUNCTION__, begin, b->mem));
-                return TRUE;
+                // D(nbug("[Kernel:TLSF] %s  begin >= b->mem (%p >= %p)\n", __PRETTY_FUNCTION__, begin, b->mem));
+                return 1;
             }
         }
 
         area = area->next;
     }
 
-    return FALSE;
+    return 0;
 }
 
-
-static void destroy_Pool(struct MemHeaderExt *mhe)
+static void destroy_Pool(void * pool)
 {
-    tlsf_destroy(mhe);
-}
-
-static APTR fetch_more_ram(void * data, IPTR *size)
-{
-    struct MemHeaderExt *mhe = (struct MemHeaderExt *)data;
-    tlsf_t *tlsf = (tlsf_t *)mhe->mhe_UserData;
-
-    D(nbug("[Kernel:TLSF] %s(%p, %u)\n", __PRETTY_FUNCTION__, mhe, *size));
-
-    APTR ptr = AllocMem(*size, tlsf->autogrow_requirements);
-    return ptr;
-}
-
-static VOID release_ram(void * data, APTR ptr, IPTR size)
-{
-    D(nbug("[Kernel:TLSF] %s(%p, %u)\n", __PRETTY_FUNCTION__, ptr, size));
-
-    FreeMem(ptr, size);
-}
-
-static void * init_Pool(struct MemHeaderExt *mhe, IPTR puddleSize, IPTR initialSize)
-{
-    return tlsf_init_autogrow(mhe, puddleSize, (ULONG)(IPTR)mhe->mhe_MemHeader.mh_First, fetch_more_ram, release_ram, mhe);
-}
-
-void krnCreateTLSFMemHeader(CONST_STRPTR name, BYTE pri, APTR start, IPTR size, ULONG flags)
-{
-    /* If the end is less than (1 << 31), MEMF_31BIT is implied */
-    if (((IPTR)start+size) < (1UL << 31))
-        flags |= MEMF_31BIT;
-    else
-        flags &= ~MEMF_31BIT;
-
-    flags |= MEMF_MANAGED;
-
-    struct MemHeaderExt *mhe = start;
-
-    mhe->mhe_Magic         = MEMHEADER_EXT_MAGIC;
-
-    mhe->mhe_DestroyPool   = destroy_Pool;
-    mhe->mhe_InitPool      = init_Pool;
-
-    mhe->mhe_Alloc         = tlsf_malloc;
-    mhe->mhe_AllocVec      = tlsf_malloc;
-    mhe->mhe_AllocAligned  = tlsf_malloc_aligned;
-    mhe->mhe_AllocVecAligned=tlsf_malloc_aligned;
-    mhe->mhe_Free          = tlsf_freemem;
-    mhe->mhe_FreeVec       = tlsf_freevec;
-    mhe->mhe_AllocAbs      = tlsf_allocabs;
-    mhe->mhe_ReAlloc       = tlsf_realloc;
-    mhe->mhe_Avail         = tlsf_avail;
-    mhe->mhe_InBounds      = tlsf_in_bounds;
-
-    mhe->mhe_MemHeader.mh_Node.ln_Succ    = NULL;
-    mhe->mhe_MemHeader.mh_Node.ln_Pred    = NULL;
-    mhe->mhe_MemHeader.mh_Node.ln_Type    = NT_MEMORY;
-    mhe->mhe_MemHeader.mh_Node.ln_Name    = (STRPTR)name;
-    mhe->mhe_MemHeader.mh_Node.ln_Pri     = pri;
-    mhe->mhe_MemHeader.mh_Attributes      = flags;
-    /* mh_First is not valid. Also in current implementation it is used to transport pool requirements */
-    mhe->mhe_MemHeader.mh_First           = NULL;
-
-    mhe->mhe_UserData      = NULL;
-
-    /*
-     * mh_Lower and mh_Upper are informational only. Since our MemHeader resides
-     * inside the region it describes, the region includes MemHeader.
-     */
-    mhe->mhe_MemHeader.mh_Lower           = start;
-    mhe->mhe_MemHeader.mh_Upper           = start + size;
-    mhe->mhe_MemHeader.mh_Free            = size;
-
-    D(nbug("[Kernel:TLSF] %s: 0x%p -> 0x%p\n", __PRETTY_FUNCTION__, mhe->mhe_MemHeader.mh_Lower, mhe->mhe_MemHeader.mh_Upper));
-
-    tlsf_init(mhe);
-}
-
-struct MemHeader * krnConvertMemHeaderToTLSF(struct MemHeader * source)
-{
-    struct MemChunk * mc = source->mh_First->mc_Next;
-    APTR mh = source->mh_First;
-    IPTR fsize = source->mh_First->mc_Bytes;
-    APTR mhUpper = source->mh_Upper;	// Cache the mh_Upper value
-    if (source->mh_Attributes & MEMF_MANAGED)
-        return NULL;
-
-    /* First chunk will host the mem header */
-    krnCreateTLSFMemHeader(source->mh_Node.ln_Name, source->mh_Node.ln_Pri, mh, fsize,
-            source->mh_Attributes);
-
-    /* Restore cached mh_Upper value (informative field, only) */
-    ((struct MemHeaderExt *)mh)->mhe_MemHeader.mh_Upper = mhUpper;
-
-    /* source->mh_First is destroyed beyond this point */
-
-    /* Add remaining chunks */
-    while (mc)
-    {
-        APTR p = mc->mc_Next;
-        tlsf_add_memory(mh, mc, mc->mc_Bytes);
-        /* mc is destroyed beyond this point */
-        mc = p;
-    }
-
-    return mh;
+    tlsf_destroy((tlsf_t *)pool);
 }

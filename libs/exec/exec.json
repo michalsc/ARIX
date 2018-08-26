@@ -10,6 +10,7 @@
     "cdef": [
         "#include <exec/nodes.h>",
         "#include <exec/lists.h>",
+        "#include <utility/hooks.h>",
         "#include <stddef.h>",
         "#include <stdint.h>",
         "#include <unistd.h>"
@@ -21,7 +22,7 @@
         [ "int32_t",            "ExtFunc" ],
 
         [ "void",               "Reschedule" ],
-        [ "void",               "Spawn" ],
+        [ "void",               "Spawn", "struct Hook * hook" ],
 
         [ "struct Library *",   "OldOpenLibrary", "const char * libName" ],
         [ "struct Library *",   "OpenLibrary", "const char * libName", "uint32_t version" ],
@@ -50,7 +51,5 @@
 
         [ "void",               "CopyMem", "const void * source", "void * dest", "size_t size" ],
         [ "void",               "CopyMemQuick", "const void * source", "void * dest", "size_t size" ]
-
-        
     ]
 }

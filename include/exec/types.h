@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+typedef void        VOID;
 typedef void *      APTR;
 typedef uint8_t     UBYTE;
 typedef int8_t      BYTE;
@@ -14,6 +15,8 @@ typedef uint64_t    UQUAD;
 typedef int64_t     QUAD;
 typedef uintptr_t   IPTR;
 typedef intptr_t    SIPTR;
+
+typedef int8_t      BOOL;
 
 #ifndef NULL
 #define NULL    ((APTR)0)
