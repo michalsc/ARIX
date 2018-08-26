@@ -18,7 +18,7 @@
 #include <stdio.h>
 
 #define nbug printf
-#define D(x) x
+#define D(x) 
 
 /*
  * Minimal alignment as required by AROS. In contrary to the default
