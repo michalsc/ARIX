@@ -25,11 +25,15 @@ int main(int argc, char **argv)
     void *buffer = AllocVec(100, MEMF_CLEAR);
     printf("AllocMem returned %p\n", buffer);
 
-    void *buffer2 = AllocVecAligned(100, 4096, MEMF_CLEAR);
-    printf("AllocMemAligned returned %p\n", buffer);
+    void *buffer3 = AllocVec(100, MEMF_CLEAR);
+    printf("AllocMem returned %p\n", buffer3);
+
+    void *buffer2 = AllocVecAligned(240000, 262144, MEMF_CLEAR);
+    printf("AllocMemAligned returned %p\n", buffer2);
 
     FreeVec(buffer);
     FreeVec(buffer2);
+    FreeVec(buffer3);
 
     DebugBase = OpenLibrary("debug.library", 0);
 
