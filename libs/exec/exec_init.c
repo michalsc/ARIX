@@ -28,9 +28,9 @@ void * Expunge()
     return NULL;
 }
 
-int32_t ExtFunc()
+void * GetHandle()
 {
-    return 0;
+    return NULL;
 }
 
 void __attribute__((constructor)) ExecInit()

@@ -21,7 +21,7 @@ void *Expunge()
     return _handle;
 }
 
-int32_t ExtFunc()
+void *GetHandle()
 {
-    return 0;
+    return _handle;
 }

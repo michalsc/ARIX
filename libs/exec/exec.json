@@ -19,7 +19,7 @@
         [ "struct Library *",   "Open", "void * handle", "uint32_t version" ],
         [ "void *",             "Close" ],
         [ "void *",             "Expunge" ],
-        [ "int32_t",            "ExtFunc" ],
+        [ "void *",             "GetHandle" ],
 
         [ "void",               "Reschedule" ],
         [ "void",               "Spawn", "struct Hook * hook" ],
@@ -27,6 +27,7 @@
         [ "struct Library *",   "OldOpenLibrary", "const char * libName" ],
         [ "struct Library *",   "OpenLibrary", "const char * libName", "uint32_t version" ],
         [ "void",               "CloseLibrary", "struct Library * library" ],
+        [ "void *",             "GetSymbolAddress", "struct Library * library", "const char * symbol" ],
 
         [ "void",               "Insert", "struct List * list", "struct Node * node", "struct Node * pred" ],
         [ "void",               "AddHead", "struct List * list", "struct Node * node" ],

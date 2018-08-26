@@ -15,7 +15,7 @@ struct LibraryLVO {
     struct Library *    (*Open)(void * handle, uint32_t version);
     void *              (*Close)();
     void *              (*Expunge)();
-    int32_t             (*ExtFunc)();
+    void *              (*GetHandle)();
 };
 
 #endif // _EXEC_LIBRARIES_H
