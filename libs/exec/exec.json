@@ -10,6 +10,7 @@
     "cdef": [
         "#include <exec/nodes.h>",
         "#include <exec/lists.h>",
+        "#include <exec/avl.h>",
         "#include <utility/hooks.h>",
         "#include <stddef.h>",
         "#include <stdint.h>",
@@ -42,6 +43,7 @@
         [ "void *",             "AllocMemAligned", "size_t byteSize", "size_t align", "uint32_t requirements" ],
         [ "void *",             "AllocVec", "size_t byteSize", "uint32_t requirements" ],
         [ "void *",             "AllocVecAligned", "size_t byteSize", "size_t align", "uint32_t requirements" ],
+        [ "void *",             "AllocAbs", "size_t byteSize", "void * location" ],
         [ "void *",             "ReallocMem", "void * memoryBlock", "size_t newSize" ],
         [ "void",               "FreeMem", "void * memoryBlock", "size_t byteSize" ],
         [ "void",               "FreeVec", "void * memoryBlock" ],
@@ -54,6 +56,17 @@
         [ "void",               "FreeVecPooled", "void * pool", "void * memoryBlock" ],
 
         [ "void",               "CopyMem", "const void * source", "void * dest", "size_t size" ],
-        [ "void",               "CopyMemQuick", "const void * source", "void * dest", "size_t size" ]
+        [ "void",               "CopyMemQuick", "const void * source", "void * dest", "size_t size" ],
+
+        [ "struct AVLNode *",   "AVL_AddNode", "struct AVLNode ** root", "struct AVLNode * node", "AVLNODECOMP func" ],
+        [ "struct AVLNode *",   "AVL_RemNodeByAddress", "struct AVLNode ** root", "struct AVLNode * node" ],
+        [ "struct AVLNode *",   "AVL_RemNodeByKey", "struct AVLNode ** root", "AVLKey key", "AVLKEYCOMP func" ],
+        [ "struct AVLNode *",   "AVL_FindNode", "const struct AVLNode * root", "AVLKey key", "AVLKEYCOMP func" ],
+        [ "struct AVLNode *",   "AVL_FindPrevNodeByAddress", "const struct AVLNode * node" ],
+        [ "struct AVLNode *",   "AVL_FindPrevNodeByKey", "const struct AVLNode * root", "AVLKey key", "AVLKEYCOMP func" ],
+        [ "struct AVLNode *",   "AVL_FindNextNodeByAddress", "const struct AVLNode * node" ],
+        [ "struct AVLNode *",   "AVL_FindNextNodeByKey", "const struct AVLNode * node", "AVLKey key", "AVLKEYCOMP func" ],
+        [ "struct AVLNode *",   "AVL_FindFirstNode", "const struct AVLNode * root" ],
+        [ "struct AVLNode *",   "AVL_FindLastNode", "const struct AVLNode * root" ]
     ]
 }
