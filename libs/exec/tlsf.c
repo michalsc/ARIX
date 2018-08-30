@@ -3,6 +3,10 @@
     $Id$
 */
 
+#define _GNU_SOURCE
+#include <unistd.h>
+#include <sys/syscall.h>
+
 #include <exec/types.h>
 #include <exec/memory.h>
 #include <clib/exec_protos.h>
@@ -1065,7 +1069,8 @@ void bzero(void *ptr, IPTR len)
 
 void * tlsf_init()
 {
-    tlsf_t *tlsf = mmap(NULL, sizeof(tlsf_t), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    tlsf_t *tlsf = (tlsf_t*)syscall(SYS_mmap2, NULL, sizeof(tlsf_t), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    //mmap(NULL, sizeof(tlsf_t), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 
     D(nbug("[TLSF] tlsf_init.\n[TLSF] tlsf=%p\n", tlsf));
 
@@ -1082,7 +1087,8 @@ static APTR fetch_more_ram_mmap(void *data, IPTR *size)
 {
     // Align size to 4K boundary. TODO: Align to actual page size of hardware
     *size = (*size + 4095) & ~4095;
-    APTR ptr = mmap(NULL, *size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    APTR ptr = (APTR)syscall(SYS_mmap2, NULL, *size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    //mmap(NULL, *size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
     D(nbug("[TLSF] fetch_more_ram_mmap(%p, %ld) = %p\n", data, *size, ptr));
     return ptr;
 }
@@ -1090,7 +1096,8 @@ static APTR fetch_more_ram_mmap(void *data, IPTR *size)
 static void release_ram_mmap(void *data, APTR ptr, IPTR size)
 {
     D(nbug("[TLSF] release_ram_mmap(%p, %p, %ld)\n", data, ptr, size));
-    munmap(ptr, size);
+    syscall(SYS_munmap, ptr, size);
+    //munmap(ptr, size);
 }
 
 void *tlsf_init_autogrow(IPTR puddle_size, ULONG requirements, autogrow_get grow_function, autogrow_release release_function, APTR autogrow_data)
@@ -1151,7 +1158,8 @@ void tlsf_destroy(void *t)
 
         if (tlsf->autodestroy_self)
         {
-            munmap(tlsf, sizeof(tlsf_t));
+            syscall(SYS_munmap, tlsf, sizeof(tlsf_t));
+            //munmap(tlsf, sizeof(tlsf_t));
         }
     }
 }

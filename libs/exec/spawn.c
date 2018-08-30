@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+#include <sys/syscall.h>
 #include <utility/hooks.h>
 #include <clib/exec_protos.h>
 #include <sys/types.h>
@@ -7,7 +9,7 @@ void Spawn(struct Hook * spawnHook)
 {
     if (spawnHook)
     {
-        pid_t pid = fork();
+        pid_t pid = (pid_t)syscall(SYS_fork); //fork();
 
         if (pid > 0)
         {
