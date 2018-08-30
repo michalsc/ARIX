@@ -11,7 +11,7 @@ export CFLAGS := -Os -I$(INCLUDE_DIR) $(USER_CFLAGS)
 export CXXFLAGS := -Os -I$(INCLUDE_DIR) $(USER_CXXFLAGS)
 export SFDC := $(ROOT_DIR)/tools/sfdc/sfdc.py
 
-SUBDIRS := libs test
+SUBDIRS := libs test arix
 
 all: includes $(SUBDIRS)
 

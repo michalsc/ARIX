@@ -11,6 +11,7 @@
         "#include <exec/nodes.h>",
         "#include <exec/lists.h>",
         "#include <exec/avl.h>",
+        "#include <exec/ports.h>",
         "#include <utility/hooks.h>",
         "#include <stddef.h>",
         "#include <stdint.h>",
@@ -55,6 +56,8 @@
         [ "void *",             "ReallocPooled", "void * pool", "void * memoryBlock", "size_t newSize" ],
         [ "void",               "FreePooled", "void * pool", "void * memoryBlock", "size_t byteSize" ],
         [ "void",               "FreeVecPooled", "void * pool", "void * memoryBlock" ],
+
+        [ "struct Message *",   "GetMsg", "struct MsgPort * port"],
 
         [ "void",               "CopyMem", "const void * source", "void * dest", "size_t size" ],
         [ "void",               "CopyMemQuick", "const void * source", "void * dest", "size_t size" ],
