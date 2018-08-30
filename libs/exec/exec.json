@@ -57,7 +57,12 @@
         [ "void",               "FreePooled", "void * pool", "void * memoryBlock", "size_t byteSize" ],
         [ "void",               "FreeVecPooled", "void * pool", "void * memoryBlock" ],
 
-        [ "struct Message *",   "GetMsg", "struct MsgPort * port"],
+        [ "struct MsgPort *",   "CreateMsgPort" ],
+        [ "struct Message *",   "GetMsg", "struct MsgPort * port" ],
+        [ "void",               "PutMsg", "struct MsgPort * port", "struct Message * msg" ],
+        [ "void",               "ReplyMsg", "struct Message * msg" ],
+        [ "void",               "DiscardMsg", "struct Message * msg" ],
+        [ "void",               "WaitPort", "struct MsgPort * port" ],
 
         [ "void",               "CopyMem", "const void * source", "void * dest", "size_t size" ],
         [ "void",               "CopyMemQuick", "const void * source", "void * dest", "size_t size" ],

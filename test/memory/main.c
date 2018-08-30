@@ -1,12 +1,32 @@
+#define _GNU_SOURCE
+#include <sys/syscall.h>
 #include <exec/libraries.h>
 #include <exec/types.h>
 #include <exec/memory.h>
 #include <proto/exec.h>
 
 #include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 int main(int argc, char **argv)
 {
+    struct Message msg = { NULL, NULL, 0, 0, 100 };
+    struct MsgPort arix = {
+        MAKE_UUID(0x00000001, 0x0000, 0x4000, 0x8000 | NT_MSGPORT, 0x000000000000),
+        0, NULL
+    };
+    struct MsgPort *reply = CreateMsgPort();
+
+    msg.mn_ReplyPort = reply;
+    int i;
+    printf("doing 100000 iterations\n");
+    for (i=0; i < 100000; i++) {
+        PutMsg(&arix, &msg);
+        WaitPort(reply);
+        DiscardMsg(GetMsg(reply));
+    }
+
     // Use c lib's printf. We are allowed to do that.
     printf("Testing memory allocations\n");
     printf("SysBase = %p\n", ExecBase);

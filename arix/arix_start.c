@@ -16,10 +16,9 @@
 #include "../libs/exec/exec_intern.h"
 
 struct MsgPort ARIXPort = {
-    MAKE_UUID(0x00000001, 0x0000, 0x4000, 0x8000, 0xffff00000000 | NT_MSGPORT),
+    MAKE_UUID(0x00000001, 0x0000, 0x4000, 0x8000 | NT_MSGPORT, 0x000000000000),
     0,
-    NULL
-};
+    NULL};
 
 static const char __attribute__((used)) version[] = "\0$VER: ARIX " VERSION_STRING;
 
@@ -85,6 +84,11 @@ int main(int argc, char **argv)
     }
 
     while(1) {
+        WaitPort(&ARIXPort);
+        struct MsgARIX *msg = (struct MsgARIX *)GetMsg(&ARIXPort);
+//        printf("[ARIX] Got message @ %p\n, sending it back...\n", msg);
+        ReplyMsg((struct Message *)msg);
+
         /*
         int nread = read(serverSocket, &buffer, sizeof(buffer));
         

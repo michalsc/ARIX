@@ -13,7 +13,10 @@ struct MsgPort
 
 struct Message
 {
-    uuid_t      mn_ReplyPort;
+    struct MsgPort * mn_ReplyPort;
+    struct MsgPort * mn_ReceivePort;
+    uint8_t     mn_Type;
+    uint8_t     mn_Pad;
     uint16_t    mn_Length;
     uint8_t     mn_Data[0];
 };

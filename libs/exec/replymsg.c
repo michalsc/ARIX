@@ -1,9 +1,31 @@
+#include <exec/types.h>
+#include <exec/memory.h>
+#include <exec/nodes.h>
 #include <exec/ports.h>
+#include <unistd.h>
+#include <stdlib.h>
 #include <clib/exec_protos.h>
+#include <poll.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <sys/uio.h>
+#include <strings.h>
+#include "exec_intern.h"
 
-void ReplyMsg(struct Message *msg)
+void InternalPutMsg(struct MsgPort *port, struct Message *msg);
+
+void ReplyMsg(struct Message * msg)
 {
-    if (msg) {
-        //if (msg->mn_Length > 0)
+    if (msg)
+    {
+        if (msg->mn_ReplyPort)
+        {
+            msg->mn_Type = NT_REPLYMSG;
+            InternalPutMsg(msg->mn_ReplyPort, msg);
+        }
+
+        DiscardMsg(msg);
     }
 }
