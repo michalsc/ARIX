@@ -52,6 +52,7 @@
         [ "void",               "DeletePool", "void * pool" ],
         [ "void *",             "AllocPooled", "void * pool", "size_t byteSize" ],
         [ "void *",             "AllocVecPooled", "void * pool", "size_t byteSize" ],
+        [ "void *",             "ReallocPooled", "void * pool", "void * memoryBlock", "size_t newSize" ],
         [ "void",               "FreePooled", "void * pool", "void * memoryBlock", "size_t byteSize" ],
         [ "void",               "FreeVecPooled", "void * pool", "void * memoryBlock" ],
 
