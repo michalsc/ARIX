@@ -22,7 +22,7 @@ static uuid_t getRandomID()
         uint8_t data[16];
     } id;
 
-    int fd = open("/dev/random", O_RDONLY);
+    int fd = open("/dev/urandom", O_RDONLY);
     read(fd, id.data, 16);
     close(fd);
 
