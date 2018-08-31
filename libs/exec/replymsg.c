@@ -23,7 +23,7 @@ void ReplyMsg(struct Message * msg)
         int noreply = 0;
         if (msg->mn_ReplyPort)
         {
-            uint64_t *s = (uint64_t)msg->mn_ReplyPort;
+            uint64_t *s = (uint64_t *)msg->mn_ReplyPort;
             if (s[0] || s[1])
             {
                 msg->mn_Type = NT_REPLYMSG;
