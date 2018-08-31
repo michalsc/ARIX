@@ -37,7 +37,7 @@ void InternalPutMsg(struct MsgPort *port, struct Message *msg)
 
         msg->mn_Pad = 0;
         /* Create socket on which to send. */
-        sock = socket(AF_UNIX, SOCK_DGRAM, 0);
+    //    sock = socket(AF_UNIX, SOCK_DGRAM, 0);
 
         name.sun_family = AF_UNIX;
         name.sun_path[0] = 0;
@@ -59,20 +59,26 @@ void InternalPutMsg(struct MsgPort *port, struct Message *msg)
                msg->mn_ReplyPort->mp_ID.node[0], msg->mn_ReplyPort->mp_ID.node[1], msg->mn_ReplyPort->mp_ID.node[2],
                msg->mn_ReplyPort->mp_ID.node[3], msg->mn_ReplyPort->mp_ID.node[4], msg->mn_ReplyPort->mp_ID.node[5]);
 */
-        connect(sock, (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(uuid_t));
+//        connect(sock, (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(uuid_t));
 
         struct iovec io[2] = {
             { &empty_uuid, sizeof(uuid_t) },
             { &msg->mn_Type, msg->mn_Length + 4 },
         };
 
+        struct msghdr message = {
+            &name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(uuid_t),
+            io, 2,
+            NULL, 0, 0
+        };
+
         if (msg->mn_ReplyPort)
             io[0].iov_base = &msg->mn_ReplyPort->mp_ID;
 
-        int ret = writev(sock, io, 2);
+        int ret = sendmsg(OutSocket, &message, 0);
+
+//        int ret = writev(sock, io, 2);
 
 //        printf("[EXEC] sendto returned %d\n", ret);
-
-        close(sock);
     }
 }
