@@ -15,7 +15,7 @@ main-build: pre-build
 
 $(TARGETDIR)/AllocTest: $(addprefix $(OBJDIR)/,$(OBJS))
 	@echo "Linking AllocTest"
-	@$(CC) -o $@ $(foreach f,$(OBJS),$(OBJDIR)/$(f)) -Wl,-unresolved-symbols=ignore-in-shared-libs \
+	@$(CC) -o $@ $(foreach f,$(OBJS),$(OBJDIR)/$(f)) -lrt -Wl,-unresolved-symbols=ignore-in-shared-libs \
 	 $(BIN_DIR)/Libs/exec.library
 
 .PHONY: all

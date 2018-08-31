@@ -37,7 +37,7 @@ int main(int argc, char **argv)
         int64_t delta_ns = t1.tv_nsec - t0.tv_nsec;
         int64_t delta_s = t1.tv_sec - t0.tv_sec;
         int64_t delta = delta_s * 1000000000 + delta_ns;
-        printf("Elapsed time: %ld ns\nTime per iteration: %d ns\n", delta, delta / NUM_ITER);
+        printf("Elapsed time: %d µs\nTime per iteration: %d ns\n", (uint32_t)(delta / 1000), (uint32_t)(delta / NUM_ITER));
     }
 
     printf("doing 100000 iterations without reply port\n");
@@ -51,7 +51,7 @@ int main(int argc, char **argv)
         int64_t delta_ns = t1.tv_nsec - t0.tv_nsec;
         int64_t delta_s = t1.tv_sec - t0.tv_sec;
         int64_t delta = delta_s * 1000000000 + delta_ns;
-        printf("Elapsed time: %ld ns\nTime per iteration: %d ns\n", delta, delta / NUM_ITER);
+        printf("Elapsed time: %d µs\nTime per iteration: %d ns\n", (uint32_t)(delta / 1000), (uint32_t)(delta / NUM_ITER));
     }
 
     // Use c lib's printf. We are allowed to do that.
