@@ -30,14 +30,18 @@ struct Message *GetMsg(struct MsgPort *port)
 
             if (p[0].revents & POLLIN) {
                 void *buff = AllocVecPooled(port->mp_MsgPool, 4096);
+                uint64_t *s = buff;
                 msg = (struct Message *)(buff + sizeof(uuid_t));
                 struct iovec io[2] = {
                     { buff, sizeof(uuid_t) },
                     { &msg->mn_Type, 4096 - sizeof(uuid_t) },
                 };
                 int nbytes = readv(port->mp_Socket, io, 2);
-
-                msg->mn_ReplyPort = buff;
+                if (s[0] || s[1])
+                    msg->mn_ReplyPort = buff;
+                else
+                    msg->mn_ReplyPort = 0;
+                    
                 msg->mn_ReceivePort = port;
 /*
                 printf("[EXEC] Message with length of %d (actually read %d)\n", msg->mn_Length, nbytes);

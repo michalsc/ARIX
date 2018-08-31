@@ -21,7 +21,7 @@ int main(int argc, char **argv)
     msg.mn_ReplyPort = reply;
     int i;
     printf("doing 100000 iterations\n");
-    for (i=0; i < 100000; i++) {
+    for (i=0; i < 10; i++) {
         PutMsg(&arix, &msg);
         WaitPort(reply);
         DiscardMsg(GetMsg(reply));

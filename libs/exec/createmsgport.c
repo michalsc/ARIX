@@ -51,7 +51,7 @@ struct MsgPort * CreateMsgPort()
             return NULL;
         }
 
-        port->mp_MsgPool = CreatePool(MEMF_CLEAR, 8192, 8192);
+        port->mp_MsgPool = CreatePool(0, 8192, 8192);
         if (port->mp_MsgPool == NULL)
         {
             printf("[EXEC] Cannot create memory pool\n");

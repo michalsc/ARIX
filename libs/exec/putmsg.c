@@ -12,8 +12,11 @@
 #include <sys/uio.h>
 
 #include "exec_intern.h"
+#include <time.h>
 
 void InternalPutMsg(struct MsgPort *port, struct Message *msg);
+
+static uuid_t empty_uuid = { 0, };
 
 void PutMsg(struct MsgPort * port, struct Message * msg)
 {
@@ -31,15 +34,18 @@ void InternalPutMsg(struct MsgPort *port, struct Message *msg)
         struct sockaddr_un name;
 
         msg->mn_Pad = 0;
-
+struct timespec t1, t2, t3, t4, t5, t0;
+    clock_gettime(CLOCK_REALTIME, &t0);
         /* Create socket on which to send. */
         sock = socket(AF_UNIX, SOCK_DGRAM, 0);
-
-//        printf("[EXEC] socket=%d\n", sock);
+    clock_gettime(CLOCK_REALTIME, &t1);
+        //        printf("[EXEC] socket=%d\n", sock);
 
         name.sun_family = AF_UNIX;
         name.sun_path[0] = 0;
-        CopyMem(&port->mp_ID, &name.sun_path[1], sizeof(uuid_t));
+        uuid_t *u = (uuid_t *)&name.sun_path[1];
+        *u = port->mp_ID;
+        //CopyMem(&port->mp_ID, &name.sun_path[1], sizeof(uuid_t));
 /*
         printf("[EXEC] Sending Message with length of %d\n", msg->mn_Length);
         printf("[EXEC] MessageType: %d\n", msg->mn_Type);
@@ -56,20 +62,29 @@ void InternalPutMsg(struct MsgPort *port, struct Message *msg)
                msg->mn_ReplyPort->mp_ID.node[3], msg->mn_ReplyPort->mp_ID.node[4], msg->mn_ReplyPort->mp_ID.node[5]);
 */
         connect(sock, (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(uuid_t));
-
+    clock_gettime(CLOCK_REALTIME, &t2);
         struct iovec io[2] = {
-            { &msg->mn_ReplyPort->mp_ID, sizeof(uuid_t) },
+            { &empty_uuid, sizeof(uuid_t) },
             { &msg->mn_Type, msg->mn_Length + 4 },
         };
+        if (msg->mn_ReplyPort)
+            io[0].iov_base = &msg->mn_ReplyPort->mp_ID;
 
         int ret = writev(sock, io, 2);
+    clock_gettime(CLOCK_REALTIME, &t3);
+        //        int ret =
+        //        sendto(sock, msg, msg->mn_Length, 0,
+        //               (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(uuid_t));
 
-//        int ret = 
-//        sendto(sock, msg, msg->mn_Length, 0,
-//               (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(uuid_t));
-
-//        printf("[EXEC] sendto returned %d\n", ret);
+        //        printf("[EXEC] sendto returned %d\n", ret);
 
         close(sock);
+    clock_gettime(CLOCK_REALTIME, &t4);
+    int64_t d1, d2, d3, d4;
+    d1 = t1.tv_nsec - t0.tv_nsec;
+    d2 = t2.tv_nsec - t1.tv_nsec;
+    d3 = t3.tv_nsec - t2.tv_nsec;
+    d4 = t4.tv_nsec - t3.tv_nsec;
+    printf("[EXEC] PutMsg: %d %d %d %d\n", d1, d2, d3, d4);
     }
 }
