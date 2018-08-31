@@ -20,10 +20,15 @@ void ReplyMsg(struct Message * msg)
 {
     if (msg)
     {
+        int noreply = 0;
         if (msg->mn_ReplyPort)
         {
-            msg->mn_Type = NT_REPLYMSG;
-            InternalPutMsg(msg->mn_ReplyPort, msg);
+            uint64_t *s = (uint64_t)msg->mn_ReplyPort;
+            if (s[0] || s[1])
+            {
+                msg->mn_Type = NT_REPLYMSG;
+                InternalPutMsg(msg->mn_ReplyPort, msg);
+            }
         }
 
         DiscardMsg(msg);
