@@ -8,23 +8,50 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <time.h>
+
+#define NUM_ITER    100000
 
 int main(int argc, char **argv)
 {
-    struct Message msg = { NULL, NULL, 0, 0, 100 };
+    struct timespec t0, t1;
+    struct Message msg = { NULL, NULL, 0, 0, 0 };
     struct MsgPort arix = {
         MAKE_UUID(0x00000001, 0x0000, 0x4000, 0x8000 | NT_MSGPORT, 0x000000000000),
         0, NULL
     };
     struct MsgPort *reply = CreateMsgPort();
-
+    
     msg.mn_ReplyPort = reply;
     int i;
+
     printf("doing 100000 iterations\n");
-    for (i=0; i < 10; i++) {
+    clock_gettime(CLOCK_REALTIME, &t0);
+    for (i=0; i < NUM_ITER; i++) {
         PutMsg(&arix, &msg);
         WaitPort(reply);
         DiscardMsg(GetMsg(reply));
+    }
+    clock_gettime(CLOCK_REALTIME, &t1);
+    {
+        int64_t delta_ns = t1.tv_nsec - t0.tv_nsec;
+        int64_t delta_s = t1.tv_sec - t0.tv_sec;
+        int64_t delta = delta_s * 1000000000 + delta_ns;
+        printf("Elapsed time: %ld ns\nTime per iteration: %d ns\n", delta, delta / NUM_ITER);
+    }
+
+    printf("doing 100000 iterations without reply port\n");
+    msg.mn_ReplyPort = NULL;
+    clock_gettime(CLOCK_REALTIME, &t0);
+    for (i=0; i < NUM_ITER; i++) {
+        PutMsg(&arix, &msg);
+    }
+    clock_gettime(CLOCK_REALTIME, &t1);
+    {
+        int64_t delta_ns = t1.tv_nsec - t0.tv_nsec;
+        int64_t delta_s = t1.tv_sec - t0.tv_sec;
+        int64_t delta = delta_s * 1000000000 + delta_ns;
+        printf("Elapsed time: %ld ns\nTime per iteration: %d ns\n", delta, delta / NUM_ITER);
     }
 
     // Use c lib's printf. We are allowed to do that.
