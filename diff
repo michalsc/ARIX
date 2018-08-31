@@ -64,7 +64,6 @@
 -/*
 -APTR CreateIORequest(struct MsgPort *ioReplyPort, ULONG size) (A0, D0)
 -void DeleteIORequest(APTR iorequest) (A0)
--struct MsgPort *CreateMsgPort() ()
 -void DeleteMsgPort(struct MsgPort *port) (A0)
 -void ObtainSemaphoreShared(struct SignalSemaphore *sigSem) (A0)
 -ULONG AttemptSemaphoreShared(struct SignalSemaphore *sigSem) (A0)
