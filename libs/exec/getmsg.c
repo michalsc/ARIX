@@ -46,7 +46,7 @@ struct Message *GetMsg(struct MsgPort *port)
                 msg->mn_ReplyPort->mp_ID.node[0], msg->mn_ReplyPort->mp_ID.node[1], msg->mn_ReplyPort->mp_ID.node[2],
                 msg->mn_ReplyPort->mp_ID.node[3], msg->mn_ReplyPort->mp_ID.node[4], msg->mn_ReplyPort->mp_ID.node[5]);
 */
-        ReallocPooled(port->mp_MsgPool, buff, nbytes);
+        ReallocPooled(port->mp_MsgPool, buff, sizeof(uuid_t) + sizeof(struct Message) + msg->mn_Length);
     }
 
     return msg;
