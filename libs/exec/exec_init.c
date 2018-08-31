@@ -15,6 +15,7 @@ int OutSocket = 0;
 
 struct Library * Open(void * h, uint32_t version)
 {
+    (void)version;
     _handle = h;
     return ExecBase;
 }

@@ -360,12 +360,12 @@ struct AVLNode * AVL_AddNode(struct AVLNode ** root, struct AVLNode * node, AVLN
 
     AROS_LH2I(struct AVLNode *, AVL_RemNodeByAddress,
 
-/*  SYNOPSIS 
+    SYNOPSIS 
 	  AROS_LHA(struct AVLNode **, Root, A0),
 	  AROS_LHA(struct AVLNode *, Node, A1),
-/*  LOCATION 
+    LOCATION 
 	  struct ExecBase *, SysBase, 143, Exec)
-/*  FUNCTION
+    FUNCTION
 	Remove a given node from the tree.
 
     INPUTS
@@ -643,12 +643,12 @@ struct AVLNode * AVL_RemNodeByAddress(struct AVLNode ** Root, struct AVLNode * N
 
     AROS_LH3I(struct AVLNode *, AVL_RemNodeByKey,
 
-/*  SYNOPSIS 
+    SYNOPSIS 
 	  AROS_LHA(struct AVLNode **, root, A0),
 	  AROS_LHA(AVLKey, key, A1), AROS_LHA(AVLKEYCOMP, func, A2),
-/*  LOCATION 
+    LOCATION 
 	  struct ExecBase *, SysBase, 144, Exec)
-/*  FUNCTION
+    FUNCTION
 	Looks up a node in the tree by key, and removes it if it
 	is found.
 
@@ -695,12 +695,12 @@ struct AVLNode * AVL_RemNodeByKey(struct AVLNode ** root, AVLKey key, AVLKEYCOMP
 
     AROS_LH3I(struct AVLNode *, AVL_FindNode,
 
-/*  SYNOPSIS 
+    SYNOPSIS 
 	  AROS_LHA(const struct AVLNode *, Root, A0),
 	  AROS_LHA(AVLKey, key, A1), AROS_LHA(AVLKEYCOMP, func, A2),
-/*  LOCATION 
+    LOCATION 
 	  struct ExecBase *, SysBase, 145, Exec)
-/*  FUNCTION
+    FUNCTION
 	Find an entry in the AVL tree by key.
 
     INPUTS
@@ -749,11 +749,11 @@ struct AVLNode * AVL_FindNode(const struct AVLNode * Root, AVLKey key, AVLKEYCOM
 
     AROS_LH1I(struct AVLNode *, AVL_FindPrevNodeByAddress,
 
-/*  SYNOPSIS
+    SYNOPSIS
 	  AROS_LHA(const struct AVLNode *, Node, A0),
-/*  LOCATION
+    LOCATION
 	  struct ExecBase *, SysBase, 146, Exec)
-/*  FUNCTION
+    FUNCTION
 	Perform an inverse-order traversal to the previous node in the tree.
 
     INPUTS
@@ -832,12 +832,12 @@ struct AVLNode * AVL_FindPrevNodeByAddress(const struct AVLNode * Node)
 
     AROS_LH3I(struct AVLNode *, AVL_FindPrevNodeByKey,
 
-/*  SYNOPSIS 
+    SYNOPSIS 
 	  AROS_LHA(const struct AVLNode *, root, A0),
 	  AROS_LHA(AVLKey, key, A1), AROS_LHA(AVLKEYCOMP, func, A2),
-/*  LOCATION 
+    LOCATION 
 	  struct ExecBase *, SysBase, 147, Exec)
-/*  FUNCTION
+    FUNCTION
 	Find the node matching the key, or if such a node does not exist,
 	then the node with the next-lowest value.
 
@@ -888,11 +888,11 @@ struct AVLNode * AVL_FindPrevNodeByKey(const struct AVLNode * root, AVLKey key, 
 
     AROS_LH1I(struct AVLNode *, AVL_FindNextNodeByAddress,
 
-/*  SYNOPSIS 
+    SYNOPSIS 
 	  AROS_LHA(const struct AVLNode *, Node, A0),
-/*  LOCATION 
+    LOCATION 
 	  struct ExecBase *, SysBase, 148, Exec)
-/*  FUNCTION
+    FUNCTION
 	Perform an in-order traversal to the next node in the tree.
 
     INPUTS
@@ -971,12 +971,12 @@ struct AVLNode * AVL_FindNextNodeByAddress(const struct AVLNode * Node)
 
     AROS_LH3I(struct AVLNode *, AVL_FindNextNodeByKey,
 
-/*  SYNOPSIS 
+    SYNOPSIS 
 	  AROS_LHA(const struct AVLNode *, Root, A0),
 	  AROS_LHA(AVLKey, key, A1), AROS_LHA(AVLKEYCOMP, func, A2),
-/*  LOCATION 
+    LOCATION 
 	  struct ExecBase *, SysBase, 149, Exec)
-/*  FUNCTION
+    FUNCTION
 	Find the node matching the key, or if such a node does not exist,
 	then the node with the next-highest value.
 
@@ -1027,11 +1027,11 @@ struct AVLNode * AVL_FindNextNodeByKey(const struct AVLNode * Root, AVLKey key, 
 
     AROS_LH1I(struct AVLNode *, AVL_FindFirstNode,
 
-/*  SYNOPSIS 
+    SYNOPSIS 
 	  AROS_LHA(const struct AVLNode *, Root, A0),
-/*  LOCATION 
+    LOCATION 
 	  struct ExecBase *, SysBase, 150, Exec)
-/*  FUNCTION
+    FUNCTION
 	Find the smallest node in an AVL tree.
 
     INPUTS
@@ -1074,12 +1074,12 @@ struct AVLNode * AVL_FindFirstNode(const struct AVLNode * Root)
 
     AROS_LH1I(struct AVLNode *, AVL_FindLastNode,
 
-/*  SYNOPSIS 
-	  AROS_LHA(const struct AVLNode *, Root, A0),
-/*  LOCATION 
-	  struct ExecBase *, SysBase, 151, Exec)
-/*  FUNCTION
-	Find the largest node in an AVL tree.
+    SYNOPSIS 
+        AROS_LHA(const struct AVLNode *, Root, A0),
+    LOCATION 
+        struct ExecBase *, SysBase, 151, Exec)
+    FUNCTION
+        Find the largest node in an AVL tree.
 
     INPUTS
 	Root - The root node of the AVL tree.

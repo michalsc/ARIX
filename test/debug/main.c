@@ -18,9 +18,11 @@ static inline void Bug(const char *format, ...)
 
 int main(int argc, char **argv)
 {
+    (void)argc;
+    (void)argv;
     // Use c lib's printf. We are allowed to do that.
     printf("debug.library test\n");
-    printf("SysBase = %p\n", ExecBase);
+    printf("SysBase = %p\n", (void *)ExecBase);
 
     void *buffer = AllocVec(100, MEMF_CLEAR);
     printf("AllocMem returned %p\n", buffer);
@@ -37,7 +39,7 @@ int main(int argc, char **argv)
 
     DebugBase = OpenLibrary("debug.library", 0);
 
-    printf("After attempting to open debug.library\nDebugBase = %p\n", DebugBase);
+    printf("After attempting to open debug.library\nDebugBase = %p\n", (void *)DebugBase);
     
     Bug("Hello, world!\n");
 

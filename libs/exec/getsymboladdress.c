@@ -15,7 +15,7 @@ void * GetSymbolAddress(struct Library * lib, const char *name)
     void *symbol = NULL;
     void *handle = NULL;
 
-    D(bug("[EXEC] GetSymbolAddress(%p, %s)\n", lib, name));
+    D(bug("[EXEC] GetSymbolAddress(%p, %s)\n", (void *)lib, name));
 
     // Get handle of the library
     handle = ((struct LibraryLVO *)lib->lib_LVOTable)->GetHandle(lib);

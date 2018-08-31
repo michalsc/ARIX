@@ -19,12 +19,8 @@ struct Message *GetMsg(struct MsgPort *port)
 
     if (port && port->mp_Socket > 0)
     {
-        struct pollfd p[1] = {
-            { port->mp_Socket, POLLIN, 0 }
-        };
-
         void *buff = port->mp_ReceiveBuffer; //AllocVecPooled(port->mp_MsgPool, 4096);
-        msg = (struct Message *)(buff + sizeof(uuid_t));
+        msg = (struct Message *)((intptr_t)buff + sizeof(uuid_t));
         struct iovec io[2] = {
             { buff, sizeof(uuid_t) },
             { &msg->mn_Type, 4096 - sizeof(uuid_t) - offsetof(struct Message, mn_Type) },

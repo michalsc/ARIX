@@ -19,13 +19,13 @@
 struct MsgPort ARIXPort = {
     MAKE_UUID(0x00000001, 0x0000, 0x4000, 0x8000 | NT_MSGPORT, 0x000000000000),
     0,
-    NULL};
+    NULL, NULL};
 
 static const char __attribute__((used)) version[] = "\0$VER: ARIX " VERSION_STRING;
 
 typedef struct { uint64_t v64[2]; } uint128_t;
 
-static uint128_t PortID = { 0, 1 };
+static uint128_t PortID = {{ 0, 1 }};
 
 uint128_t getPortID() {
     uint128_t id = PortID;
@@ -54,6 +54,8 @@ int is_init()
 */
 int main(int argc, char **argv)
 {
+    (void)argc;
+    (void)argv;
     struct sockaddr_un serverSocketAddr;
     union {
         union {
@@ -62,6 +64,8 @@ int main(int argc, char **argv)
         } msg;
         uint8_t b[4096];
     } buffer;
+
+    (void)buffer;
 
     printf("[ARIX] %s\n", &version[7]);
 

@@ -14,11 +14,13 @@
 
 int main(int argc, char **argv)
 {
+    (void)argc;
+    (void)argv;
     struct timespec t0, t1;
     struct Message msg = { NULL, NULL, 0, 0, 0 };
     struct MsgPort arix = {
         MAKE_UUID(0x00000001, 0x0000, 0x4000, 0x8000 | NT_MSGPORT, 0x000000000000),
-        0, NULL
+        0, NULL, NULL
     };
     struct MsgPort *reply = CreateMsgPort();
     
@@ -56,7 +58,7 @@ int main(int argc, char **argv)
 
     // Use c lib's printf. We are allowed to do that.
     printf("Testing memory allocations\n");
-    printf("SysBase = %p\n", ExecBase);
+    printf("SysBase = %p\n", (void *)ExecBase);
     printf("SysBase Version = %d.%d (%s)\n", ExecBase->lib_Version, ExecBase->lib_Revision, ExecBase->lib_IdString);
 
     void *buffer = AllocVec(100, MEMF_CLEAR);

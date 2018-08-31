@@ -15,7 +15,7 @@ void CloseLibrary(struct Library * library)
     // to the library in the Open vector. If Close() returns non-null value, dlclose will
     // be called on the returned handle
 
-    D(bug("[EXEC] CloseLibrary(%p)\n", library));
+    D(bug("[EXEC] CloseLibrary(%p)\n", (void *)library));
 
     if (library) {
         struct LibraryLVO * lvo = library->lib_LVOTable;

@@ -27,11 +27,11 @@ struct Library * OpenLibrary(const char * name, uint32_t minVersion)
         // The symbol points to library base with ID string and version number
         struct Library **sym = dlsym(handle, "LibBase");
 
-        D(bug("[EXEC] pointer to symbol: %p\n", sym));
+        D(bug("[EXEC] pointer to symbol: %p\n", (void *)sym));
 
         if (sym) {
 
-            D(bug("[EXEC] LibBase = %p\n", *sym));
+            D(bug("[EXEC] LibBase = %p\n", (void *)*sym));
 
             retval = *sym;
             if (retval->lib_Revision < minVersion) {
@@ -48,7 +48,7 @@ struct Library * OpenLibrary(const char * name, uint32_t minVersion)
         struct LibraryLVO *lvo = retval->lib_LVOTable;
         struct Library * base = lvo->Open(handle, minVersion);
 
-        D(bug("[EXEC] Open function returned %p\n", base));
+        D(bug("[EXEC] Open function returned %p\n", (void *)base));
 
         if (base == NULL) {
             D(bug("[EXEC] Open failed. Closing the library\n"));

@@ -131,8 +131,9 @@ do                                                        \
     l->lh_TailPred->ln_Succ = n;                          \
     l->lh_TailPred          = n;                          \
 } while (0)
+
 #define REMOVE(_n)                                      \
-({                                                      \
+__extension__  ({                                       \
     struct Node *__aros_node_tmp = (struct Node *)(_n), \
                 *n = __aros_node_tmp;                   \
                                                         \
@@ -143,7 +144,7 @@ do                                                        \
 })
 
 #define GetHead(_l)                                     \
-({                                                      \
+__extension__ ({                                        \
     struct List *__aros_list_tmp = (struct List *)(_l), \
                 *l = __aros_list_tmp;                   \
                                                         \
@@ -151,7 +152,7 @@ do                                                        \
 })
 
 #define GetTail(_l)                                              \
-({                                                               \
+__extension__ ({                                                 \
     struct List *__aros_list_tmp = (struct List *)(_l),          \
                 *l = __aros_list_tmp;                            \
                                                                  \
@@ -159,7 +160,7 @@ do                                                        \
 })
 
 #define GetSucc(_n)                                      \
-({                                                       \
+__extension__ ({                                         \
     struct Node *__aros_node_tmp = (struct Node *)(_n),  \
                 *n = __aros_node_tmp;                    \
                                                          \
@@ -167,7 +168,7 @@ do                                                        \
 })
 
 #define GetPred(_n)                                      \
-({                                                       \
+__extension__ ({                                         \
     struct Node *__aros_node_tmp = (struct Node *)(_n),  \
                 *n = __aros_node_tmp;                    \
                                                          \
@@ -175,7 +176,7 @@ do                                                        \
 })
 
 #define REMHEAD(_l)                                               \
-({                                                                \
+__extension__ ({                                                  \
     struct List *__aros_list_tmp = (struct List *)(_l),           \
                 *l = __aros_list_tmp;                             \
                                                                   \
@@ -183,7 +184,7 @@ do                                                        \
 })
 
 #define REMTAIL(_l)                                                      \
-({                                                                       \
+__extension__ ({                                                         \
     struct List *__aros_list_tmp = (struct List *)(_l),                  \
                 *l = __aros_list_tmp;                                    \
                                                                          \

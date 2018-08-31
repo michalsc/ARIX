@@ -4,5 +4,6 @@
 
 size_t AvailMem(uint32_t attributes)
 {
+    (void)attributes;
     return 0;
 }

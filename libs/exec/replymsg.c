@@ -20,7 +20,6 @@ void ReplyMsg(struct Message * msg)
 {
     if (msg)
     {
-        int noreply = 0;
         if (msg->mn_ReplyPort)
         {
             uint64_t *s = (uint64_t *)msg->mn_ReplyPort;

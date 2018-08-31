@@ -7,7 +7,7 @@ struct Library {
     const APTR  lib_LVOTable;
     UWORD       lib_Version;
     UWORD       lib_Revision;
-    const APTR  lib_IdString;
+    const char *lib_IdString;
 };
 
 // Default functions which shall be implemented by every library!

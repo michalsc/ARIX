@@ -32,7 +32,6 @@ void InternalPutMsg(struct MsgPort *port, struct Message *msg)
 
     if (port && msg)
     {
-        int sock;
         struct sockaddr_un name;
 
         msg->mn_Pad = 0;
@@ -75,7 +74,7 @@ void InternalPutMsg(struct MsgPort *port, struct Message *msg)
         if (msg->mn_ReplyPort)
             io[0].iov_base = &msg->mn_ReplyPort->mp_ID;
 
-        int ret = sendmsg(OutSocket, &message, 0);
+        sendmsg(OutSocket, &message, 0);
 
 //        int ret = writev(sock, io, 2);
 

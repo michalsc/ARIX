@@ -187,7 +187,7 @@ static inline __attribute__((always_inline)) void MAPPING_SEARCH(IPTR *r, int *f
 
 static inline __attribute__((always_inline)) bhdr_t * FIND_SUITABLE_BLOCK(tlsf_t *tlsf, int *fl, int *sl)
 {
-    IPTR bitmap_tmp = tlsf->slbitmap[*fl] & (~0 << *sl);
+    IPTR bitmap_tmp = tlsf->slbitmap[*fl] & ((IPTR)~0 << *sl);
     bhdr_t *b = NULL;
 
     if (bitmap_tmp)
@@ -197,7 +197,7 @@ static inline __attribute__((always_inline)) bhdr_t * FIND_SUITABLE_BLOCK(tlsf_t
     }
     else
     {
-        bitmap_tmp = tlsf->flbitmap & (~0 << (*fl + 1));
+        bitmap_tmp = tlsf->flbitmap & ((IPTR)~0 << (*fl + 1));
         if (likely(bitmap_tmp != 0))
         {
             *fl = LS(bitmap_tmp);
@@ -308,7 +308,7 @@ static inline __attribute__((always_inline)) bhdr_t * GET_NEXT_BHDR(bhdr_t *hdr,
 
 static inline __attribute__((always_inline)) bhdr_t * MEM_TO_BHDR(void *ptr)
 {
-    return (bhdr_t *)(ptr - offsetof(bhdr_t, mem));
+    return (bhdr_t *)((IPTR)ptr - offsetof(bhdr_t, mem));
 }
 
 static inline __attribute__((always_inline)) void REMOVE_HEADER(tlsf_t *tlsf, bhdr_t *b, int fl, int sl)
@@ -1089,6 +1089,7 @@ void * tlsf_init()
 
 static APTR fetch_more_ram_mmap(void *data, IPTR *size)
 {
+    (void)data;
     // Align size to 4K boundary. TODO: Align to actual page size of hardware
     *size = (*size + 4095) & ~4095;
 #ifdef SYS_mmap2
@@ -1103,6 +1104,7 @@ static APTR fetch_more_ram_mmap(void *data, IPTR *size)
 
 static void release_ram_mmap(void *data, APTR ptr, IPTR size)
 {
+    (void)data;
     D(nbug("[TLSF] release_ram_mmap(%p, %p, %ld)\n", data, ptr, size));
     syscall(SYS_munmap, ptr, size);
     //munmap(ptr, size);
@@ -1247,9 +1249,4 @@ int tlsf_in_bounds(void *t, void *begin, void *end)
     }
 
     return 0;
-}
-
-static void destroy_Pool(void * pool)
-{
-    tlsf_destroy((tlsf_t *)pool);
 }

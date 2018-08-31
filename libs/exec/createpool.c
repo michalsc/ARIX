@@ -14,11 +14,13 @@ static APTR fetch_more_ram(void *data, IPTR *size)
 
 static void release_ram(void *data, APTR ptr, IPTR size)
 {
+    (void)data;
     FreeMem(ptr, size);
 }
 
 void *CreatePool(uint32_t requirement, size_t puddleSize, size_t threshSize)
 {
+    (void)threshSize;
     struct PrivPool * pool = AllocMem(sizeof(struct PrivPool), MEMF_CLEAR);
 
     if (pool)
