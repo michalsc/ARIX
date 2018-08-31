@@ -23,7 +23,7 @@ struct Message *GetMsg(struct MsgPort *port)
             { port->mp_Socket, POLLIN, 0 }
         };
 
-        void *buff = AllocVecPooled(port->mp_MsgPool, 4096);
+        void *buff = port->mp_ReceiveBuffer; //AllocVecPooled(port->mp_MsgPool, 4096);
         msg = (struct Message *)(buff + sizeof(uuid_t));
         struct iovec io[2] = {
             { buff, sizeof(uuid_t) },
@@ -32,13 +32,13 @@ struct Message *GetMsg(struct MsgPort *port)
         int nbytes = readv(port->mp_Socket, io, 2);
         if (nbytes <= 0)
         {
-            FreeVecPooled(port->mp_MsgPool, buff);
+            //FreeVecPooled(port->mp_MsgPool, buff);
             return NULL;
         }
         msg->mn_ReplyPort = buff;
         msg->mn_ReceivePort = port;
 /*
-        printf("[EXEC] Message with length of %d (actually read %d)\n", msg->mn_Length, nbytes);
+        printf("[EXEC] Message %p with length of %d (actually read %d)\n", msg, msg->mn_Length, nbytes);
         printf("[EXEC] MessageType: %d\n", msg->mn_Type);
         printf("[EXEC] ReplyPort = {%08x-%04x-%04x-%04x-%02x%02x%02x%02x%02x%02x}\n",
                 msg->mn_ReplyPort->mp_ID.time_low, msg->mn_ReplyPort->mp_ID.time_med, msg->mn_ReplyPort->mp_ID.time_hi_and_version,
@@ -47,6 +47,7 @@ struct Message *GetMsg(struct MsgPort *port)
                 msg->mn_ReplyPort->mp_ID.node[3], msg->mn_ReplyPort->mp_ID.node[4], msg->mn_ReplyPort->mp_ID.node[5]);
 */
         ReallocPooled(port->mp_MsgPool, buff, sizeof(uuid_t) + sizeof(struct Message) + msg->mn_Length);
+        port->mp_ReceiveBuffer = AllocVecPooled(port->mp_MsgPool, 4096);
     }
 
     return msg;

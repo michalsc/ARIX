@@ -9,6 +9,7 @@ struct MsgPort
     uuid_t      mp_ID;
     int         mp_Socket;
     void *      mp_MsgPool;
+    void *      mp_ReceiveBuffer;
 };
 
 struct Message

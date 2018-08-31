@@ -67,6 +67,7 @@ int main(int argc, char **argv)
 
     ARIXPort.mp_Socket = socket(AF_UNIX, SOCK_DGRAM, 0);
     ARIXPort.mp_MsgPool = CreatePool(MEMF_CLEAR, 8192, 8192);
+    ARIXPort.mp_ReceiveBuffer = AllocVecPooled(ARIXPort.mp_MsgPool, 4096);
 
     int flags = fcntl(ARIXPort.mp_Socket, F_GETFL);
     fcntl(ARIXPort.mp_Socket, F_SETFL, flags | O_NONBLOCK);
@@ -92,12 +93,13 @@ int main(int argc, char **argv)
         WaitPort(&ARIXPort);
         struct MsgARIX *msg;
         int spincnt=200;
-        //while(--spincnt)
+        while(--spincnt)
         {
+//            printf("spinning %d\n", spincnt);
             while((msg = (struct MsgARIX *)GetMsg(&ARIXPort)))
             {
-    //            n++;
-    //        printf("[ARIX] Got message @ %p\n, sending it back...\n", msg);
+                //n++;
+  //          printf("[ARIX] Got message @ %p\n, sending it back...\n", msg);
                 ReplyMsg((struct Message *)msg);
             }
         }

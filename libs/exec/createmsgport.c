@@ -65,6 +65,8 @@ struct MsgPort * CreateMsgPort()
             return NULL;
         }
 
+        port->mp_ReceiveBuffer = AllocVecPooled(port->mp_MsgPool, 4096);
+
         name.sun_family = AF_UNIX;
         name.sun_path[0] = 0;
         int maxtry = 1000;
