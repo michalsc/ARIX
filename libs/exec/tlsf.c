@@ -1069,7 +1069,11 @@ void bzero(void *ptr, IPTR len)
 
 void * tlsf_init()
 {
+#ifdef SYS_mmap2
     tlsf_t *tlsf = (tlsf_t*)syscall(SYS_mmap2, NULL, sizeof(tlsf_t), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+#else
+    tlsf_t *tlsf = (tlsf_t*)syscall(SYS_mmap, NULL, sizeof(tlsf_t), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+#endif
     //mmap(NULL, sizeof(tlsf_t), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 
     D(nbug("[TLSF] tlsf_init.\n[TLSF] tlsf=%p\n", tlsf));
@@ -1087,7 +1091,11 @@ static APTR fetch_more_ram_mmap(void *data, IPTR *size)
 {
     // Align size to 4K boundary. TODO: Align to actual page size of hardware
     *size = (*size + 4095) & ~4095;
+#ifdef SYS_mmap2
     APTR ptr = (APTR)syscall(SYS_mmap2, NULL, *size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+#else
+    APTR ptr = (APTR)syscall(SYS_mmap, NULL, *size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+#endif
     //mmap(NULL, *size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
     D(nbug("[TLSF] fetch_more_ram_mmap(%p, %ld) = %p\n", data, *size, ptr));
     return ptr;
