@@ -5,6 +5,7 @@
 #include <uuid/uuid.h>
 
 extern void * local_memory_pool;
+extern int OutSocket;
 
 struct PrivPool {
     void *      handle;
