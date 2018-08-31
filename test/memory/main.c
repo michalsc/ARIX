@@ -27,6 +27,9 @@ int main(int argc, char **argv)
     msg.mn_ReplyPort = reply;
     int i;
 
+    AddPort(reply, "Some port name");
+    FindPort("Some port name");
+
     printf("doing 100000 iterations\n");
     clock_gettime(CLOCK_REALTIME, &t0);
     for (i=0; i < NUM_ITER; i++) {

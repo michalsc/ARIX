@@ -58,6 +58,8 @@
         [ "void",               "FreeVecPooled", "void * pool", "void * memoryBlock" ],
 
         [ "struct MsgPort *",   "CreateMsgPort" ],
+        [ "uuid_t",             "FindPort", "const char * name" ],
+        [ "void",               "AddPort", "struct MsgPort * port", "const char * name" ],
         [ "struct Message *",   "GetMsg", "struct MsgPort * port" ],
         [ "void",               "PutMsg", "struct MsgPort * port", "struct Message * msg" ],
         [ "void",               "ReplyMsg", "struct Message * msg" ],

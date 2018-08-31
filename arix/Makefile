@@ -1,8 +1,9 @@
-FILES := arix_start
+FILES := arix_start publicport
 OBJDIR := $(BUILD_DIR)/arix/arix
 TARGETDIR := $(BIN_DIR)/System
 OBJS := $(foreach f,$(FILES),$(f).o)
 CFLAGS := $(CFLAGS) $(shell TAG=v60.0 ./get_git_version.sh) 
+CXXFLAGS := $(CXXFLAGS) $(shell TAG=v60.0 ./get_git_version.sh) 
 all: pre-build main-build
 
 pre-build:
@@ -15,7 +16,7 @@ main-build: pre-build
 
 $(TARGETDIR)/ARIX: $(addprefix $(OBJDIR)/,$(OBJS))
 	@echo "Linking ARIX"
-	@$(CC) -o $@ $(foreach f,$(OBJS),$(OBJDIR)/$(f)) -Wl,-unresolved-symbols=ignore-in-shared-libs \
+	@$(CXX) -o $@ $(foreach f,$(OBJS),$(OBJDIR)/$(f)) -Wl,-unresolved-symbols=ignore-in-shared-libs \
 	 $(BIN_DIR)/Libs/exec.library
 
 .PHONY: all

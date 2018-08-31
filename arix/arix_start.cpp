@@ -1,4 +1,3 @@
-#define _GNU_SOURCE
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -14,7 +13,14 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include <iostream>
+#include <map>
+
 #include "../libs/exec/exec_intern.h"
+
+#include "publicport.h"
+
+PublicPortList PublicPorts;
 
 struct MsgPort ARIXPort = {
     MAKE_UUID(0x00000001, 0x0000, 0x4000, 0x8000 | NT_MSGPORT, 0x000000000000),
@@ -22,24 +28,6 @@ struct MsgPort ARIXPort = {
     NULL, NULL};
 
 static const char __attribute__((used)) version[] = "\0$VER: ARIX " VERSION_STRING;
-
-typedef struct { uint64_t v64[2]; } uint128_t;
-
-static uint128_t PortID = {{ 0, 1 }};
-
-uint128_t getPortID() {
-    uint128_t id = PortID;
-    uint64_t lo = PortID.v64[1];
-    uint64_t hi = PortID.v64[0];
-
-    lo++;
-    if (lo == 0) hi++;
-
-    PortID.v64[1] = lo;
-    PortID.v64[0] = hi;
-
-    return id;
-}
 
 int is_init()
 {
@@ -67,7 +55,7 @@ int main(int argc, char **argv)
 
     (void)buffer;
 
-    printf("[ARIX] %s\n", &version[7]);
+    std::cout << "[ARIX] " << &version[7] << std::endl;
 
     ARIXPort.mp_Socket = socket(AF_UNIX, SOCK_DGRAM, 0);
     ARIXPort.mp_MsgPool = CreatePool(MEMF_CLEAR, 8192, 8192);
@@ -93,17 +81,48 @@ int main(int argc, char **argv)
     }
 
     while(1) {
-//        int n=0;
         WaitPort(&ARIXPort);
         struct MsgARIX *msg;
         int spincnt=200;
         while(--spincnt)
         {
-//            printf("spinning %d\n", spincnt);
             while((msg = (struct MsgARIX *)GetMsg(&ARIXPort)))
             {
-                //n++;
-  //          printf("[ARIX] Got message @ %p\n, sending it back...\n", msg);
+                if (msg->ma_Message.mn_Length >= 4)
+                {
+                    switch (msg->ma_Request) {
+                        case MSG_ARIX_ADD_PORT:
+                        {
+                            struct MsgARIXAddPort *m = reinterpret_cast<struct MsgARIXAddPort *>(msg);
+                            bool ret = PublicPorts.addPort(m->port, m->name);
+                            m->hdr.ma_RetVal = ret;
+                            break;
+                        }
+                        case MSG_ARIX_REM_PORT:
+                        {
+                            struct MsgARIXRemPort *m = reinterpret_cast<struct MsgARIXRemPort *>(msg);
+                            PublicPorts.remPort(m->port);
+                            m->hdr.ma_RetVal = 1;
+                            break;
+                        }
+                        case MSG_ARIX_FIND_PORT:
+                        {
+                            struct MsgARIXFindPort *m = reinterpret_cast<struct MsgARIXFindPort *>(msg);
+                            m->port = PublicPorts.findPort(m->name);
+                            uuid_t zero = MAKE_UUID(0, 0, 0, 0, 0);
+                            if (m->port == zero) {
+                                m->hdr.ma_RetVal = 0;
+                            }
+                            else {
+                                m->hdr.ma_RetVal = 1;
+                            }
+                            break;
+                        }
+                        default:
+                            std::cout << "[ARIX] Unhandeld request " << msg->ma_Request << std::endl;
+                            break;
+                    }
+                }
                 ReplyMsg((struct Message *)msg);
             }
         }
