@@ -12,6 +12,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #include "../libs/exec/exec_intern.h"
 
@@ -67,6 +68,9 @@ int main(int argc, char **argv)
     ARIXPort.mp_Socket = socket(AF_UNIX, SOCK_DGRAM, 0);
     ARIXPort.mp_MsgPool = CreatePool(MEMF_CLEAR, 8192, 8192);
 
+    int flags = fcntl(ARIXPort.mp_Socket, F_GETFL);
+    fcntl(ARIXPort.mp_Socket, F_SETFL, flags | O_NONBLOCK);
+
     if (ARIXPort.mp_Socket < 0) {
         printf("[ARIX] Cannot create server socket\n");
         return 1;
@@ -84,11 +88,20 @@ int main(int argc, char **argv)
     }
 
     while(1) {
+//        int n=0;
         WaitPort(&ARIXPort);
-        struct MsgARIX *msg = (struct MsgARIX *)GetMsg(&ARIXPort);
-//        printf("[ARIX] Got message @ %p\n, sending it back...\n", msg);
-        ReplyMsg((struct Message *)msg);
-
+        struct MsgARIX *msg;
+        int spincnt=200;
+        //while(--spincnt)
+        {
+            while((msg = (struct MsgARIX *)GetMsg(&ARIXPort)))
+            {
+    //            n++;
+    //        printf("[ARIX] Got message @ %p\n, sending it back...\n", msg);
+                ReplyMsg((struct Message *)msg);
+            }
+        }
+//        printf("processed %d\n", n);
         /*
         int nread = read(serverSocket, &buffer, sizeof(buffer));
         
