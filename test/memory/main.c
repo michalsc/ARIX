@@ -87,4 +87,6 @@ int main(int argc, char **argv)
 
     printf("Deleting pool\n");
     DeletePool(pool);
+
+    RemPort(reply);
 }

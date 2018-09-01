@@ -17,22 +17,19 @@
 
 #define D(x) x
 
-void AddPort(struct MsgPort *port, const char * name)
+void RemPort(struct MsgPort *port)
 {
     uuid_t arixPort = MAKE_UUID(0x00000001, 0x0000, 0x4000, 0x8000 | NT_MSGPORT, 0x000000000000);
     struct MsgPort *reply = CreateMsgPort();
-    int len = strlen(name) + 1 + sizeof(struct MsgARIXAddPort);
-    struct MsgARIXAddPort *msg = (struct MsgARIXAddPort * )AllocVec(len, 0);
-    bzero(msg, len);
+    struct MsgARIXRemPort *msg = (struct MsgARIXRemPort * )AllocVec(sizeof(struct MsgARIXRemPort), MEMF_CLEAR);
 
-    printf("[EXEC] AddPort(%p, '%s')\n", (void*)port, name);
+    printf("[EXEC] RemPort(%p)\n", (void*)port);
 
     msg->hdr.ma_Message.mn_ReplyPort = reply->mp_ID;
-    msg->hdr.ma_Message.mn_Length = len - sizeof(struct Message);
-    CopyMem(name, msg->name, strlen(name));
+    msg->hdr.ma_Message.mn_Length = sizeof(struct MsgARIXRemPort) - sizeof(struct Message);
     CopyMem(&port->mp_ID, &msg->port, sizeof(uuid_t));
 
-    msg->hdr.ma_Request = MSG_ARIX_ADD_PORT;
+    msg->hdr.ma_Request = MSG_ARIX_REM_PORT;
 
     printf("[EXEC] Sending message...\n");
 
@@ -41,10 +38,10 @@ void AddPort(struct MsgPort *port, const char * name)
 
     printf("[EXEC] Waiting for reply...\n");
     WaitPort(reply);
-    msg = (struct MsgARIXAddPort *)GetMsg(reply);
+    msg = (struct MsgARIXRemPort *)GetMsg(reply);
 
     printf("[EXEC] Got message %p\n", (void*)msg);
-    printf("[EXEC] AddPort() = %d\n", (int)msg->hdr.ma_RetVal);
+    printf("[EXEC] RemPort() = %d\n", (int)msg->hdr.ma_RetVal);
 
     DiscardMsg((struct Message *)msg);
     DeleteMsgPort(reply);

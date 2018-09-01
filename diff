@@ -26,9 +26,6 @@
 -// void FreeSignal(LONG signalNum) (D0)
 -// LONG AllocTrap(long trapNum) (D0)
 -// void FreeTrap(long trapNum) (D0)
--// void AddPort(struct MsgPort *port) (A1)
--// void RemPort(struct MsgPort *port) (A1)
--// struct MsgPort *FindPort(CONST_STRPTR name) (A1)
 -// void AddLibrary(struct Library *library) (A1)
 -// void RemLibrary(struct Library *library) (A1)
 -// APTR SetFunction(struct Library *library, LONG funcOffset, APTR newFunction) (A1, A0, D0)
@@ -64,7 +61,6 @@
 -/*
 -APTR CreateIORequest(struct MsgPort *ioReplyPort, ULONG size) (A0, D0)
 -void DeleteIORequest(APTR iorequest) (A0)
--void DeleteMsgPort(struct MsgPort *port) (A0)
 -void ObtainSemaphoreShared(struct SignalSemaphore *sigSem) (A0)
 -ULONG AttemptSemaphoreShared(struct SignalSemaphore *sigSem) (A0)
 -void ColdReboot() ()

@@ -2,7 +2,7 @@ FILES := openlibrary allocmem freemem reschedule addhead addtail insert remhead 
          findname remove closelibrary exec_init allocvec freevec availmem spawn copymem tlsf \
          createpool deletepool allocpooled freepooled reallocmem allocmemaligned allocvecaligned \
          getsymboladdress allocabs avl reallocpooled getmsg waitport putmsg createmsgport \
-         replymsg discardmsg findport addport
+         replymsg discardmsg findport addport deletemsgport remport
 
 OBJDIR := $(BUILD_DIR)/libs/exec
 TARGETDIR := $(BIN_DIR)/Libs

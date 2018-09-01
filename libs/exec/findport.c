@@ -53,6 +53,7 @@ uuid_t FindPort(const char * name)
                 id.node[3], id.node[4], id.node[5]);
 
     DiscardMsg((struct Message *)msg);
-
+    DeleteMsgPort(reply);
+    
     return id;
 }
