@@ -61,7 +61,7 @@
         [ "uuid_t",             "FindPort", "const char * name" ],
         [ "void",               "AddPort", "struct MsgPort * port", "const char * name" ],
         [ "struct Message *",   "GetMsg", "struct MsgPort * port" ],
-        [ "void",               "PutMsg", "struct MsgPort * port", "struct Message * msg" ],
+        [ "void",               "PutMsg", "uuid_t portID", "struct Message * msg" ],
         [ "void",               "ReplyMsg", "struct Message * msg" ],
         [ "void",               "DiscardMsg", "struct Message * msg" ],
         [ "void",               "WaitPort", "struct MsgPort * port" ],

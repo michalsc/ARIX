@@ -17,14 +17,12 @@ int main(int argc, char **argv)
     (void)argc;
     (void)argv;
     struct timespec t0, t1;
-    struct Message msg = { NULL, NULL, 0, 0, 0 };
-    struct MsgPort arix = {
-        MAKE_UUID(0x00000001, 0x0000, 0x4000, 0x8000 | NT_MSGPORT, 0x000000000000),
-        0, NULL, NULL
-    };
+    uuid_t empty = MAKE_UUID(0, 0, 0, 0, 0);
+    struct Message msg = { NULL, empty, 0, 0, 0 };
+    uuid_t arixPort = MAKE_UUID(0x00000001, 0x0000, 0x4000, 0x8000 | NT_MSGPORT, 0x000000000000);
     struct MsgPort *reply = CreateMsgPort();
     
-    msg.mn_ReplyPort = reply;
+    msg.mn_ReplyPort = reply->mp_ID;
     int i;
 
     AddPort(reply, "Some port name");
@@ -33,7 +31,7 @@ int main(int argc, char **argv)
     printf("doing 100000 iterations\n");
     clock_gettime(CLOCK_REALTIME, &t0);
     for (i=0; i < NUM_ITER; i++) {
-        PutMsg(&arix, &msg);
+        PutMsg(arixPort, &msg);
         WaitPort(reply);
         DiscardMsg(GetMsg(reply));
     }
@@ -46,10 +44,10 @@ int main(int argc, char **argv)
     }
 
     printf("doing 100000 iterations without reply port\n");
-    msg.mn_ReplyPort = NULL;
+    msg.mn_ReplyPort = empty;
     clock_gettime(CLOCK_REALTIME, &t0);
     for (i=0; i < NUM_ITER; i++) {
-        PutMsg(&arix, &msg);
+        PutMsg(arixPort, &msg);
     }
     clock_gettime(CLOCK_REALTIME, &t1);
     {

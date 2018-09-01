@@ -1,23 +1,27 @@
 #include <stdint.h>
 #include "publicport.h"
-
+#include <iostream>
 
 
 bool PublicPortList::addPort(const uuid_t &uuid, std::string name)
 {
     bool can_add = true;
 
+std::cout << "[ARIX] PublicPortList::addPort(" << name << ")" << std::endl;
+
     if (portList.find(uuid) != portList.end()) {
         can_add = false;
     }
     else {
         for (auto v: this->portList) {
-            if (v.first == uuid && v.second == name) {
+            if (v.second == name) {
                 can_add = false;
                 break;
             }
         }
     }
+
+std::cout << "[ARIX] can_add=" << can_add << std::endl;
 
     if (can_add) {
         portList[uuid] = name;

@@ -12,11 +12,8 @@
 
 void DiscardMsg(struct Message * msg)
 {
-    if (msg && msg->mn_ReceivePort)
+    if (msg && msg->mn_Owner)
     {
-        if (((intptr_t)msg - (intptr_t)msg->mn_ReplyPort) == sizeof(uuid_t))
-            FreeVecPooled(msg->mn_ReceivePort->mp_MsgPool, (void *)((intptr_t)msg - sizeof(uuid_t)));
-        else
-            FreeVecPooled(msg->mn_ReceivePort->mp_MsgPool, msg);
+        FreeVecPooled(msg->mn_Owner->mp_MsgPool, msg);
     }
 }

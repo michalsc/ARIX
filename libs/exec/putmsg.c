@@ -16,33 +16,26 @@
 
 #define D(x) x
 
-void InternalPutMsg(struct MsgPort *port, struct Message *msg);
+void InternalPutMsg(uuid_t portID, struct Message *msg);
 
-static uuid_t empty_uuid = { 0, };
-
-void PutMsg(struct MsgPort * port, struct Message * msg)
+void PutMsg(uuid_t portID, struct Message * msg)
 {
     msg->mn_Type = NT_MESSAGE;
-    InternalPutMsg(port, msg);
+    InternalPutMsg(portID, msg);
 }
 
-void InternalPutMsg(struct MsgPort *port, struct Message *msg)
+void InternalPutMsg(uuid_t portID, struct Message *msg)
 {
 //    printf("[EXEC] PutMsg(%p, %p)\n", port, msg);
 
-    if (port && msg)
+    if (msg)
     {
-        struct sockaddr_un name;
+        struct sockaddr_un name = { AF_UNIX, {0,} };
+        uuid_t *u = (uuid_t *)&name.sun_path[1];
 
         msg->mn_Pad = 0;
-        /* Create socket on which to send. */
-    //    sock = socket(AF_UNIX, SOCK_DGRAM, 0);
+        *u = portID;
 
-        name.sun_family = AF_UNIX;
-        name.sun_path[0] = 0;
-        uuid_t *u = (uuid_t *)&name.sun_path[1];
-        *u = port->mp_ID;
-        //CopyMem(&port->mp_ID, &name.sun_path[1], sizeof(uuid_t));
 /*
         printf("[EXEC] Sending Message with length of %d\n", msg->mn_Length);
         printf("[EXEC] MessageType: %d\n", msg->mn_Type);
@@ -58,25 +51,11 @@ void InternalPutMsg(struct MsgPort *port, struct Message *msg)
                msg->mn_ReplyPort->mp_ID.node[0], msg->mn_ReplyPort->mp_ID.node[1], msg->mn_ReplyPort->mp_ID.node[2],
                msg->mn_ReplyPort->mp_ID.node[3], msg->mn_ReplyPort->mp_ID.node[4], msg->mn_ReplyPort->mp_ID.node[5]);
 */
-//        connect(sock, (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(uuid_t));
 
-        struct iovec io[2] = {
-            { &empty_uuid, sizeof(uuid_t) },
-            { &msg->mn_Type, msg->mn_Length + 4 },
-        };
-
-        struct msghdr message = {
-            &name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(uuid_t),
-            io, 2,
-            NULL, 0, 0
-        };
-
-        if (msg->mn_ReplyPort)
-            io[0].iov_base = &msg->mn_ReplyPort->mp_ID;
-
-        sendmsg(OutSocket, &message, 0);
-
-//        int ret = writev(sock, io, 2);
+        sendto(OutSocket, 
+            &msg->mn_ReplyPort, msg->mn_Length + sizeof(struct Message) - offsetof(struct Message, mn_ReplyPort), 0, 
+            (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(uuid_t)
+        );
 
 //        printf("[EXEC] sendto returned %d\n", ret);
     }

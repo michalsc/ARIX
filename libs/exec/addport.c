@@ -19,10 +19,7 @@
 
 void AddPort(struct MsgPort *port, const char * name)
 {
-    struct MsgPort arix = {
-        MAKE_UUID(0x00000001, 0x0000, 0x4000, 0x8000 | NT_MSGPORT, 0x000000000000),
-        0, NULL, NULL
-    };
+    uuid_t arixPort = MAKE_UUID(0x00000001, 0x0000, 0x4000, 0x8000 | NT_MSGPORT, 0x000000000000);
     struct MsgPort *reply = CreateMsgPort();
     int len = strlen(name) + 1 + sizeof(struct MsgARIXAddPort);
     struct MsgARIXAddPort *msg = (struct MsgARIXAddPort * )AllocVec(len, 0);
@@ -30,7 +27,7 @@ void AddPort(struct MsgPort *port, const char * name)
 
     printf("[EXEC] AddPort(%p, '%s')\n", (void*)port, name);
 
-    msg->hdr.ma_Message.mn_ReplyPort = reply;
+    msg->hdr.ma_Message.mn_ReplyPort = reply->mp_ID;
     msg->hdr.ma_Message.mn_Length = len - sizeof(struct Message);
     CopyMem(name, msg->name, strlen(name));
     CopyMem(&port->mp_ID, &msg->port, sizeof(uuid_t));
@@ -39,7 +36,7 @@ void AddPort(struct MsgPort *port, const char * name)
 
     printf("[EXEC] Sending message...\n");
 
-    PutMsg(&arix, (struct Message *)msg);
+    PutMsg(arixPort, (struct Message *)msg);
     FreeVec(msg);
 
     printf("[EXEC] Waiting for reply...\n");

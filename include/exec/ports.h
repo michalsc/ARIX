@@ -14,8 +14,9 @@ struct MsgPort
 
 struct Message
 {
-    struct MsgPort * mn_ReplyPort;
-    struct MsgPort * mn_ReceivePort;
+    struct MsgPort * mn_Owner;
+    /* Starting from here the message is pushed through unix socket */
+    uuid_t      mn_ReplyPort;
     uint8_t     mn_Type;
     uint8_t     mn_Pad;
     uint16_t    mn_Length;

@@ -14,20 +14,17 @@
 #include <strings.h>
 #include "exec_intern.h"
 
-void InternalPutMsg(struct MsgPort *port, struct Message *msg);
+void InternalPutMsg(uuid_t portID, struct Message *msg);
 
 void ReplyMsg(struct Message * msg)
 {
     if (msg)
     {
-        if (msg->mn_ReplyPort)
+        uint64_t *s = (uint64_t *)&msg->mn_ReplyPort;
+        if (s[0] || s[1])
         {
-            uint64_t *s = (uint64_t *)msg->mn_ReplyPort;
-            if (s[0] || s[1])
-            {
-                msg->mn_Type = NT_REPLYMSG;
-                InternalPutMsg(msg->mn_ReplyPort, msg);
-            }
+            msg->mn_Type = NT_REPLYMSG;
+            InternalPutMsg(msg->mn_ReplyPort, msg);
         }
 
         DiscardMsg(msg);
