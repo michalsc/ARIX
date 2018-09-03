@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include <time.h>
 
-#define NUM_ITER    100000
+#define NUM_ITER    1000000
 
 int main(int argc, char **argv)
 {
@@ -28,7 +28,7 @@ int main(int argc, char **argv)
     AddPort(reply, "Some port name");
     FindPort("Some port name");
 
-    printf("doing 100000 iterations\n");
+    printf("doing %d iterations\n", NUM_ITER);
     clock_gettime(CLOCK_REALTIME, &t0);
     for (i=0; i < NUM_ITER; i++) {
         PutMsg(arixPort, &msg);
