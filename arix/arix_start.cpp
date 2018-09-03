@@ -83,7 +83,7 @@ int main(int argc, char **argv)
     while(1) {
         WaitPort(&ARIXPort);
         struct MsgARIX *msg;
-        int spincnt=200;
+        int spincnt=2000;
         while(--spincnt)
         {
             while((msg = (struct MsgARIX *)GetMsg(&ARIXPort)))
