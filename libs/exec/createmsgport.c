@@ -26,7 +26,7 @@ static uuid_t getRandomID()
     read(fd, id.data, 16);
     close(fd);
 
-    id.uuid.clock_seq_hi_and_reserved &= 0x0f;
+    id.uuid.clock_seq_hi_and_reserved &= 0x3f;
     id.uuid.clock_seq_hi_and_reserved |= 0x80;
     id.uuid.time_hi_and_version &= 0x0fff;
     id.uuid.time_hi_and_version |= 0x4000;
