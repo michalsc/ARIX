@@ -1,0 +1,18 @@
+{
+    "configuration": {
+        "name": "uuid",
+        "type": "library",
+        "version.major": 60,
+        "version.minor": 0,
+        "base.type": "Library",
+        "base.name": "UUIDBase"
+    },
+    "cdef": [
+    ],
+    "functions": [
+        [ "struct Library *",   "Open", "void * handle", "uint32_t version" ],
+        [ "void *",             "Close" ],
+        [ "void *",             "Expunge" ],
+        [ "void *",             "GetHandle" ]
+    ]
+}

@@ -1,4 +1,4 @@
-LIBS := exec debug utility
+LIBS := exec debug utility uuid
 OBJDIR := $(BUILD_DIR)/$(CURDIR)
 
 includes:
