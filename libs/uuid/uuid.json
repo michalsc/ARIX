@@ -8,11 +8,14 @@
         "base.name": "UUIDBase"
     },
     "cdef": [
+        "#include <uuid/uuid.h>"
     ],
     "functions": [
         [ "struct Library *",   "Open", "void * handle", "uint32_t version" ],
         [ "void *",             "Close" ],
         [ "void *",             "Expunge" ],
-        [ "void *",             "GetHandle" ]
+        [ "void *",             "GetHandle" ],
+        [ "void",               "UUID_Clear", "uuid_t * uuid" ],
+        [ "void",               "UUID_Copy", "const uuid_t * src", "uuid_t * dest" ]
     ]
 }
