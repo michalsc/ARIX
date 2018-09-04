@@ -16,7 +16,7 @@ pre-build:
 	@mkdir -p $(_M_OBJDIR) >/dev/null
 
 main-build: pre-build
-	@echo "Building $(OBJNAME).$(OBJTYPE)"
+	@echo "Building $(OBJNAME).$(OBJTYPE):"
 	@make --no-print-directory $(_M_TARGETDIR)/$(OBJNAME).$(OBJTYPE)
 
 $(_M_TARGETDIR)/$(OBJNAME).$(OBJTYPE): $(addprefix $(_M_OBJDIR)/,$(_M_OBJS)) $(_M_OBJDIR)/version.script
@@ -33,7 +33,7 @@ $(_M_OBJDIR)/version.script:
 $(_M_OBJDIR)/__base_file.c: $(OBJNAME).json
 	@$(SFDC) basefile $< >$@
 
-$(_M_OBJDIR)/__base_file.o: $(_M_OBJDIR)/__base_file.c
+#$(_M_OBJDIR)/__base_file.o: $(_M_OBJDIR)/__base_file.c
 
 $(INCLUDE_DIR)/proto/$(OBJNAME).h: $(OBJNAME).json
 	@$(SFDC) header_proto $< >$@
