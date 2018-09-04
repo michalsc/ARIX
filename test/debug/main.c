@@ -12,6 +12,7 @@
 #include <proto/exec.h>
 #include <proto/debug.h>
 
+#include <stdarg.h>
 #include <stdio.h>
 
 struct Library *DebugBase = NULL;
