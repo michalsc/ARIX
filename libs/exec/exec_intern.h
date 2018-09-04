@@ -11,9 +11,12 @@
 
 #include <exec/ports.h>
 #include <uuid/uuid.h>
+#include <time.h>
 
 extern void * local_memory_pool;
 extern int OutSocket;
+extern uint32_t UUID_Seed;
+extern struct timespec StartTime;
 
 struct PrivPool {
     void *      handle;
