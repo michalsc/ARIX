@@ -1,8 +1,9 @@
--include user_config.mk
+export ROOT_DIR := $(shell pwd)
+
+-include $(ROOT_DIR)/config/user_config.mk
 
 export CC := $(CROSS_COMPILE)gcc
 export CXX := $(CROSS_COMPILE)g++
-export ROOT_DIR := $(shell pwd)
 export BUILD_DIR := $(ROOT_DIR)/Build/gen
 export BIN_DIR := $(ROOT_DIR)/Build/ARIX
 export MAKE := make
