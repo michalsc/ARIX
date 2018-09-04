@@ -16,7 +16,7 @@ pre-build:
 	@mkdir -p $(_M_OBJDIR) >/dev/null
 
 main-build: pre-build
-	@echo "Building $(OBJNAME).$(OBJTYPE):"
+	@echo "Building $(OBJNAME).$(OBJTYPE)"
 	@make --no-print-directory $(_M_TARGETDIR)/$(OBJNAME).$(OBJTYPE)
 
 $(_M_TARGETDIR)/$(OBJNAME).$(OBJTYPE): $(addprefix $(_M_OBJDIR)/,$(_M_OBJS)) $(_M_OBJDIR)/version.script
