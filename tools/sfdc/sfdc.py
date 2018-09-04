@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright © 2018 Michal Schulz <michal.schulz@gmx.de>
+# Copyright (C) 2018 Michal Schulz <michal.schulz@gmx.de>
 # https://github.com/michalsc
 #
 # This Source Code Form is subject to the terms of the
