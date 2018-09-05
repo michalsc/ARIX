@@ -12,7 +12,7 @@ export CFLAGS := -Os -std=c11 -I$(INCLUDE_DIR) $(USER_CFLAGS)
 export CXXFLAGS := -Os -std=c++11 -I$(INCLUDE_DIR) $(USER_CXXFLAGS)
 export SFDC := $(ROOT_DIR)/tools/sfdc/sfdc.py
 
-SUBDIRS := libs test arix
+SUBDIRS := libs system test
 
 all: includes $(SUBDIRS)
 

@@ -1,5 +1,5 @@
 FILES := arix_start publicport
-OBJDIR := $(BUILD_DIR)/arix/arix
+OBJDIR := $(BUILD_DIR)/system/arix
 TARGETDIR := $(BIN_DIR)/System
 OBJS := $(foreach f,$(FILES),$(f).o)
 CFLAGS := $(CFLAGS) $(shell TAG=v60.0 ./get_git_version.sh) 
