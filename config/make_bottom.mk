@@ -1,18 +1,27 @@
 $(_M_OBJDIR)/%.o: %.cpp
 	@mkdir -p $(@D)
 	@echo "  Compiling: $*.cpp"
-	@$(CXX) -c -fpic $(CXXFLAGS) $< -o $@
+	@$(CXX) -c $(EXTRA_CXXFLAGS) $(CXXFLAGS) $< -o $@
+	touch $(_M_OBJDIR)/.compiled
 
 $(_M_OBJDIR)/%.o: %.c
 	@mkdir -p $(@D)
 	@echo "  Compiling: $*.c"
-	@$(CC) -c -fpic $(CFLAGS) $< -o $@
+	@$(CC) -c $(EXTRA_CFLAGS) $(CFLAGS) $< -o $@
+	@touch $(_M_OBJDIR)/.compiled
 
 # Special case for c files automatically generated in _M_OBJDIR
 $(_M_OBJDIR)/%.o: $(_M_OBJDIR)/%.c
 	@mkdir -p $(@D)
 	@echo "  Compiling: $*.c"
-	@$(CC) -c -fpic $(CFLAGS) $< -o $@
+	@$(CC) -c -fpic $(EXTRA_CFLAGS) $(CFLAGS) $< -o $@
+	@touch $(_M_OBJDIR)/.compiled
+
+$(_M_OBJDIR)/%.o: $(_M_OBJDIR)/%.cpp
+	@mkdir -p $(@D)
+	@echo "  Compiling: $*.cpp"
+	@$(CXX) -c -fpic $(EXTRA_CXXFLAGS) $(CXXFLAGS) $< -o $@
+	@touch $(_M_OBJDIR)/.compiled
 
 $(_M_OBJDIR)/%.d: %.c
 	@mkdir -p $(@D)

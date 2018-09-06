@@ -26,10 +26,9 @@ def generate_basefile(cfg):
     for cdef in cfg["cdef"]:
         print(cdef)
     print("")
-    print("static const char __idString[] = \"\\0$VER: {0}.{1} {2}.{3} ({4})\\0\";".format(
+    print("static const char __idString[] = \"\\0$VER: {0}.{1} {2}.{3} \" VERSION_STRING_DATE \"\\0\";".format(
         cfg["configuration"]["name"], cfg["configuration"]["type"],
-        cfg["configuration"]["version.major"], cfg["configuration"]["version.minor"],
-        datetime.date.today().strftime("%d.%m.%Y")
+        cfg["configuration"]["version.major"], cfg["configuration"]["version.minor"]
     ))
     print("")
     for func in cfg["functions"]:

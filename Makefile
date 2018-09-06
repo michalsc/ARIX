@@ -1,6 +1,7 @@
 export ROOT_DIR := $(shell pwd)
 
 -include $(ROOT_DIR)/config/user_config.mk
+include $(ROOT_DIR)/config/version.mk
 
 export CC := $(CROSS_COMPILE)gcc
 export CXX := $(CROSS_COMPILE)g++
