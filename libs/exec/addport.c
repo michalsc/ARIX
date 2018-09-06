@@ -63,7 +63,7 @@
  *      upon application exit.
  * 
  * SEE ALSO
- *      RemPort, CreateMsgPort(), DeleteMsgPort()
+ *      FindPort(), RemPort(), CreateMsgPort(), DeleteMsgPort()
 */
 int AddPort(struct MsgPort *port, const char * name)
 {

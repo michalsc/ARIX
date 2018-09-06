@@ -25,43 +25,86 @@
 
 #define D(x) x
 
+/**
+ * NAME
+ *      FindPort - Find public message port by name
+ * 
+ * SYNOPSIS
+ *      uuid_t FindPort(const char *name);
+ * 
+ * FUNCTION
+ *      Searches public port list for given name and returns message port
+ *      ID (uuid) which can be subsequently used to send messages to that
+ *      port. Once ID is obtained, messages can be send to even if the 
+ *      owner has removed the message port from the public list.
+ * 
+ * INPUTS
+ *      name - A null-terminated string with public port name of interest.
+ * 
+ * RESULT
+ *      uuid_t - The ID of the message port or zero uuid if the port has not
+ *               been found.
+ * 
+ * SEE ALSO
+ *      AddPort(), RemPort()
+*/
 uuid_t FindPort(const char * name)
 {
+    /* Port to ARIX master who stores public list of message ports */
     uuid_t arixPort = MAKE_UUID(0x00000001, 0x0000, 0x4000, 0x8000 | NT_MSGPORT, 0x000000000000);
-
     uuid_t id = MAKE_UUID(0, 0, 0, 0, 0);
-    struct MsgPort *reply = CreateMsgPort();
-    int len = strlen(name) + 1 + sizeof(struct MsgARIXFindPort);
-    struct MsgARIXFindPort *msg = (struct MsgARIXFindPort * )AllocVec(len, 0);
-    bzero(msg, len);
+    struct MsgARIXFindPort *msg = NULL;
+    struct MsgPort *reply = NULL;
+    int messageLength = 0;
 
     printf("[EXEC] FindPort('%s')\n", name);
 
-    msg->hdr.ma_Message.mn_ReplyPort = reply->mp_ID;
-    msg->hdr.ma_Message.mn_Length = len - sizeof(struct Message);
-    CopyMem(name, msg->name, strlen(name));
+    // Assert port name is given
+    if (name)
+    {
+        // Calculate length of the entire message and allocate the buffer
+        messageLength = strlen(name) + 1 + sizeof(struct MsgARIXFindPort);
+        msg = (struct MsgARIXFindPort *)AllocVec(messageLength, MEMF_CLEAR);
 
-    msg->hdr.ma_Request = MSG_ARIX_FIND_PORT;
+        if (msg)
+        {
+            // Create temporary reply port
+            reply = CreateMsgPort();
 
-    printf("[EXEC] Sending message...\n");
+            if (reply)
+            {
+                // Fill contents of the message
+                msg->hdr.ma_Request = MSG_ARIX_FIND_PORT;
+                msg->hdr.ma_Message.mn_ReplyPort = reply->mp_ID;
+                msg->hdr.ma_Message.mn_Length = messageLength - sizeof(struct Message);
+                CopyMem(name, msg->name, strlen(name));
 
-    PutMsg(arixPort, (struct Message *)msg);
-    FreeVec(msg);
+                // Send message to ARIX
+                printf("[EXEC] Sending message...\n");
+                PutMsg(arixPort, (struct Message *)msg);
 
-    printf("[EXEC] Waiting for reply...\n");
-    WaitPort(reply);
-    msg = (struct MsgARIXFindPort *)GetMsg(reply);
-    id = msg->port;
+                // Wait for an answer...
+                printf("[EXEC] Waiting for reply...\n");
+                WaitPort(reply);
+                msg = (struct MsgARIXFindPort *)GetMsg(reply);
+                
+                // And store it
+                id = msg->port;
 
-    printf("[EXEC] Got message %p\n", (void*)msg);
-    printf("[EXEC] FindPort() = {%08x-%04x-%04x-%04x-%02x%02x%02x%02x%02x%02x}\n",
-                id.time_low, id.time_med, id.time_hi_and_version,
-                id.clock_seq_hi_and_reserved << 8 | id.clock_seq_low,
-                id.node[0], id.node[1], id.node[2],
-                id.node[3], id.node[4], id.node[5]);
+                printf("[EXEC] Got message %p\n", (void *)msg);
+                printf("[EXEC] FindPort() = {%08x-%04x-%04x-%04x-%02x%02x%02x%02x%02x%02x}\n",
+                       id.time_low, id.time_med, id.time_hi_and_version,
+                       id.clock_seq_hi_and_reserved << 8 | id.clock_seq_low,
+                       id.node[0], id.node[1], id.node[2],
+                       id.node[3], id.node[4], id.node[5]);
 
-    DiscardMsg((struct Message *)msg);
-    DeleteMsgPort(reply);
-    
+                // Clean up
+                DiscardMsg((struct Message *)msg);
+                DeleteMsgPort(reply);
+            }
+            FreeVec(msg);
+        }
+    }
+
     return id;
 }
