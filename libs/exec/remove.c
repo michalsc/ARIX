@@ -1,11 +1,38 @@
+/*
+    Copyright © 1995-2001, The AROS Development Team. All rights reserved.
+    $Id$
 
-#define NOLIBINLINE
-#define NOLIBDEFINES
+    Desc: Remove a node from a list
+    Lang: english
+*/
 
 #include <exec/lists.h>
 #include <clib/exec_protos.h>
 
-void Remove(struct Node *  node)
+/**
+ * NAME
+ *      Remove
+ * 
+ * SYNOPSIS
+ *      void Remove(struct Node * node)
+ * 
+ * FUNCTION
+ *      Remove a node from a list.
+ *
+ * INPUTS
+ *      node - This node to be removed.
+ *
+ * NOTES
+ *      There is no need to specify the list but the node must be in
+ *      a list !
+ *
+ * EXAMPLE
+ *      struct Node * node;
+ *
+ *      // Remove node
+ *      Remove (node);
+ */
+void Remove(struct Node * node)
 {
     /*
         Unfortunately, there is no (quick) check that the node

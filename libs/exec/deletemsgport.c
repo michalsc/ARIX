@@ -41,7 +41,7 @@
  * 
  * SEE ALSO
  *      CreateMsgPort(), AddPort(), RemPort()
-*/
+ */
 void DeleteMsgPort(struct MsgPort * port)
 {
     printf("[EXEC] DeleteMsgPort(%p)\n", (void *)port);

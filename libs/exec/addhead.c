@@ -12,6 +12,31 @@
 #include <exec/lists.h>
 #include <clib/exec_protos.h>
 
+/**
+ * NAME
+ *      AddHead
+ * 
+ * SYNOPSIS
+ *      void AddHead(struct List *list, struct Node * node)
+ * 
+ *  FUNCTION
+ *      Insert Node node as the first node of the list.
+ * 
+ * INPUTS
+ *      list - The list to insert the node into
+ *      node - This node is to be inserted
+ * 
+ * EXAMPLE
+ *      struct List * list;
+ *      struct Node * pred;
+ * 
+ *      // Insert Node at top
+ *      AddHead (list, node);
+ * 
+ * SEE ALSO
+ *      libamiga/NewList(), AddTail(), Insert(), Remove(), RemHead(), RemTail(),
+ *      Enqueue()
+ */
 void AddHead(struct List * list, struct Node * node)
 {
     if (node != NULL && list != NULL)

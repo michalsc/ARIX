@@ -64,7 +64,7 @@
  * 
  * SEE ALSO
  *      FindPort(), RemPort(), CreateMsgPort(), DeleteMsgPort()
-*/
+ */
 int AddPort(struct MsgPort *port, const char * name)
 {
     /* Port to ARIX master who stores public list of message ports */

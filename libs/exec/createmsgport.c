@@ -51,7 +51,7 @@ static uuid_t getRandomID();
  * 
  * SEE ALSO
  *      DeleteMsgPort(), AddPort(), RemPort()
-*/
+ */
 struct MsgPort * CreateMsgPort()
 {
     struct sockaddr_un name;

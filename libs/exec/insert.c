@@ -12,6 +12,34 @@
 #include <exec/lists.h>
 #include <clib/exec_protos.h>
 
+/**
+ * NAME
+ *      Insert
+ * 
+ * SYNOPSIS
+ *      void Insert(struct List * list, struct Node * node, struct Node * pred)
+ * 
+ * FUNCTION
+ *      Insert Node node after pred in list.
+ *
+ * INPUTS
+ *      list - The list to insert the node into
+ *      node - This node is to be inserted
+ *      pred - Insert after this node. If this is NULL, node is inserted
+ *             as the first node (same as AddHead()).
+ *
+ * EXAMPLE
+ *      struct List * list;
+ *      struct Node * pred, * node;
+ *
+ *      // Insert Node node as second node in list
+ *      pred = GetHead (list);
+ *      Insert (list, node, pred);
+ *
+ * SEE ALSO
+ *      AddHead(), AddTail(), Enqueue(), RemHead(), Remove(), RemTail(),
+ *      "AROS: Exec Lists".
+ */
 void Insert(struct List *list, struct Node *node, struct Node *pred)
 {
     if (node != NULL)

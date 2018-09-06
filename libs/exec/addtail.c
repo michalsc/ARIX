@@ -12,6 +12,26 @@
 #include <exec/lists.h>
 #include <clib/exec_protos.h>
 
+/**
+ * NAME
+ *      AddTail
+ * 
+ * SYNOPSIS
+ *      void AddTail(struct List *list, struct Node *node)
+ * 
+ * FUNCTION
+ *      Insert Node node at the end of a list.
+ * 
+ * INPUTS
+ *      list - The list to insert the node into
+ *      node - This node is to be inserted
+ * 
+ * EXAMPLE
+ *      struct List * list;
+ *      struct Node * pred;
+ *      // Insert Node at end of the list
+ *      AddTail (list, node);
+ */
 void AddTail(struct List * list, struct Node * node)
 {
     if (list != NULL && node != NULL)
