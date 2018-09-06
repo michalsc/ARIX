@@ -18,6 +18,8 @@
 #include <unistd.h>
 #include <time.h>
 
+static const char __attribute__((used)) version[] = "\0$VER: AllocTest 60.0 " VERSION_STRING_DATE;
+
 #define NUM_ITER    1000000
 
 int main(int argc, char **argv)
