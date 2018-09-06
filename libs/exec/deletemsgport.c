@@ -36,7 +36,7 @@
  * 
  *      It is safe to call this function with port == NULL.
  * 
- * RESULT
+ * INPUTS
  *      port - Message port to be deleted or NULL.
  * 
  * SEE ALSO
