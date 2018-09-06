@@ -18,6 +18,7 @@ SUBDIRS := libs system test
 all: includes $(SUBDIRS)
 
 includes:
+	@echo "Generating header files"
 	@$(MAKE) -C include includes
 	@$(MAKE) -C libs includes
 

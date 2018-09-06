@@ -11,13 +11,15 @@ all:
 	@make --no-print-directory build
 	@make --no-print-directory main-build
 
-includes: $(INCLUDE_DIR)/proto/$(OBJNAME).h \
+includes: 
+	@echo "  Generating headers for $(OBJNAME).$(OBJTYPE)"
+	@make --no-print-directory $(INCLUDE_DIR)/proto/$(OBJNAME).h \
           $(INCLUDE_DIR)/clib/$(OBJNAME)_protos.h \
           $(INCLUDE_DIR)/inline/$(OBJNAME).h \
           $(INCLUDE_DIR)/defines/$(OBJNAME).h
 
 pre-build:
-	@echo "Building $(OBJNAME).$(OBJTYPE)"
+	@echo "Building $(TARGETDIR)/$(OBJNAME).$(OBJTYPE)"
 	@mkdir -p $(_M_TARGETDIR) >/dev/null
 	@mkdir -p $(_M_OBJDIR) >/dev/null
 
