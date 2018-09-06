@@ -36,7 +36,7 @@ struct MsgPort ARIXPort = {
     0,
     NULL, NULL};
 
-static const char __attribute__((used)) version[] = "\0$VER: ARIX " VERSION_STRING;
+static const char __attribute__((used)) version[] = "\0$VER: ARIX 60.0 " VERSION_STRING_DATE;
 
 int is_init()
 {
