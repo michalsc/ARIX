@@ -22,7 +22,7 @@
 #include <stdio.h>
 
 #define nbug printf
-#define D(x) 
+#define D(x)
 
 /*
  * Minimal alignment as required by AROS. In contrary to the default
@@ -370,6 +370,7 @@ void * tlsf_malloc(void *t, IPTR size, ULONG *flags)
     b = FIND_SUITABLE_BLOCK(tlsf, &fl, &sl);
 
     D(nbug("[Kernel:TLSF] %s: adjusted size %ld\n", __PRETTY_FUNCTION__, size));
+    D(nbug("[Kernel:TLSF] block b=%p\n", (void *)b));
 
     /* No block found? Either failure or tlsf will get more memory. */
     if (unlikely(!b))
@@ -670,7 +671,7 @@ void tlsf_freevec(void *t, APTR ptr)
     tlsf_t *tlsf = t;
     bhdr_t *fb;
     bhdr_t *next;
-    tlsf_area_t * area;
+//    tlsf_area_t * area;
 
     if (unlikely(!ptr))
         return;
@@ -696,10 +697,10 @@ void tlsf_freevec(void *t, APTR ptr)
     next->header.prev = fb;
 
     /* Check if this was the last used block of an autogrown area */
-    area = fb->header.prev->header.prev == NULL ? (tlsf_area_t *)fb->header.prev->mem : NULL;
-    if (area != NULL && area->end == next && area->autogrown == 1)
-        tlsf_release_memory_area(tlsf, area);
-    else
+//    area = fb->header.prev->header.prev == NULL ? (tlsf_area_t *)fb->header.prev->mem : NULL;
+//    if (area != NULL && area->end == next && area->autogrown == 1)
+//        tlsf_release_memory_area(tlsf, area);
+//    else
     {
         /* Insert free block into the proper list */
         INSERT_FREE_BLOCK(tlsf, fb);
@@ -1154,7 +1155,7 @@ void tlsf_destroy(void *t)
             while(area)
             {
                 tlsf_area_t *next = area->next;
-
+D(nbug("next=%p\n", (void *)next));
                 /*
                  Autogrown area? Release it here.
                  Otherwise it's the responsibility of add_memory_area caller
@@ -1172,6 +1173,7 @@ void tlsf_destroy(void *t)
             //munmap(tlsf, sizeof(tlsf_t));
         }
     }
+    D(nbug("tlsf destroy done\n"));
 }
 
 IPTR tlsf_avail(void *t, ULONG requirements)
