@@ -90,6 +90,7 @@ int AddPort(struct MsgPort *port, const char * name)
 
             if (reply)
             {
+                struct MsgARIXAddPort * m = NULL;
                 // Fill the message
                 msg->hdr.ma_Request = MSG_ARIX_ADD_PORT;
                 msg->hdr.ma_Message.mn_ReplyPort = reply->mp_ID;
@@ -105,16 +106,16 @@ int AddPort(struct MsgPort *port, const char * name)
                 // if the port has been successfuly added to the list
                 printf("[EXEC] Waiting for reply...\n");
                 WaitPort(reply);
-                msg = (struct MsgARIXAddPort *)GetMsg(reply);
+                m = (struct MsgARIXAddPort *)GetMsg(reply);
 
-                printf("[EXEC] Got message %p\n", (void*)msg);
-                printf("[EXEC] AddPort() = %d\n", (int)msg->hdr.ma_RetVal);
+                printf("[EXEC] Got message %p\n", (void*)m);
+                printf("[EXEC] AddPort() = %d\n", (int)m->hdr.ma_RetVal);
 
                 // Store the return value from ARIX
-                retval = msg->hdr.ma_RetVal;
+                retval = m->hdr.ma_RetVal;
 
                 // Free the message and destroy reply port
-                DiscardMsg((struct Message *)msg);
+                DiscardMsg((struct Message *)m);
                 DeleteMsgPort(reply);
             }
 

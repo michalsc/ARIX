@@ -73,6 +73,7 @@ uuid_t FindPort(const char * name)
 
             if (reply)
             {
+                struct MsgARIXFindPort *m = NULL;
                 // Fill contents of the message
                 msg->hdr.ma_Request = MSG_ARIX_FIND_PORT;
                 msg->hdr.ma_Message.mn_ReplyPort = reply->mp_ID;
@@ -86,12 +87,12 @@ uuid_t FindPort(const char * name)
                 // Wait for an answer...
                 printf("[EXEC] Waiting for reply...\n");
                 WaitPort(reply);
-                msg = (struct MsgARIXFindPort *)GetMsg(reply);
+                m = (struct MsgARIXFindPort *)GetMsg(reply);
                 
                 // And store it
-                id = msg->port;
+                id = m->port;
 
-                printf("[EXEC] Got message %p\n", (void *)msg);
+                printf("[EXEC] Got message %p\n", (void *)m);
                 printf("[EXEC] FindPort() = {%08x-%04x-%04x-%04x-%02x%02x%02x%02x%02x%02x}\n",
                        id.time_low, id.time_med, id.time_hi_and_version,
                        id.clock_seq_hi_and_reserved << 8 | id.clock_seq_low,
@@ -99,7 +100,7 @@ uuid_t FindPort(const char * name)
                        id.node[3], id.node[4], id.node[5]);
 
                 // Clean up
-                DiscardMsg((struct Message *)msg);
+                DiscardMsg((struct Message *)m);
                 DeleteMsgPort(reply);
             }
             FreeVec(msg);
