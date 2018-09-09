@@ -45,7 +45,8 @@ struct Message *GetMsg(struct MsgPort *port)
                 msg->mn_ReplyPort.node[0], msg->mn_ReplyPort.node[1], msg->mn_ReplyPort.node[2],
                 msg->mn_ReplyPort.node[3], msg->mn_ReplyPort.node[4], msg->mn_ReplyPort.node[5]);
 */
-        ReallocPooled(port->mp_MsgPool, msg, offsetof(struct Message, mn_ReplyPort) + nbytes);
+        msg = ReallocPooled(port->mp_MsgPool, msg, offsetof(struct Message, mn_ReplyPort) + nbytes);
+
         port->mp_ReceiveBuffer = AllocVecPooled(port->mp_MsgPool, 4096);
     }
 
