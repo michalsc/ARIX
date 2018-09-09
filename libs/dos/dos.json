@@ -1,0 +1,28 @@
+{
+    "configuration": {
+        "name": "dos",
+        "type": "library",
+        "version.major": 60,
+        "version.minor": 0,
+        "base.type": "Library",
+        "base.name": "DOSBase"
+    },
+    "cdef": [
+        "#include <stdint.h>",
+        "#include <stddef.h>"
+    ],
+    "functions": [
+        [ "struct Library *",   "LibOpen", "void * handle", "uint32_t version" ],
+        [ "void *",             "LibClose" ],
+        [ "void *",             "LibExpunge" ],
+        [ "void *",             "GetHandle" ],
+
+        [ "intptr_t",           "SetIoErr", "intptr_t new_error" ],
+        [ "intptr_t",           "IoErr" ],
+
+        [ "int",                "Open", "const char * name", "int mode" ],
+        [ "int",                "Close", "int handle" ],
+        [ "size_t",             "Read", "int handle", "void * buffer", "size_t length" ],
+        [ "size_t",             "Write", "int handle", "const void * buffer", "size_t length" ]
+    ]
+}
