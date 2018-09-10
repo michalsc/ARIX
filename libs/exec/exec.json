@@ -23,6 +23,8 @@
         [ "void *",             "Expunge" ],
         [ "void *",             "GetHandle" ],
 
+        [ "uuid_t",             "GetRandomID", "uint8_t type" ],
+
         [ "void",               "Reschedule" ],
         [ "void",               "Spawn", "struct Hook * hook" ],
 
