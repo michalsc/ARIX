@@ -8,6 +8,7 @@
         "base.name": "DOSBase"
     },
     "cdef": [
+        "#include <uuid/uuid.h>",
         "#include <stdint.h>",
         "#include <stddef.h>"
     ],
@@ -20,10 +21,10 @@
         [ "intptr_t",           "SetIoErr", "intptr_t new_error" ],
         [ "intptr_t",           "IoErr" ],
 
-        [ "int",                "Open", "const char * name", "int mode" ],
-        [ "int",                "Close", "int handle" ],
-        [ "size_t",             "Read", "int handle", "void * buffer", "size_t length" ],
-        [ "size_t",             "Write", "int handle", "const void * buffer", "size_t length" ],
+        [ "uuid_t",             "Open", "const char * name", "int mode" ],
+        [ "int",                "Close", "uuid_t handle" ],
+        [ "size_t",             "Read", "uuid_t handle", "void * buffer", "size_t length" ],
+        [ "size_t",             "Write", "uuid_t handle", "const void * buffer", "size_t length" ],
 
         [ "int",                "AssignPath", "const char * name", "const char * path" ]
     ]

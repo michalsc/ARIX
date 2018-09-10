@@ -1,10 +1,15 @@
+#include <uuid/uuid.h>
 #include <clib/dos_protos.h>
 #include <strings.h>
 #include <string>
 
 #include "dos_private.h"
 
-int Open(const char * name, int mode)
+#include <unordered_map>
+
+//std::unordered_map<uuid_t, std::string> assigns;
+
+uuid_t Open(const char * name, int mode)
 {
     std::string strname;
     /* Handle special case: path names starting with PROGDIR: */
@@ -22,5 +27,5 @@ int Open(const char * name, int mode)
         printf("[DOS] special name: %s\n", strname.c_str());
     }
     (void)mode;
-    return 0;
+    return MAKE_UUID(0, 0, 0, 0, 0);
 }

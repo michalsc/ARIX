@@ -79,3 +79,8 @@ void __attribute__((constructor)) DOSInit()
     __AssignsDirLock = syscall(SYS_openat, __TmpDirLock, "Assigns", O_RDONLY);
 
 }
+
+void __attribute__((destructor)) DOSDestroy()
+{
+    printf("[DOS] DOS says goodbye!\n");
+}
