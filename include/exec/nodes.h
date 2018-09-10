@@ -72,6 +72,9 @@ struct MinNode
 #define NT_DEATHMESSAGE 19
 #define NT_HIDD         20      /* AROS specific                            */
 
+
+#define NT_FILE         253
+
 #define NT_USER         254     /* User node types work down from here      */
 #define NT_EXTENDED     255
 
