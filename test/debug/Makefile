@@ -1,7 +1,7 @@
 OBJNAME   := DebugTest
 TARGETDIR := Test
 LDLIBS    := 
-AUTOLIBS  := 
+AUTOLIBS  :=
 FILES     := main
 
 include $(ROOT_DIR)/config/make_app.mk

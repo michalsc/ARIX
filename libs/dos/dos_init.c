@@ -44,9 +44,11 @@ void *GetHandle()
     return _handle;
 }
 
-char *__pr_HomePath;
 intptr_t __pr_result_2;
-int __pr_HomeDir;
+char *__pr_HomePath;
+int __pr_HomeDirLock;
+int __AssignsDirLock;
+int __TmpDirLock;
 
 void __attribute__((constructor)) DOSInit()
 {
@@ -67,7 +69,13 @@ void __attribute__((constructor)) DOSInit()
 
     printf("[DOS] HomePath = %s\n", __pr_HomePath);
 
-    __pr_HomeDir = syscall(SYS_open, __pr_HomePath, O_RDONLY);
+    __pr_HomeDirLock = syscall(SYS_open, __pr_HomePath, O_RDONLY);
 
-    printf("[DOS] PROGDIR: lock = %d\n", __pr_HomeDir);
+    printf("[DOS] PROGDIR: lock = %d\n", __pr_HomeDirLock);
+
+    syscall(SYS_mkdir, "/tmp/ARIX", 0777);
+    __TmpDirLock = syscall(SYS_open, "/tmp/ARIX", O_RDONLY);
+    syscall(SYS_mkdirat, __TmpDirLock, "Assigns", 0777);
+    __AssignsDirLock = syscall(SYS_openat, __TmpDirLock, "Assigns", O_RDONLY);
+
 }

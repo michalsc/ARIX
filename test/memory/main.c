@@ -12,6 +12,7 @@
 #include <exec/types.h>
 #include <exec/memory.h>
 #include <proto/exec.h>
+#include <proto/dos.h>
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -34,6 +35,8 @@ int main(int argc, char **argv)
     
     msg.mn_ReplyPort = reply->mp_ID;
     int i;
+
+    AssignPath("FONTS", "SYS:Fonts");
 
     AddPort(reply, "Some port name");
     FindPort("Some port name");

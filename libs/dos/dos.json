@@ -23,6 +23,8 @@
         [ "int",                "Open", "const char * name", "int mode" ],
         [ "int",                "Close", "int handle" ],
         [ "size_t",             "Read", "int handle", "void * buffer", "size_t length" ],
-        [ "size_t",             "Write", "int handle", "const void * buffer", "size_t length" ]
+        [ "size_t",             "Write", "int handle", "const void * buffer", "size_t length" ],
+
+        [ "int",                "AssignPath", "const char * name", "const char * path" ]
     ]
 }
