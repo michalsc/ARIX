@@ -5,7 +5,7 @@ LDLIBS    := c stdc++
 AUTOLIBS  := exec
 GLOBAL    := LibBase DOSBase
 LOCAL     := *
-FILES     := dos_init setioerr ioerr open close read write assignpath
+FILES     := dos_init setioerr ioerr open close read write assignpath arixfile
 
 include $(ROOT_DIR)/config/make_shared.mk
 include $(ROOT_DIR)/config/make_bottom.mk

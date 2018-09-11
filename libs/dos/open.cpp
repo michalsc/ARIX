@@ -7,7 +7,7 @@
 
 #include <unordered_map>
 
-//std::unordered_map<uuid_t, std::string> assigns;
+std::unordered_map<uuid_t, std::string> assigns;
 
 uuid_t Open(const char * name, int mode)
 {

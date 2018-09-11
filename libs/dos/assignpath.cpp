@@ -18,4 +18,3 @@ int AssignPath(const char * name, const char * path)
     printf("fd=%d\n", fd);
     syscall(SYS_symlinkat, path, fd, "0");
 }
-
