@@ -2,6 +2,7 @@
 #define UUID_UUID_H
 
 #include <stdint.h>
+#include <unistd.h>
 
 typedef uint64_t uuid_time_t;
 
@@ -56,5 +57,80 @@ typedef enum
 } uuid_variant_t;
 
 #define UUID_STRLEN 36
+
+#ifdef __cplusplus
+
+static inline bool operator==(uuid_t first, uuid_t second) {
+    union {
+        uint64_t a[2];
+        uuid_t u;
+    } u1, u2;
+
+    u1.u = first;
+    u2.u = second;
+
+    return (u1.a[0] == u2.a[0] && u1.a[1] == u2.a[1]);
+}
+
+static inline bool operator<(uuid_t first, uuid_t second) {
+    union {
+        uint64_t a[2];
+        uuid_t u;
+    } u1, u2;
+
+    u1.u = first;
+    u2.u = second;
+
+    return (u1.a[0] < u2.a[0] || ((u1.a[0] == u2.a[0]) && (u1.a[1] < u2.a[1])));
+}
+
+static inline bool operator>(uuid_t first, uuid_t second) {
+    union {
+        uint64_t a[2];
+        uuid_t u;
+    } u1, u2;
+
+    u1.u = first;
+    u2.u = second;
+
+    return (u1.a[0] > u2.a[0] || ((u1.a[0] == u2.a[0]) && (u1.a[1] > u2.a[1])));
+}
+
+// uuid specialization for std::hash 
+#include <functional>
+#include <ostream>
+#include <stdio.h>
+namespace std
+{
+    template <> struct hash<uuid_t>
+    {
+        size_t operator()(const uuid_t & id) const noexcept
+        {
+            union {
+                uint64_t u64[2];
+                uint32_t u32[4];
+                uuid_t uuid;
+            } u;
+            u.uuid = id;
+            if (sizeof(size_t) == 32) {
+                return u.u32[0] ^ u.u32[1] ^ u.u32[2] ^ u.u32[3];
+            } else {
+                return u.u64[0] ^ u.u64[1];
+            }
+        }
+    };
+
+    static inline ostream& operator<<(ostream &strm, const uuid_t &id) {
+        char tmpbuf[UUID_STRLEN + 1];
+        snprintf(tmpbuf, UUID_STRLEN + 1, "%08x-%04x-%04x-%04x-%02x%02x%02x%02x%02x%02x",
+                id.time_low, id.time_med, id.time_hi_and_version, id.clock_seq_hi_and_reserved << 8 | id.clock_seq_low,
+                id.node[0], id.node[1], id.node[2], id.node[3], id.node[4], id.node[5]);
+        strm << (char *)tmpbuf;
+        return strm;
+    }
+}
+
+
+#endif
 
 #endif /* UUID_UUID_H */
