@@ -20,7 +20,7 @@
 #include <sys/un.h>
 #include <sys/uio.h>
 
-#include "exec_intern.h"
+#include "../../system/arix/arix_messages.h"
 #include <string.h>
 #include <strings.h>
 
