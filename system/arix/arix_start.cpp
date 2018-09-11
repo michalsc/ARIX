@@ -6,7 +6,8 @@
     Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed
     with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
-
+#undef _GNU_SOURCE
+#define _GNU_SOURCE
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -17,6 +18,7 @@
 #include <proto/exec.h>
 #include <uuid/uuid.h>
 
+#include <linux/limits.h>
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -25,11 +27,13 @@
 #include <iostream>
 #include <map>
 
-#include "../../libs/exec/exec_intern.h"
+#include "arix_messages.h"
 
 #include "publicport.h"
 
 PublicPortList PublicPorts;
+
+#define ARIX_TEMP_PATH "/tmp/ARIX/"
 
 struct MsgPort ARIXPort = {
     MAKE_UUID(0x00000001, 0x0000, 0x4000, 0x8000 | NT_MSGPORT, 0x000000000000),
@@ -51,6 +55,10 @@ int is_init()
 */
 int main(int argc, char **argv)
 {
+    int dir_tmp;
+    int dir_assigns;
+    char *sys_path;
+
     (void)argc;
     (void)argv;
     struct sockaddr_un serverSocketAddr;
@@ -89,6 +97,40 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    /* Prepare temporary directory for assigns and volumes */
+    syscall(SYS_mkdir, ARIX_TEMP_PATH, 0755);
+    dir_tmp = syscall(SYS_open, ARIX_TEMP_PATH, O_RDONLY | O_DIRECTORY);
+    syscall(SYS_mkdirat, dir_tmp, ".assigns", 0755);
+    dir_assigns = syscall(SYS_openat, dir_tmp, ".assigns", O_RDONLY | O_DIRECTORY);
+    
+    /* Synthesize UNIX: assign */
+    syscall(SYS_mkdirat, dir_assigns, "UNIX", 0755);
+    syscall(SYS_symlinkat, "/", dir_assigns, "UNIX/0");
+
+    /* Get path to the file */
+    sys_path = static_cast<char*>(AllocVec(PATH_MAX, MEMF_CLEAR));
+    size_t path_length = syscall(SYS_readlink, "/proc/self/exe", sys_path, PATH_MAX);
+
+    /* Remove executable name from the path */
+    while(path_length > 0 && sys_path[path_length] != '/')
+    {
+        sys_path[path_length--] = 0;
+    }
+
+    /* Remove one directory level from the path, ARIX has to be in SYS:System/ directory */
+    path_length--;
+    while(path_length > 0 && sys_path[path_length] != '/')
+    {
+        sys_path[path_length--] = 0;
+    }
+
+    /* Release as much memory as possible */
+    sys_path = static_cast<char *>(ReallocMem(sys_path, path_length + 1));
+
+    /* Synthesize SYS: assign */
+    syscall(SYS_mkdirat, dir_assigns, "SYS", 0755);
+    syscall(SYS_symlinkat, sys_path, dir_assigns, "SYS/0");
+
     while(1) {
         WaitPort(&ARIXPort);
         struct MsgARIX *msg;
@@ -97,7 +139,7 @@ int main(int argc, char **argv)
         {
             while((msg = (struct MsgARIX *)GetMsg(&ARIXPort)))
             {
-                if (msg->ma_Message.mn_Length >= 4)
+                if (msg->ma_Message.mn_Length >= (sizeof(MsgARIX) - sizeof(Message)))
                 {
                     switch (msg->ma_Request) {
                         case MSG_ARIX_ADD_PORT:
@@ -125,6 +167,13 @@ int main(int argc, char **argv)
                             else {
                                 m->hdr.ma_RetVal = 1;
                             }
+                            break;
+                        }
+                        case MSG_ARIX_GET_TEMP_PATH:
+                        {
+                            struct MsgARIXGetTempPath *m = reinterpret_cast<struct MsgARIXGetTempPath *>(msg);
+                            strncpy(m->path, ARIX_TEMP_PATH, m->hdr.ma_Message.mn_Length + sizeof(Message) - sizeof(MsgARIX));
+                            m->hdr.ma_RetVal = 1;
                             break;
                         }
                         default:
