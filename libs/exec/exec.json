@@ -62,6 +62,7 @@
         [ "struct MsgPort *",   "CreateMsgPort" ],
         [ "void",               "DeleteMsgPort", "struct MsgPort * port" ],
         [ "uuid_t",             "FindPort", "const char * name" ],
+        [ "int",                "TestPort", "uuid_t portID" ],
         [ "int",                "AddPort", "struct MsgPort * port", "const char * name" ],
         [ "void",               "RemPort", "struct MsgPort * port" ],
         [ "struct Message *",   "GetMsg", "struct MsgPort * port" ],
