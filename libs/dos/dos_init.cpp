@@ -62,6 +62,7 @@ int __AssignsDirLock;
 int __TmpDirLock;
 struct MsgPort * __pr_MsgPort;
 std::unordered_map<uuid_t, ARIXFile *> *__files;
+uuid_t __pr_CurrentDir;
 
 void __attribute__((constructor)) DOSInit()
 {
@@ -122,8 +123,10 @@ void __attribute__((constructor)) DOSInit()
 
     __AssignsDirLock = syscall(SYS_openat, __TmpDirLock, ".assigns", O_RDONLY | O_DIRECTORY);
     
-    ARIXFile *f = new ARIXFile("sys:test_file.txt");
-    f = new ARIXFile("progdir:a");
+    ARIXFile *f = new ARIXFile("sys:test_file.txt", O_RDONLY);
+    f = new ARIXFile("progdir:a", O_RDONLY);
+    new ARIXFile("SYS:../../file", O_RDONLY);
+    new ARIXFile("SYS:", O_RDONLY | O_DIRECTORY);
 }
 
 void __attribute__((destructor)) DOSDestroy()

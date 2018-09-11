@@ -21,20 +21,69 @@ static std::string str_toupper(std::string s) {
     return s;
 }
 
-ARIXFile::ARIXFile(const char * p)
+// Converts ARIX path of any kind (relative, absolute, etc) to unix path
+std::string ARIXFile::arix2unix(std::string arix_path)
+{
+
+}
+
+ARIXFile::ARIXFile(const char * p, int mode)
 {
     int fd_vol;
     std::string path(p);
     std::string volume;
+
+    printf("[DOS] ARIXFile::ARIXFile(%s, %d)\n", p, mode);
+
     // Try to find out requested volume and path within volume.
     std::size_t pos = path.find(":");
-    if (pos != std::string::npos)
+    // There is semicolon in path. if it is at position 0, search for current dir
+    // and use it's own volume
+    if (pos == 0)
+    {
+        ARIXFile *f = NULL;
+
+        auto it = __files->find(__pr_CurrentDir);
+        if (it != __files->end()) {
+            f = it->second;
+        }
+        
+        if (f) {
+            volume = f->__volume;
+            path = path.substr(1);
+        }
+    }
+    // If there is semicolon in path and everything *before* it does not contain slash, then this is the volume
+    else if (pos != std::string::npos && path.substr(0, pos).find_first_of("/\\|*#?") == std::string::npos)
     {
         volume = str_toupper(path.substr(0, pos));
         path = path.substr(pos+1);
-        printf("vol=%s\n", volume.c_str());
-        printf("path=%s\n", path.c_str());
     }
+    else
+    {
+        // No semicolon was given in the name. Get the volume of current dir instead
+        ARIXFile *f = NULL;
+        auto it = __files->find(__pr_CurrentDir);
+        if (it != __files->end()) {
+            f = it->second;
+        }
+
+        if (f) {
+            std::string _p = f->__path;
+            volume = f->__volume;
+
+            if (*(_p.rbegin()) == '/')
+                _p.pop_back();
+            
+            path = _p + path;
+        }
+    }
+
+    if (path == "")
+        path = ".";
+
+    printf("[DOS] Volume=%s\n", volume.c_str());
+    printf("[DOS] Path=%s\n", path.c_str());
 
     // Try to open the volume first
     if (volume == "PROGDIR") {
@@ -53,7 +102,7 @@ ARIXFile::ARIXFile(const char * p)
                 if (fd_num < 0)
                     break;
 
-                __fd = syscall(SYS_openat, fd_num, path.c_str(), O_RDONLY);
+                __fd = syscall(SYS_openat, fd_num, path.c_str(), mode);
                 if (__fd > 0) {
                     syscall(SYS_close, fd_num);
                     break;

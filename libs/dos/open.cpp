@@ -5,10 +5,6 @@
 
 #include "dos_private.h"
 
-#include <unordered_map>
-
-std::unordered_map<uuid_t, std::string> assigns;
-
 uuid_t Open(const char * name, int mode)
 {
     std::string strname;

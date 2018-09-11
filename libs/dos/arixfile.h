@@ -18,10 +18,13 @@ struct ARIXAssign : public ARIXEntry {
 };
 
 class ARIXFile {
+    std::string __volume;
+    std::string __path;
     uuid_t  __id;
     int     __fd;
 public:
-    ARIXFile(const char * path);
+    ARIXFile(const char * path, int mode);
+    static std::string arix2unix(std::string path);
 
     int     fd() { return __fd; }
     uuid_t  id() { return __id; }
