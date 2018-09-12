@@ -11,7 +11,7 @@
 #include <sstream>
 #include <cctype>
 #include <algorithm>
-
+#include <vector>
 #include <fcntl.h>
 
 #include "dos_private.h"
@@ -72,18 +72,79 @@ ARIXFile::ARIXFile(const char * p, int mode)
             std::string _p = f->__path;
             volume = f->__volume;
 
-            if (*(_p.rbegin()) == '/')
-                _p.pop_back();
+            if (*(_p.rbegin()) != '/')
+                _p.push_back('/');
             
             path = _p + path;
         }
     }
+
+    if (path[0] == '/')
+        path = path.substr(1);
 
     if (path == "")
         path = ".";
 
     printf("[DOS] Volume=%s\n", volume.c_str());
     printf("[DOS] Path=%s\n", path.c_str());
+
+    // Simplify path and check if it goes out of volume/assign bounds.
+    std::vector<std::string> path_array;
+    bool success = true;
+    while (path != "")
+    {
+        std::size_t pos = path.find('/');
+
+        if (pos != std::string::npos) {
+            std::string elem = path.substr(0, pos);
+            if (elem != ".")
+            {
+                if (elem == "" || elem == "..")
+                {
+                    if (path_array.size() > 0)
+                        path_array.pop_back();
+                    else
+                    {
+                        success = false;
+                        break;
+                    }
+                }
+                else
+                    path_array.push_back(elem);
+            }
+            path = path.substr(pos + 1);
+        } else {
+            if (path == "")
+                continue;
+            else if (path == "..") {
+                if (path_array.size() > 0)
+                    path_array.pop_back();
+                else {
+                    success = false;
+                }
+            }
+            else
+                path_array.push_back(path);
+            path = "";
+        }
+    }
+
+    if (!success) {
+        printf("Path excaping the volume boundary");
+    }
+    else {
+        path = "";
+        for (int i=0; i < path_array.size(); i++)
+        {
+            if (i==0)
+                path += path_array[i];
+            else
+                path += "/" + path_array[i];
+            printf("element %3d: '%s'\n", i, path_array[i].c_str());
+        }
+
+        printf("[DOS] real path: '%s'\n", path.c_str());
+    }
 
     // Try to open the volume first
     if (volume == "PROGDIR") {

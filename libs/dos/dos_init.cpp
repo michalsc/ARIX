@@ -127,6 +127,10 @@ void __attribute__((constructor)) DOSInit()
     f = new ARIXFile("progdir:a", O_RDONLY);
     new ARIXFile("SYS:../../file", O_RDONLY);
     new ARIXFile("SYS:", O_RDONLY | O_DIRECTORY);
+    new ARIXFile("SYS:../ARIX", O_RDONLY | O_DIRECTORY);
+    new ARIXFile("UNIX:/usr/local/bin/a", O_RDONLY);
+    new ARIXFile("UNIX:/usr/local/./../bin/a", O_RDONLY);
+    new ARIXFile("UNIX:/usr/local///bin/a", O_RDONLY);
 }
 
 void __attribute__((destructor)) DOSDestroy()
