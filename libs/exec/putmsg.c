@@ -40,6 +40,21 @@ void InternalPutMsg(uuid_t portID, struct Message *msg)
     {
         struct sockaddr_un name = { AF_UNIX, {0,} };
         uuid_t *u = (uuid_t *)&name.sun_path[1];
+        struct iovec io = {
+            &msg->mn_ReplyPort, msg->mn_Length + sizeof(struct Message) - offsetof(struct Message, mn_ReplyPort)
+        };
+        struct msghdr msghdr = {
+            &name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(uuid_t), // msg_name, msg_namelen
+            &io, 1,         // msg_iov, msg_iolen
+            NULL, 0,        // msg_control, msg_controllen
+            0
+        };
+
+        if (msg->mn_Control != NULL && msg->mn_ControlLength != 0)
+        {
+            msghdr.msg_control = msg->mn_Control;
+            msghdr.msg_controllen = msg->mn_ControlLength;
+        }
 
         msg->mn_Pad = 0;
         *u = portID;
@@ -59,12 +74,13 @@ void InternalPutMsg(uuid_t portID, struct Message *msg)
                msg->mn_ReplyPort->mp_ID.node[0], msg->mn_ReplyPort->mp_ID.node[1], msg->mn_ReplyPort->mp_ID.node[2],
                msg->mn_ReplyPort->mp_ID.node[3], msg->mn_ReplyPort->mp_ID.node[4], msg->mn_ReplyPort->mp_ID.node[5]);
 */
-
+        sendmsg(OutSocket, &msghdr, 0);
+/*
         sendto(OutSocket, 
             &msg->mn_ReplyPort, msg->mn_Length + sizeof(struct Message) - offsetof(struct Message, mn_ReplyPort), 0, 
             (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(uuid_t)
         );
-
+*/
 //        printf("[EXEC] sendto returned %d\n", ret);
     }
 }

@@ -85,7 +85,7 @@ struct MsgPort * CreateMsgPort()
         }
 
         // Allocate first receive buffer of 4K size *in advance*
-        port->mp_ReceiveBuffer = AllocVecPooled(port->mp_MsgPool, 4096);
+        port->mp_ReceiveBuffer = AllocVecPooled(port->mp_MsgPool, MESSAGE_MAX_LENGTH + MESSAGE_CTRL_MAX_LENGTH);
 
         // Attempt to create random ID for port and bind socket to that ID
         name.sun_family = AF_UNIX;

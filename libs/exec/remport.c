@@ -66,6 +66,7 @@ void RemPort(struct MsgPort *port)
     {
         // Fill the message
         msg->hdr.ma_Request = MSG_ARIX_REM_PORT;
+        msg->hdr.ma_Message.mn_Control = NULL;
         msg->hdr.ma_Message.mn_ReplyPort = reply->mp_ID;
         msg->hdr.ma_Message.mn_Length = sizeof(struct MsgARIXRemPort) - sizeof(struct Message);
         CopyMem(&port->mp_ID, &msg->port, sizeof(uuid_t));

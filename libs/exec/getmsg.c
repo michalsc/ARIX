@@ -20,22 +20,46 @@
 
 #include "exec_intern.h"
 
-void InternalPutMsg(struct MsgPort *port, struct Message *msg);
-
 struct Message *GetMsg(struct MsgPort *port)
 {
     struct Message * msg = NULL;
 
     if (port && port->mp_Socket > 0)
     {
-        msg = port->mp_ReceiveBuffer;
+        size_t msglength = offsetof(struct Message, mn_ReplyPort);
+        struct iovec io;
+        struct msghdr msghdr = {
+            NULL, 0,        // msg_name, msg_namelen
+            &io, 1,         // msg_iov, msg_iolen
+            (void*)((intptr_t)port->mp_ReceiveBuffer + MESSAGE_MAX_LENGTH),
+            MESSAGE_CTRL_MAX_LENGTH,
+            0
+        };
 
-        int nbytes = recv(port->mp_Socket, &msg->mn_ReplyPort, 4096 - offsetof(struct Message, mn_ReplyPort), 0);
+        msg = port->mp_ReceiveBuffer;
+        
+        io.iov_base = &msg->mn_ReplyPort;
+        io.iov_len = 4096 - offsetof(struct Message, mn_ReplyPort);
+        
+        //int nbytes = recv(port->mp_Socket, &msg->mn_ReplyPort, 4096 - offsetof(struct Message, mn_ReplyPort), 0);
+        int nbytes = recvmsg(port->mp_Socket, &msghdr, 0);
         if (nbytes <= 0)
         {
             return NULL;
         }
+        msglength += nbytes;
         msg->mn_Owner = port;
+
+        // Ancillary data received. attach it past the message data and update message headers
+        // accordingly.
+        if (msghdr.msg_controllen > 0) {
+            printf("[EXEC] Control data of size %ld received\n", msghdr.msg_controllen);
+            msg->mn_Control = (void *)((intptr_t)msg + msglength);
+            msg->mn_ControlLength = msghdr.msg_controllen;
+            CopyMem(msghdr.msg_control, msg->mn_Control, msg->mn_ControlLength);
+            msglength += msg->mn_ControlLength;
+        }
+
 /*
         printf("[EXEC] Message %p with length of %d (actually read %d)\n", (void *)msg, msg->mn_Length, nbytes);
         printf("[EXEC] MessageType: %d\n", msg->mn_Type);
@@ -45,9 +69,9 @@ struct Message *GetMsg(struct MsgPort *port)
                 msg->mn_ReplyPort.node[0], msg->mn_ReplyPort.node[1], msg->mn_ReplyPort.node[2],
                 msg->mn_ReplyPort.node[3], msg->mn_ReplyPort.node[4], msg->mn_ReplyPort.node[5]);
 */
-        msg = ReallocPooled(port->mp_MsgPool, msg, offsetof(struct Message, mn_ReplyPort) + nbytes);
+        msg = ReallocPooled(port->mp_MsgPool, msg, msglength);
 
-        port->mp_ReceiveBuffer = AllocVecPooled(port->mp_MsgPool, 4096);
+        port->mp_ReceiveBuffer = AllocVecPooled(port->mp_MsgPool, MESSAGE_MAX_LENGTH + MESSAGE_CTRL_MAX_LENGTH);
     }
 
     return msg;
