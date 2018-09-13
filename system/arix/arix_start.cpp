@@ -19,8 +19,10 @@
 #include <uuid/uuid.h>
 
 #include <linux/limits.h>
+#include <sys/mount.h>
 #include <string.h>
 #include <stdio.h>
+#include <sched.h>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -99,7 +101,17 @@ int main(int argc, char **argv)
 
     /* Prepare temporary directory for assigns and volumes */
     syscall(SYS_mkdir, ARIX_TEMP_PATH, 0755);
+    /* Unshare mount namespace */
+    syscall(SYS_unshare, CLONE_NEWNS);
+    /* All mounts under /tmp are private and do not propagate outside this namespace */
+    syscall(SYS_mount, "none", "/tmp", NULL, MS_REC | MS_PRIVATE, NULL);
+    /*
+        Mount tmpfs there. The mount is invisible outside ARIX process, however ARIX can 
+        pass file descriptor from it to the outside world through messages
+    */
+    syscall(SYS_mount, "none", ARIX_TEMP_PATH, "tmpfs", 0, NULL);
     dir_tmp = syscall(SYS_open, ARIX_TEMP_PATH, O_RDONLY | O_DIRECTORY);
+    
     syscall(SYS_mkdirat, dir_tmp, ".assigns", 0755);
     dir_assigns = syscall(SYS_openat, dir_tmp, ".assigns", O_RDONLY | O_DIRECTORY);
     
@@ -172,8 +184,27 @@ int main(int argc, char **argv)
                         case MSG_ARIX_GET_TEMP_PATH:
                         {
                             struct MsgARIXGetTempPath *m = reinterpret_cast<struct MsgARIXGetTempPath *>(msg);
+                            union {
+                                char buffer[CMSG_SPACE(sizeof(int))];
+                                struct cmsghdr cmsg;
+                            } u;
+
+                            // Copy the path into message
                             strncpy(m->path, ARIX_TEMP_PATH, m->hdr.ma_Message.mn_Length + sizeof(Message) - sizeof(MsgARIX));
+
+                            // Fill in the control data in order to send the socket
+                            u.cmsg.cmsg_level = SOL_SOCKET;
+                            u.cmsg.cmsg_type = SCM_RIGHTS;
+                            u.cmsg.cmsg_len = CMSG_LEN(sizeof(int));
+                            *(int*)CMSG_DATA(&u.cmsg) = dir_tmp;
+                            m->hdr.ma_Message.mn_Control = u.buffer;
+                            m->hdr.ma_Message.mn_ControlLength = sizeof(u.buffer);
                             m->hdr.ma_RetVal = 1;
+
+                            // Reply the message here already, otherwise cmsg buffer runs out of scope and
+                            // may be not valid when the main ReplyMsg is called
+                            ReplyMsg((struct Message *)msg);
+                            msg = NULL;
                             break;
                         }
                         default:

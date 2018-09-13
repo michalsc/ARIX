@@ -15,6 +15,7 @@
 #include <clib/dos_protos.h>
 #include <proto/exec.h>
 
+#include <sys/socket.h>
 #include <linux/limits.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -80,6 +81,9 @@ void __attribute__((constructor)) DOSInit()
         MsgARIXGetTempPath *m = (MsgARIXGetTempPath *)AllocVec(512, MEMF_CLEAR);
         if (m)
         {
+            // Get the ARIX temp path (there are assigns volumes etc inside)
+            // The path is sent back in form of ancillary data (file descriptor)
+            // to the directory
             m->hdr.ma_Request = MSG_ARIX_GET_TEMP_PATH;
             m->hdr.ma_Message.mn_ReplyPort = __pr_MsgPort->mp_ID;
             m->hdr.ma_Message.mn_Length = 512 - sizeof(Message);
@@ -90,9 +94,29 @@ void __attribute__((constructor)) DOSInit()
             WaitPort(__pr_MsgPort);
             m = (MsgARIXGetTempPath *)GetMsg(__pr_MsgPort);
 
-            if (m->hdr.ma_RetVal) {
-                printf("[DOS] ARIX tmp path is '%s'\n", m->path);
-                __TmpDirLock = syscall(SYS_open, m->path, O_RDONLY);
+            if (m->hdr.ma_Message.mn_Control != NULL)
+            {
+                struct msghdr msghdr;
+                struct cmsghdr *cmsg;
+                msghdr.msg_control = m->hdr.ma_Message.mn_Control;
+                msghdr.msg_controllen = m->hdr.ma_Message.mn_ControlLength;
+
+                printf("[DOS] Received control data at %p of size %ld\n", msghdr.msg_control, msghdr.msg_controllen);
+                for (cmsg = CMSG_FIRSTHDR(&msghdr); cmsg; cmsg = CMSG_NXTHDR(&msghdr, cmsg))
+                {
+                    printf("[DOS] level: %d, type: %d, len: %d\n", cmsg->cmsg_level, cmsg->cmsg_type, cmsg->cmsg_len);
+                    if (cmsg->cmsg_level == SOL_SOCKET && cmsg->cmsg_type == SCM_RIGHTS) {
+                        int fd = *(int*)CMSG_DATA(cmsg);
+                        __TmpDirLock = fd;
+                    }
+                }
+            }
+            else
+            {
+                if (m->hdr.ma_RetVal) {
+                    printf("[DOS] ARIX tmp path is '%s'\n", m->path);
+                    __TmpDirLock = syscall(SYS_open, m->path, O_RDONLY);
+                }
             }
 
             DiscardMsg((Message *)m);
