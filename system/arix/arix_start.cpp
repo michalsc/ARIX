@@ -35,7 +35,7 @@
 
 PublicPortList PublicPorts;
 
-#define ARIX_TEMP_PATH "/tmp/ARIX/"
+#define ARIX_TEMP_PATH "/tmp/.arix/"
 
 struct MsgPort ARIXPort = {
     MAKE_UUID(0x00000001, 0x0000, 0x4000, 0x8000 | NT_MSGPORT, 0x000000000000),
@@ -111,7 +111,7 @@ int main(int argc, char **argv)
     */
     syscall(SYS_mount, "none", ARIX_TEMP_PATH, "tmpfs", 0, NULL);
     dir_tmp = syscall(SYS_open, ARIX_TEMP_PATH, O_RDONLY | O_DIRECTORY);
-    
+
     syscall(SYS_mkdirat, dir_tmp, ".assigns", 0755);
     dir_assigns = syscall(SYS_openat, dir_tmp, ".assigns", O_RDONLY | O_DIRECTORY);
     
