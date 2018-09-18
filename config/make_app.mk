@@ -20,7 +20,7 @@ main-build: pre-build
 $(_M_TARGETDIR)/$(OBJNAME): $(addprefix $(_M_OBJDIR)/,$(_M_OBJS))
 	@echo "* Linking $(OBJNAME)"
 	@$(CC) -o $@ $(foreach f,$(_M_OBJS),$(_M_OBJDIR)/$(f)) -Wl,-unresolved-symbols=ignore-in-shared-libs \
-	 $(_M_LDLIBS) $(_M_AUTOLIBS)
+	 $(LDFLAGS) $(_M_LDLIBS) $(_M_AUTOLIBS)
 
 .PHONY: all
 .SECONDARY: main-build pre-build

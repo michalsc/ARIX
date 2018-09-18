@@ -32,7 +32,7 @@ build: $(addprefix $(_M_OBJDIR)/,$(_M_OBJS)) $(_M_OBJDIR)/version.script
 $(_M_TARGETDIR)/$(OBJNAME).$(OBJTYPE): $(addprefix $(_M_OBJDIR)/,$(_M_OBJS) __base_file.o) $(_M_OBJDIR)/version.script
 	@echo "* Linking $(OBJNAME).$(OBJTYPE)"
 	@$(CC) -fpic -shared -Wl,-soname,$(OBJNAME).$(OBJTYPE) -Wl,--version-script=$(_M_OBJDIR)/version.script \
-	 -fvisibility=hidden -o $@ $(foreach f,$(_M_OBJS) __base_file.o,$(_M_OBJDIR)/$(f)) $(_M_LDLIBS) $(_M_AUTOLIBS)
+	 -fvisibility=hidden $(LDFLAGS) -o $@ $(foreach f,$(_M_OBJS) __base_file.o,$(_M_OBJDIR)/$(f)) $(_M_LDLIBS) $(_M_AUTOLIBS)
 	@rm -rf $(_M_OBJDIR)/.compiled
 
 .PHONY: all

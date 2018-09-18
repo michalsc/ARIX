@@ -11,6 +11,7 @@ export MAKE := make -s
 export INCLUDE_DIR := $(BIN_DIR)/Development/include
 export CFLAGS := -Os -std=c11 -I$(INCLUDE_DIR) $(USER_CFLAGS)
 export CXXFLAGS := -Os -std=c++11 -I$(INCLUDE_DIR) $(USER_CXXFLAGS)
+export LDFLAGS := $(USER_LDFLAGS)
 export SFDC := $(ROOT_DIR)/tools/sfdc/sfdc.py
 
 SUBDIRS := libs system test
