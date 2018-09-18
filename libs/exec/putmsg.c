@@ -6,6 +6,8 @@
     Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed
     with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
+#define _GNU_SOURCE
+#include <sys/syscall.h>
 #include <exec/types.h>
 #include <exec/memory.h>
 #include <exec/ports.h>
@@ -74,7 +76,7 @@ void InternalPutMsg(uuid_t portID, struct Message *msg)
                msg->mn_ReplyPort->mp_ID.node[0], msg->mn_ReplyPort->mp_ID.node[1], msg->mn_ReplyPort->mp_ID.node[2],
                msg->mn_ReplyPort->mp_ID.node[3], msg->mn_ReplyPort->mp_ID.node[4], msg->mn_ReplyPort->mp_ID.node[5]);
 */
-        sendmsg(OutSocket, &msghdr, 0);
+        syscall(SYS_sendmsg, OutSocket, &msghdr, 0);
 /*
         sendto(OutSocket, 
             &msg->mn_ReplyPort, msg->mn_Length + sizeof(struct Message) - offsetof(struct Message, mn_ReplyPort), 0, 

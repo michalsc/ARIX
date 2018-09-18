@@ -6,6 +6,8 @@
     Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed
     with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
+#define _GNU_SOURCE
+#include <sys/syscall.h>
 #include <exec/types.h>
 #include <exec/memory.h>
 #include <exec/ports.h>
@@ -42,7 +44,7 @@ struct Message *GetMsg(struct MsgPort *port)
         io.iov_len = 4096 - offsetof(struct Message, mn_ReplyPort);
         
         //int nbytes = recv(port->mp_Socket, &msg->mn_ReplyPort, 4096 - offsetof(struct Message, mn_ReplyPort), 0);
-        int nbytes = recvmsg(port->mp_Socket, &msghdr, 0);
+        int nbytes = syscall(SYS_recvmsg, port->mp_Socket, &msghdr, 0);
         if (nbytes <= 0)
         {
             return NULL;

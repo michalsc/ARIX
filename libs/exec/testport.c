@@ -46,11 +46,11 @@ int TestPort(uuid_t portID)
     int sock;
     int ret = -1;
 
-    sock = socket(AF_UNIX, SOCK_DGRAM, 0);
+    sock = syscall(SYS_socket, AF_UNIX, SOCK_DGRAM, 0);
     if (sock > 0)
     {
-        ret = connect(sock, (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(uuid_t));
-        close(sock);
+        ret = syscall(SYS_connect, sock, (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(uuid_t));
+        syscall(SYS_close, sock);
     }
 
     return (ret == 0) ? 1:0;

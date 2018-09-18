@@ -55,7 +55,7 @@ void __attribute__((constructor)) ExecInit()
     printf("[EXEC] ExecInit()\n");
     local_memory_pool = tlsf_init_autogrow(65536, 0, NULL, NULL, NULL);
     printf("[EXEC] Local memory pool @ %p\n", local_memory_pool);
-    OutSocket = socket(AF_UNIX, SOCK_DGRAM, 0);
+    OutSocket = syscall(SYS_socket, AF_UNIX, SOCK_DGRAM, 0);
     syscall(SYS_clock_gettime, CLOCK_REALTIME, &StartTime);
     printf("[EXEC] Start time: %ld.%09ld\n", StartTime.tv_sec, StartTime.tv_nsec);
     UUID_Seed = 2654435761 * ((StartTime.tv_sec >> 32) ^ (StartTime.tv_sec) ^ StartTime.tv_nsec);
@@ -65,6 +65,6 @@ void __attribute__((constructor)) ExecInit()
 void __attribute__((destructor)) ExecDestroy()
 {
     printf("[EXEC] ExecDestroy()\n");
-    close(OutSocket);
+    syscall(SYS_close, OutSocket);
     tlsf_destroy(local_memory_pool);
 }

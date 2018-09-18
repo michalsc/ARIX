@@ -6,6 +6,8 @@
     Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed
     with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
+#define _GNU_SOURCE
+#include <sys/syscall.h>
 #include <exec/types.h>
 #include <exec/memory.h>
 #include <exec/ports.h>
@@ -28,7 +30,7 @@ void WaitPort(struct MsgPort *port)
 
         while(1) 
         {
-            if (poll(p, 1, -1) > 0)
+            if (syscall(SYS_poll, p, 1, -1) > 0)
             {
 //                printf("[EXEC] There's something in the port, WaitPort will return now\n");
 
