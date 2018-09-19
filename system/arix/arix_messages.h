@@ -34,7 +34,6 @@ struct MsgARIXGetUniqueID {
 
 struct MsgARIXGetTempPath {
     struct MsgARIX  hdr;
-    char            path[];
 };
 
 #define MSG_ARIX_GET_UNIQUE_ID  0xCAFE0001

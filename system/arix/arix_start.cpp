@@ -189,9 +189,6 @@ int main(int argc, char **argv)
                                 struct cmsghdr cmsg;
                             } u;
 
-                            // Copy the path into message
-                            strncpy(m->path, ARIX_TEMP_PATH, m->hdr.ma_Message.mn_Length + sizeof(Message) - sizeof(MsgARIX));
-
                             // Fill in the control data in order to send the socket
                             u.cmsg.cmsg_level = SOL_SOCKET;
                             u.cmsg.cmsg_type = SCM_RIGHTS;

@@ -111,13 +111,6 @@ void __attribute__((constructor)) DOSInit()
                     }
                 }
             }
-            else
-            {
-                if (m->hdr.ma_RetVal) {
-                    printf("[DOS] ARIX tmp path is '%s'\n", m->path);
-                    __TmpDirLock = syscall(SYS_open, m->path, O_RDONLY);
-                }
-            }
 
             DiscardMsg((Message *)m);
         }
