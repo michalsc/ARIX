@@ -18,6 +18,12 @@ SUBDIRS := libs system test
 
 all: includes $(SUBDIRS)
 
+initrd: includes $(SUBDIRS)
+	@echo "Building the initial ramdisk"
+	@cp $(ROOT_DIR)/initrd/vmlinuz $(ROOT_DIR)/Build
+	@cp $(ROOT_DIR)/initrd/arix_base_cpio.img.gz $(ROOT_DIR)/Build/initrd
+	@cd $(ROOT_DIR)/Build && find ARIX | cpio -o -H newc 2>/dev/null | gzip >> $(ROOT_DIR)/Build/initrd
+
 includes:
 	@echo "Generating header files"
 	@$(MAKE) -C include includes
@@ -26,4 +32,4 @@ includes:
 $(SUBDIRS):
 	@$(MAKE) -C $@ all
 
-.PHONY: all includes $(SUBDIRS)
+.PHONY: all includes initrd $(SUBDIRS)
