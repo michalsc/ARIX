@@ -12,6 +12,7 @@
 #include <exec/ports.h>
 #include <uuid/uuid.h>
 #include <time.h>
+#include <utility/tagitem.h>
 
 #ifdef __cplusplus
 
@@ -31,5 +32,17 @@ struct PrivPool {
     uint32_t    requirements;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+struct TagItem *LibNextTagItem(struct TagItem **tagListPtr);
+struct TagItem *LibFindTagItem(Tag tagValue, const struct TagItem *tagList);
+IPTR LibGetTagData(Tag tagValue, IPTR defaultVal, const struct TagItem *tagList);
+void bug(const char *format, ...);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _EXEC_INTERN_H */
