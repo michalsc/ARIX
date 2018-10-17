@@ -13,6 +13,14 @@
 #include <uuid/uuid.h>
 #include <time.h>
 
+#ifdef __cplusplus
+
+#include <list>
+
+extern std::list<struct MsgPort *> __ports;
+
+#endif
+
 extern void * local_memory_pool;
 extern int OutSocket;
 extern uint32_t UUID_Seed;

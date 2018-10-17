@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <exec/types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef APTR (*autogrow_get)(APTR, IPTR *);
 typedef void (*autogrow_release)(APTR, APTR, IPTR);
 
@@ -22,5 +26,9 @@ void *tlsf_allocabs(void *handle, IPTR size, void *ptr);
 
 IPTR tlsf_avail(void *tlsf, ULONG requirements);
 int tlsf_in_bounds(void *tlsf, APTR begin, APTR end);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _TLSF_H */

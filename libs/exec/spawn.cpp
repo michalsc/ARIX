@@ -35,7 +35,7 @@ void Spawn(struct Hook * spawnHook)
 
             if (!__ports.empty())
             {
-                printf("[EXEC] Spawn() Renaming all MsgPorts\n");
+                printf("[EXEC] Spawn(): Renaming all MsgPorts\n");
 
                 for (auto port: __ports)
                 {
@@ -49,7 +49,7 @@ void Spawn(struct Hook * spawnHook)
                     // If socket failed return NULL.
                     if (port->mp_Socket < 0)
                     {
-                        printf("[EXEC] Cannot create socket\n");
+                        printf("[EXEC] Spawn(): Cannot create socket\n");
                     }
 
                     // Put the socket in non-blocking mode.
@@ -70,11 +70,11 @@ void Spawn(struct Hook * spawnHook)
                         // Number of retries exhausted? Just fail...
                         if (--maxtry < 0)
                         {
-                            printf("[EXEC] too many tries. giving up\n");
+                            printf("[EXEC] Spawn(): too many tries. giving up\n");
                             return;
                         }
 
-                        printf("[EXEC] Binding to port ID {%08x-%04x-%04x-%04x-%02x%02x%02x%02x%02x%02x}\n",
+                        printf("[EXEC] Spawn(): Binding to port ID {%08x-%04x-%04x-%04x-%02x%02x%02x%02x%02x%02x}\n",
                                port->mp_ID.time_low, port->mp_ID.time_med, port->mp_ID.time_hi_and_version,
                                port->mp_ID.clock_seq_hi_and_reserved << 8 | port->mp_ID.clock_seq_low,
                                port->mp_ID.node[0], port->mp_ID.node[1], port->mp_ID.node[2],

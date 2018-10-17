@@ -6,6 +6,7 @@
     Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed
     with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
+#undef _GNU_SOURCE
 #define _GNU_SOURCE
 #include <unistd.h>
 #include <sys/syscall.h>
@@ -20,12 +21,27 @@
 
 #include <stdio.h>
 
+#include <list>
+
+std::list<struct MsgPort *> __ports;
+
 extern struct Library * ExecBase;
 static void * _handle = NULL;
 void * local_memory_pool = NULL;
 int OutSocket = 0;
 
 struct timespec StartTime;
+
+#ifdef __cplusplus
+
+extern "C" {
+    struct Library *Open(void *h, uint32_t version);
+    void *Close();
+    void *Expunge();
+    void *GetHandle();
+}
+
+#endif
 
 struct Library * Open(void * h, uint32_t version)
 {
@@ -65,6 +81,18 @@ void __attribute__((constructor)) ExecInit()
 void __attribute__((destructor)) ExecDestroy()
 {
     printf("[EXEC] ExecDestroy()\n");
+
+    if (!__ports.empty()) {
+        printf("[EXEC] Not all MsgPorts were closed. Closing now...\n");
+
+        while (!__ports.empty()) {
+            struct MsgPort *p = __ports.front();
+            __ports.remove(p);
+
+            DeleteMsgPort(p);
+        }
+    }
+
     syscall(SYS_close, OutSocket);
     tlsf_destroy(local_memory_pool);
 }
