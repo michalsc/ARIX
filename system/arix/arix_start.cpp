@@ -99,8 +99,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    /* Mount procfs */
-    syscall(SYS_mount, "proc", "/proc", "proc", 0, NULL);
+
 
     /* Prepare temporary directory for assigns and volumes */
     syscall(SYS_mkdir, ARIX_TEMP_PATH, 0755);
