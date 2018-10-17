@@ -8,13 +8,30 @@
         "base.name": "UtilityBase"
     },
     "cdef": [
-        "#include <utility/hooks.h>"
+        "#include <utility/hooks.h>",
+        "#include <utility/tagitem.h>"
     ],
     "functions": [
         [ "struct Library *",   "Open", "void * handle", "uint32_t version" ],
         [ "void *",             "Close" ],
         [ "void *",             "Expunge" ],
         [ "void *",             "GetHandle" ],
-        [ "uintptr_t",          "CallHookPkt", "struct Hook * hook", "void * object", "void * paramPacket" ]
+        [ "uintptr_t",          "CallHookPkt", "struct Hook * hook", "void * object", "void * paramPacket" ],
+
+        [ "struct TagItem *",   "AllocateTagItems", "uint32_t numTags" ],
+        [ "void",               "FreeTagItems", "struct TagItem * tags" ],
+        [ "struct TagItem *",   "CloneTagItems", "const struct TagItem * tagList" ],
+        [ "void",               "ApplyTagChanges", "struct TagItem * list", "struct TagItem * changelist" ],
+        [ "void",               "FilterTagChanges", "struct TagItem * changeList", "const struct TagItem * originalList", "BOOL apply" ],
+        [ "ULONG",              "FilterTagItems", "struct TagItem * tagList", "Tag * filterArray", "ULONG logic" ],
+        [ "struct TagItem *",   "FindTagItem", "Tag tagValue", "const struct TagItem *tagList" ],
+        [ "IPTR",               "GetTagData", "Tag tagValue", "IPTR defaultVal", "const struct TagItem * tagList" ],
+        [ "void",               "MapTags", "struct TagItem * tagList", "struct TagItem * mapList", "ULONG mapType" ],
+        [ "struct TagItem *",   "NextTagItem", "struct TagItem ** tagListPtr" ],
+        [ "ULONG",              "PackBoolTags", "ULONG initialFlags", "struct TagItem * tagList", "struct TagItem * boolMap" ],
+        [ "ULONG",              "PackStructureTags", "APTR pack", "ULONG * packTable", "struct TagItem * tagList" ],
+        [ "void",               "RefreshTagItemClones", "struct TagItem * clone", "const struct TagItem * original" ],
+        [ "BOOL",               "TagInArray", "Tag tagValue", "Tag * tagArray" ],
+        [ "ULONG",              "UnpackStructureTags", "APTR pack", "ULONG * packTable", "struct TagItem * tagList" ]
     ]
 }
