@@ -64,6 +64,7 @@ int __TmpDirLock;
 struct MsgPort * __pr_MsgPort;
 std::unordered_map<uuid_t, ARIXFile *> *__files;
 uuid_t __pr_CurrentDir;
+struct Library * UtilityBase;
 
 void __attribute__((constructor)) DOSInit()
 {
@@ -75,6 +76,8 @@ void __attribute__((constructor)) DOSInit()
         printf("[DOS] ARIX Message Port not available. Consider booting ARIX first.\n");
         syscall(SYS_exit, 1);
     }
+
+    UtilityBase = OpenLibrary("utility.library", 0);
 
     __pr_MsgPort = CreateMsgPort();
     if (__pr_MsgPort) {
