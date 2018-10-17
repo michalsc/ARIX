@@ -139,7 +139,7 @@ void __attribute__((constructor)) DOSInit()
     printf("[DOS] PROGDIR: lock = %d\n", __pr_HomeDirLock);
 
     __AssignsDirLock = syscall(SYS_openat, __TmpDirLock, ".assigns", O_RDONLY | O_DIRECTORY);
-    
+/*
     ARIXFile *f = new ARIXFile("sys:test_file.txt", O_RDONLY);
     f = new ARIXFile("progdir:a", O_RDONLY);
     new ARIXFile("SYS:../../file", O_RDONLY);
@@ -148,9 +148,11 @@ void __attribute__((constructor)) DOSInit()
     new ARIXFile("UNIX:/usr/local/bin/a", O_RDONLY);
     new ARIXFile("UNIX:/usr/local/./../bin/a", O_RDONLY);
     new ARIXFile("UNIX:/usr/local///bin/a", O_RDONLY);
+*/
 }
 
 void __attribute__((destructor)) DOSDestroy()
 {
     printf("[DOS] DOS says goodbye!\n");
+    DeleteMsgPort(__pr_MsgPort);
 }
