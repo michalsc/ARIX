@@ -1,4 +1,4 @@
-LIBS := arix
+LIBS := arix init
 OBJDIR := $(BUILD_DIR)/$(CURDIR)
 
 includes:
