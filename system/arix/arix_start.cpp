@@ -99,6 +99,9 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    /* Mount procfs */
+    syscall(SYS_mount, "proc", "/proc", "proc", 0, NULL);
+
     /* Prepare temporary directory for assigns and volumes */
     syscall(SYS_mkdir, ARIX_TEMP_PATH, 0755);
     /* Unshare mount namespace */
@@ -122,6 +125,7 @@ int main(int argc, char **argv)
     /* Get path to the file */
     sys_path = static_cast<char*>(AllocVec(PATH_MAX, MEMF_CLEAR));
     size_t path_length = syscall(SYS_readlink, "/proc/self/exe", sys_path, PATH_MAX);
+std::cout << "path_length = " << path_length << ", sys_path=" << sys_path << std::endl;
 
     /* Remove executable name from the path */
     while(path_length > 0 && sys_path[path_length] != '/')
