@@ -11,6 +11,7 @@
 #include <sys/syscall.h>
 #include <sys/socket.h>
 #include <sys/prctl.h>
+#include <stdlib.h>
 #include <utility/hooks.h>
 #include <clib/exec_protos.h>
 #include <sys/types.h>
@@ -71,7 +72,7 @@ int __thread_bootstrap(void *arg)
     }
 
     t = LibFindTagItem(TASKTAG_NAME, tags);
-    if (t)
+    if (t != NULL)
     {
         syscall(SYS_prctl, PR_SET_NAME, t->ti_Data);
     }
