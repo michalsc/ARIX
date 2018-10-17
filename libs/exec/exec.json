@@ -13,6 +13,7 @@
         "#include <exec/avl.h>",
         "#include <exec/ports.h>",
         "#include <utility/hooks.h>",
+        "#include <utility/tagitem.h>",
         "#include <stddef.h>",
         "#include <stdint.h>",
         "#include <unistd.h>"
@@ -27,6 +28,7 @@
 
         [ "void",               "Reschedule" ],
         [ "void",               "Spawn", "struct Hook * hook" ],
+        [ "void",               "CreateThread", "struct TagItem * tags" ],
 
         [ "struct Library *",   "OldOpenLibrary", "const char * libName" ],
         [ "struct Library *",   "OpenLibrary", "const char * libName", "uint32_t version" ],
