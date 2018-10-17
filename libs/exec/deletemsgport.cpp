@@ -6,6 +6,7 @@
     Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed
     with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
+#undef _GNU_SOURCE
 #define _GNU_SOURCE
 #include <sys/syscall.h>
 #include <exec/types.h>
@@ -49,6 +50,9 @@ void DeleteMsgPort(struct MsgPort * port)
     // Make sure non-null value was given.
     if (port)
     {
+        // Remove port from the list
+        __ports.remove(port);
+
         // Close unix socket
         syscall(SYS_close, port->mp_Socket);
 

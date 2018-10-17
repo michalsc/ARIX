@@ -1,7 +1,7 @@
 OBJNAME   := exec
 OBJTYPE   := library
 TARGETDIR := Libs
-LDLIBS    := c dl
+LDLIBS    := c dl stdc++
 GLOBAL    := LibBase ExecBase
 LOCAL     := *
 FILES     := openlibrary allocmem freemem reschedule addhead addtail insert remhead remtail enqueue \
