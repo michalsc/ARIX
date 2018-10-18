@@ -26,7 +26,7 @@ def generate_basefile(cfg):
     for cdef in cfg["cdef"]:
         print(cdef)
     print("")
-    print("static const char __idString[] = \"\\0$VER: {0}.{1} {2}.{3} \" VERSION_STRING_DATE \"\\0\";".format(
+    print("static const char __attribute__((used, section(\".text\"))) __idString[] = \"\\0$VER: {0}.{1} {2}.{3} \" VERSION_STRING_DATE \"\\0\";".format(
         cfg["configuration"]["name"], cfg["configuration"]["type"],
         cfg["configuration"]["version.major"], cfg["configuration"]["version.minor"]
     ))
@@ -39,12 +39,16 @@ def generate_basefile(cfg):
     for func in cfg["functions"]:
         print("    " + func[1] + ",")
     print("};")
+    print("static const char __attribute__((used)) __versionString[] = \"{0} {2}.{3} \" VERSION_STRING_DATE;".format(
+        cfg["configuration"]["name"], cfg["configuration"]["type"],
+        cfg["configuration"]["version.major"], cfg["configuration"]["version.minor"]
+    ))
     print("""
 static const struct Library _{0} = {{
     (const APTR)&__lvo, 
     {1},
     {2},
-    (const APTR)&__idString[7],
+    (const APTR)__versionString,
 }};
 
 const struct Library * LibBase __attribute__((weak)) = &_{0};
