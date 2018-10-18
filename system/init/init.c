@@ -4,8 +4,21 @@
 #include <linux/memfd.h>
 #include <linux/fcntl.h>
 #include <unistd.h>
+#include <sys/mount.h>
 
 static const char __attribute__((used)) version[] = "\0$VER: System/init 60.0 " VERSION_STRING_DATE;
+
+void do_mounts()
+{
+    syscall(SYS_mount, "proc", "/proc", "proc", MS_NOSUID | MS_NOEXEC | MS_NODEV, NULL);
+    syscall(SYS_mount, "devtmpfs", "/dev", "devtmpfs", MS_NOSUID, "mode=755");
+    syscall(SYS_mount, "tmpfs", "/tmp", "tmpfs", MS_NODEV, NULL);
+    syscall(SYS_mkdir, "/dev/pts", 0755);
+    syscall(SYS_mkdir, "/dev/shm", 0777);
+    syscall(SYS_mount, "sysfs", "/sys", "sysfs", MS_NOSUID | MS_NOEXEC | MS_NODEV, NULL);
+    syscall(SYS_mount, "devpts", "/dev/pts", "devpts", MS_NOSUID | MS_NOEXEC, NULL);
+    syscall(SYS_mount, "tmpfs", "/dev/shm", "tmpfs", MS_NOSUID | MS_NODEV, NULL);
+}
 
 void _start(int argc, char **argv)
 {
@@ -36,8 +49,8 @@ void _start(int argc, char **argv)
     }
     arg[1] = b;
 
-    syscall(SYS_write, 1, "[INIT] Mounting proc filesystem\n", 32);
-    syscall(SYS_mount, "proc", "/proc", "proc", 0, NULL);
+    syscall(SYS_write, 1, "[INIT] Mounting filesystems\n", 32);
+    do_mounts();
 
     syscall(SYS_write, 1, "[INIT] Booting ARIX\n", 20);
     syscall(SYS_execve, "/ARIX/System/ARIX", arg, env);
