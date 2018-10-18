@@ -66,6 +66,22 @@ int main(int argc, char **argv)
 
     (void)argc;
     (void)argv;
+
+    std::cout << "argc = " << argc << std::endl;
+    for (int i=0; i < argc; i++)
+    {
+        std::cout << "argv[" << i << "] = " << argv[i] << std::endl;
+    }
+
+    if (argc > 1)
+    {
+        char buff[256];
+        int fd = atoi(argv[1]);
+        int count = syscall(SYS_read, fd, buff, 256);
+        std::cout << "read from fd " << fd << " got " << count << " bytes: '" << buff << "'" << std::endl;
+        syscall(SYS_close, fd);
+    }
+
     struct sockaddr_un serverSocketAddr;
     union {
         union {
