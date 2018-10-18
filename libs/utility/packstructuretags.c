@@ -74,7 +74,7 @@ ULONG PackStructureTags(APTR pack, ULONG *packTable, struct TagItem *tagList)
     for( ; *packTable != 0; packTable++)
     {
         /* New base tag */
-        if(*packTable == -1)
+        if(*packTable == (ULONG)-1)
         {
             tagBase = *++packTable;
             continue;
