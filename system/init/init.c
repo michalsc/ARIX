@@ -7,6 +7,9 @@ static const char __attribute__((used)) version[] = "\0$VER: System/init 60.0 " 
 
 void _start(int argc, char **argv)
 {
+    (void)argc;
+    (void)argv;
+    
     const char * arg[] = {
         "ARIX", (char *)0
     };
