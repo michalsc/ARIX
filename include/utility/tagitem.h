@@ -39,6 +39,6 @@ struct TagItem
 #define MAP_KEEP_NOT_FOUND 1   /* keep tags that aren't in mapList   */
 
 /* Macro for syntactic sugar (and a little extra bug-resiliance) */
-#define TAGLIST(args...) ((struct TagItem *)(IPTR[]){args, TAG_DONE})
+#define TAGLIST(...) ((struct TagItem *)(IPTR[]){__VA_ARGS__, TAG_DONE})
 
 #endif /* UTILITY_TAGITEM_H */
