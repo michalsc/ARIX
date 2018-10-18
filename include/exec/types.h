@@ -22,4 +22,7 @@ typedef int8_t      BOOL;
 #define NULL    ((APTR)0)
 #endif // NULL
 
+#define TRUE        1
+#define FALSE       0
+
 #endif // _EXEC_TYPES_H

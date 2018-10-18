@@ -64,6 +64,7 @@ int __TmpDirLock;
 struct MsgPort * __pr_MsgPort;
 std::unordered_map<uuid_t, ARIXFile *> *__files;
 uuid_t __pr_CurrentDir;
+struct Library * UtilityBase;
 
 void __attribute__((constructor)) DOSInit()
 {
@@ -75,6 +76,8 @@ void __attribute__((constructor)) DOSInit()
         printf("[DOS] ARIX Message Port not available. Consider booting ARIX first.\n");
         syscall(SYS_exit, 1);
     }
+
+    UtilityBase = OpenLibrary("utility.library", 0);
 
     __pr_MsgPort = CreateMsgPort();
     if (__pr_MsgPort) {
@@ -139,7 +142,7 @@ void __attribute__((constructor)) DOSInit()
     printf("[DOS] PROGDIR: lock = %d\n", __pr_HomeDirLock);
 
     __AssignsDirLock = syscall(SYS_openat, __TmpDirLock, ".assigns", O_RDONLY | O_DIRECTORY);
-    
+/*
     ARIXFile *f = new ARIXFile("sys:test_file.txt", O_RDONLY);
     f = new ARIXFile("progdir:a", O_RDONLY);
     new ARIXFile("SYS:../../file", O_RDONLY);
@@ -148,9 +151,11 @@ void __attribute__((constructor)) DOSInit()
     new ARIXFile("UNIX:/usr/local/bin/a", O_RDONLY);
     new ARIXFile("UNIX:/usr/local/./../bin/a", O_RDONLY);
     new ARIXFile("UNIX:/usr/local///bin/a", O_RDONLY);
+*/
 }
 
 void __attribute__((destructor)) DOSDestroy()
 {
     printf("[DOS] DOS says goodbye!\n");
+    DeleteMsgPort(__pr_MsgPort);
 }

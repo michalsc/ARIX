@@ -1,0 +1,15 @@
+allocatetagitems.c
+applytagchanges.c
+clonetagitems.c
+filtertagchanges.c
+filtertagitems.c
+findtagitem.c
+freetagitems.c
+gettagdata.c
+maptags.c
+nexttagitem.c
+packbooltags.c
+packstructuretags.c
+refreshtagitemclones.c
+taginarray.c
+unpackstructuretags.c

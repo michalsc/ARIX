@@ -3,6 +3,8 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 
+static const char __attribute__((used)) version[] = "\0$VER: System/init 60.0 " VERSION_STRING_DATE;
+
 void _start(int argc, char **argv)
 {
     const char * arg[] = {

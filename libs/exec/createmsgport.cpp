@@ -6,6 +6,7 @@
     Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed
     with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
+#undef _GNU_SOURCE
 #define _GNU_SOURCE
 #include <unistd.h>
 #include <sys/syscall.h>
@@ -53,7 +54,7 @@ struct MsgPort * CreateMsgPort()
 {
     struct sockaddr_un name;
     uuid_t *sock_id = (uuid_t *)&name.sun_path[1];
-    struct MsgPort * port = AllocMem(sizeof(struct MsgPort), MEMF_CLEAR);
+    struct MsgPort * port = static_cast<struct MsgPort *>(AllocMem(sizeof(struct MsgPort), MEMF_CLEAR));
 
     printf("[EXEC] CreateMsgPort()\n");
 
@@ -118,6 +119,8 @@ struct MsgPort * CreateMsgPort()
             err = syscall(SYS_bind, port->mp_Socket, (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(uuid_t));
         } while (err != 0);
     }
+
+    __ports.push_back(port);
 
     return port;
 }
