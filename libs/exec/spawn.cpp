@@ -35,7 +35,11 @@ void Spawn(struct Hook * spawnHook)
             /* Regenerate random seed and start time */
             syscall(SYS_clock_gettime, CLOCK_REALTIME, &StartTime);
             printf("[EXEC] Spawn(): Start time: %ld.%09ld\n", StartTime.tv_sec, StartTime.tv_nsec);
+#if __SIZEOF_LONG__ > 4
             UUID_Seed = 2654435761 * ((StartTime.tv_sec >> 32) ^ (StartTime.tv_sec) ^ StartTime.tv_nsec);
+#else
+            UUID_Seed = 2654435761 * ((StartTime.tv_sec) ^ StartTime.tv_nsec);
+#endif
             printf("[EXEC] Spawn(): UUID Random seed=0x%08x\n", UUID_Seed);
 
             if (!__ports.empty())
