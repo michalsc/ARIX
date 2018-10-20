@@ -33,7 +33,7 @@ void _start(int argc, char **argv)
     };
 
     const char * env[] = {
-        "LD_LIBRARY_PATH=/ARIX/Libs", (char *)0
+        "LD_LIBRARY_PATH=/ARIX/Libs:/lib64:/lib", (char *)0
     };
 
     int mem = syscall(SYS_memfd_create, "hellomsg", MFD_ALLOW_SEALING);
