@@ -16,6 +16,7 @@
 #include <sys/un.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <signal.h>
 
 #include "exec_intern.h"
 
@@ -23,7 +24,11 @@ void Spawn(struct Hook * spawnHook)
 {
     if (spawnHook)
     {
-        pid_t pid = (pid_t)syscall(SYS_fork);
+#ifndef SYS_fork
+        pid_t pid = (pid_t)syscall(SYS_clone, SIGCHLD, 0);
+#else
+        pid_t pid = (pid_t)syscall(SYS_flock);
+#endif
 
         if (pid > 0)
         {
