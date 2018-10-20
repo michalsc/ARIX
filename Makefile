@@ -21,8 +21,11 @@ all: includes $(SUBDIRS)
 
 initrd: includes $(SUBDIRS)
 	@echo "Building the initial ramdisk"
+	@echo "* Copying kernel image"
 	@cp $(ROOT_DIR)/initrd/vmlinuz-$(ARCH) $(ROOT_DIR)/Build
+	@echo "* Copying initrd template"
 	@cp $(ROOT_DIR)/initrd/arix_base_cpio-$(ARCH).img.gz $(ROOT_DIR)/Build/initrd
+	@echo "* Appending ARIX initrd"
 	@cd $(ROOT_DIR)/Build && find ARIX | cpio -o -H newc 2>/dev/null | gzip >> $(ROOT_DIR)/Build/initrd
 
 includes:
