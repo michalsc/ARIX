@@ -55,7 +55,7 @@ struct Message *GetMsg(struct MsgPort *port)
         // Ancillary data received. attach it past the message data and update message headers
         // accordingly.
         if (msghdr.msg_controllen > 0) {
-            printf("[EXEC] Control data of size %ld received\n", msghdr.msg_controllen);
+            printf("[EXEC] Control data of size %zu received\n", msghdr.msg_controllen);
             msg->mn_Control = (void *)((intptr_t)msg + msglength);
             msg->mn_ControlLength = msghdr.msg_controllen;
             CopyMem(msghdr.msg_control, msg->mn_Control, msg->mn_ControlLength);
