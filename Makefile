@@ -4,8 +4,8 @@ export ROOT_DIR := $(shell pwd)
 include $(ROOT_DIR)/config/version.mk
 
 export ARCH
-export CC := $(CROSS_COMPILE)gcc
-export CXX := $(CROSS_COMPILE)g++
+export CC := $(CROSS_COMPILE_$(ARCH))gcc
+export CXX := $(CROSS_COMPILE_$(ARCH))g++
 export BUILD_DIR := $(ROOT_DIR)/Build-$(ARCH)/gen
 export BIN_DIR := $(ROOT_DIR)/Build-$(ARCH)/ARIX
 export MAKE := make -s
@@ -17,7 +17,10 @@ export SFDC := $(ROOT_DIR)/tools/sfdc/sfdc.py
 
 SUBDIRS := libs system test
 
-all: includes $(SUBDIRS)
+all: echo_target includes $(SUBDIRS)
+
+echo_target:
+	@echo "Building ARIX for architecture $(ARCH)"
 
 initrd: includes $(SUBDIRS)
 	@echo "Building the initial ramdisk"
@@ -33,7 +36,7 @@ includes:
 	@$(MAKE) -C include includes
 	@$(MAKE) -C libs includes
 
-$(SUBDIRS):
+$(SUBDIRS): includes
 	@$(MAKE) -C $@ all
 
-.PHONY: all includes initrd $(SUBDIRS)
+.PHONY: echo_target 4all includes initrd $(SUBDIRS)
