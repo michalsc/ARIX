@@ -1,4 +1,4 @@
 /.vscode
 .DS_Store
-Build/
+Build-*/
 user_config.mk
