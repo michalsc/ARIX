@@ -30,7 +30,7 @@ void WaitPort(struct MsgPort *port)
 
         while(1) 
         {
-            if (syscall(SYS_poll, p, 1, -1) > 0)
+            if (syscall(SYS_ppoll, p, 1, NULL, NULL) > 0)
             {
 //                printf("[EXEC] There's something in the port, WaitPort will return now\n");
 

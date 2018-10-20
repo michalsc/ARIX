@@ -45,7 +45,7 @@ uuid_t GetRandomID(uint8_t type)
         enough entropy. If opening /dev/urandom fails for some reason, fall back to 
         pseudo random number generator.
     */
-    int fd = syscall(SYS_open, "/dev/urandom", O_RDONLY);
+    int fd = syscall(SYS_openat, AT_FDCWD, "/dev/urandom", O_RDONLY);
     if (fd > 0) {
         syscall(SYS_read, fd, id.data, 16);
         syscall(SYS_close, fd);

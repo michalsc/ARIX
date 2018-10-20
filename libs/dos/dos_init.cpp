@@ -124,7 +124,7 @@ void __attribute__((constructor)) DOSInit()
 
     /* Get path to the file */
     __pr_HomePath = static_cast<char*>(AllocVec(PATH_MAX, MEMF_CLEAR));
-    size_t path_length = syscall(SYS_readlink, "/proc/self/exe", __pr_HomePath, PATH_MAX);
+    size_t path_length = syscall(SYS_readlinkat, AT_FDCWD, "/proc/self/exe", __pr_HomePath, PATH_MAX);
 
     /* Remove executable name from the path */
     while(path_length > 0 && __pr_HomePath[path_length] != '/')
@@ -137,7 +137,7 @@ void __attribute__((constructor)) DOSInit()
 
     printf("[DOS] HomePath = %s\n", __pr_HomePath);
 
-    __pr_HomeDirLock = syscall(SYS_open, __pr_HomePath, O_RDONLY | O_DIRECTORY);
+    __pr_HomeDirLock = syscall(SYS_openat, AT_FDCWD, __pr_HomePath, O_RDONLY | O_DIRECTORY);
 
     printf("[DOS] PROGDIR: lock = %d\n", __pr_HomeDirLock);
 

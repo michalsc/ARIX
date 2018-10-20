@@ -119,7 +119,7 @@ int main(int argc, char **argv)
     }
 
     /* Prepare temporary directory for assigns and volumes */
-    syscall(SYS_mkdir, ARIX_TEMP_PATH, 0755);
+    syscall(SYS_mkdirat, AT_FDCWD, ARIX_TEMP_PATH, 0755);
     /* Unshare mount namespace */
     syscall(SYS_unshare, CLONE_NEWNS);
     /* All mounts under /tmp are private and do not propagate outside this namespace */
@@ -129,7 +129,7 @@ int main(int argc, char **argv)
         pass file descriptor from it to the outside world through messages
     */
     syscall(SYS_mount, "none", ARIX_TEMP_PATH, "tmpfs", 0, NULL);
-    dir_tmp = syscall(SYS_open, ARIX_TEMP_PATH, O_RDONLY | O_DIRECTORY);
+    dir_tmp = syscall(SYS_openat, AT_FDCWD, ARIX_TEMP_PATH, O_RDONLY | O_DIRECTORY);
 
     syscall(SYS_mkdirat, dir_tmp, ".assigns", 0755);
     dir_assigns = syscall(SYS_openat, dir_tmp, ".assigns", O_RDONLY | O_DIRECTORY);
@@ -140,7 +140,7 @@ int main(int argc, char **argv)
 
     /* Get path to the file */
     sys_path = static_cast<char*>(AllocVec(PATH_MAX, MEMF_CLEAR));
-    size_t path_length = syscall(SYS_readlink, "/proc/self/exe", sys_path, PATH_MAX);
+    size_t path_length = syscall(SYS_readlinkat, AT_FDCWD, "/proc/self/exe", sys_path, PATH_MAX);
 
     /* Remove executable name from the path */
     while(path_length > 0 && sys_path[path_length] != '/')
