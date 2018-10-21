@@ -7,7 +7,9 @@
     with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-int __syscall_error()
+int __syscall_error(int code)
 {
+    (void)code;
     /* Empty. Maybe copy the error code to stderr some day */
+    return -1;
 }
