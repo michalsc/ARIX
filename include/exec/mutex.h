@@ -13,4 +13,23 @@ struct Mutex {
 #define MUTEX_LOCKED    0
 #define MUTEX_FREE      1
 
+#ifdef __cplusplus
+
+#include <exception>
+#ifndef CLIB_EXEC_PROTOS_H
+extern "C" {
+int ObtainMutex(APTR);
+int ReleaseMutex(APTR);
+}
+#endif
+
+class MutexLocker {
+    APTR m;
+public:
+    explicit MutexLocker(APTR mutex) { m = mutex; if (ObtainMutex(m) == FALSE) throw std::exception(); }
+    ~MutexLocker() { ReleaseMutex(m); }
+};
+
+#endif
+
 #endif /* EXEC_MUTEX_H */
