@@ -27,21 +27,24 @@ int ReleaseMutex(APTR mutex)
     {
         int err;
 
-        if (__sync_bool_compare_and_swap(&m->m_Lock, 0, 1))
+        /* Release the mutex right now. */
+        if (__sync_bool_compare_and_swap(&m->m_Lock, MUTEX_LOCKED, MUTEX_FREE))
         {
-            err = syscall(SYS_futex, FUTEX_WAKE, 1, NULL, NULL, 0);
+            /* If mutex is free send Wake signal to all waiting for the same mutex */
+            err = syscall(SYS_futex, FUTEX_WAKE, MUTEX_FREE, NULL, NULL, 0);
             if (err < 0)
             {
                 bug("[EXEC] Error releasing futex\n");
-                return 0;
+                return FALSE;
             }
         }
     }
     else
     {
+        /* Not a mutex? Boo! Crash */
         bug("[EXEC] Not a mutex!\n");
-        return 0;
+        return FALSE;
     }
 
-    return 1;
+    return TRUE;
 }

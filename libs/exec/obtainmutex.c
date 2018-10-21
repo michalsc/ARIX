@@ -23,29 +23,42 @@ int ObtainMutex(APTR mutex)
 
     bug("[EXEC] AcquireMutex(%p)\n", m);
 
+    /* Make sure the Mutex is really a mutex */
     if (m != NULL && m->m_Node.ln_Type == NT_MUTEX)
     {
+        /* Repeat forever */
         while(1)
         {
             int err;
 
-            if (__sync_bool_compare_and_swap(&m->m_Lock, 1, 0))
+            /* 
+                Test if Mutex is free, in that case set it to locked state. In case of
+                a success, the builtin returns true, in case of failure false is returned.
+             */
+            if (__sync_bool_compare_and_swap(&m->m_Lock, MUTEX_FREE, MUTEX_LOCKED))
                 break;
 
-            err = syscall(SYS_futex, FUTEX_WAIT, 0, NULL, NULL, 0);
+            /*
+                Attempt to obtain mutex failed. Call FUTEX_WAIT. The system call will wait
+                if and only if the futex is still locked, otherwise it returns immediately
+                so that another lock attempt can be made.
+            */
+            err = syscall(SYS_futex, FUTEX_WAIT, MUTEX_LOCKED, NULL, NULL, 0);
+            
+            /* Error was there? Report a failure */
             if (err < 0 && err != -EAGAIN)
             {
                 bug("[EXEC] error waiting for futex\n");
-                return 0;
+                return FALSE;
             }
         }
     }
     else
     {
+        /* Wasn't that a mutex? Return FALSE */
         bug("[EXEC] Not a mutex!\n");
-
-        return 0;
+        return FALSE;
     }
 
-    return 1;
+    return TRUE;
 }

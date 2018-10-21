@@ -21,24 +21,29 @@ int AttemptMutex(APTR mutex)
 {
     struct Mutex *m = (struct Mutex *)mutex;
 
-    bug("[EXEC] TryMutex(%p)\n", m);
+    bug("[EXEC] AttemptMutex(%p)\n", m);
 
     if (m != NULL && m->m_Node.ln_Type == NT_MUTEX)
     {
-        if (__sync_bool_compare_and_swap(&m->m_Lock, 1, 0))
+        /* 
+            If mutex was free, set it to locked state and return TRUE,
+            return FALSE otherwise.
+        */
+        if (__sync_bool_compare_and_swap(&m->m_Lock, MUTEX_FREE, MUTEX_LOCKED))
         {
-            return 1;
+            return TRUE;
         }
         else
         {
-            return 0;
+            return FALSE;
         }
     }
     else
     {
+        /* Not a Mutex? Return FALSE, something GURU-like could be better */
         bug("[EXEC] Not a mutex!\n");
-        return 0;
+        return FALSE;
     }
 
-    return 1;
+    return TRUE;
 }
