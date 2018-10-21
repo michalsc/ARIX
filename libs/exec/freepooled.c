@@ -17,9 +17,10 @@ void FreePooled(void *p, void *memoryBlock, size_t byteSize)
 {
     struct PrivPool *pool = p;
 
-    if (pool)
+    if (pool && ObtainMutex(&pool->mutex))
     {
         tlsf_freemem(pool->handle, memoryBlock, byteSize);
+        ReleaseMutex(&pool->mutex);
     }
 }
 

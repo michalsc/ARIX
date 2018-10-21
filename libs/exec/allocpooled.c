@@ -19,9 +19,10 @@ void *AllocPooled(void * p, size_t byteSize)
     struct PrivPool *pool = p;
     void *ret = NULL;
 
-    if (pool)
+    if (pool && ObtainMutex(&pool->mutex))
     {
         ret = tlsf_malloc(pool->handle, byteSize, &pool->requirements);
+        ReleaseMutex(&pool->mutex);
     }
 
     return ret;

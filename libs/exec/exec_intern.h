@@ -10,6 +10,7 @@
 #define _EXEC_INTERN_H
 
 #include <exec/ports.h>
+#include <exec/mutex.h>
 #include <uuid/uuid.h>
 #include <time.h>
 #include <utility/tagitem.h>
@@ -29,6 +30,7 @@ extern struct timespec StartTime;
 
 struct PrivPool {
     void *      handle;
+    struct Mutex mutex;
     uint32_t    requirements;
 };
 

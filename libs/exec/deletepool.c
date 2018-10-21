@@ -17,7 +17,7 @@ void DeletePool(void * p)
 {
     struct PrivPool *pool = p;
 
-    if (pool)
+    if (pool && ObtainMutex(&pool->mutex))
     {
         tlsf_destroy(pool->handle);
         FreeMem(pool, sizeof(struct PrivPool));

@@ -33,6 +33,7 @@ void *CreatePool(uint32_t requirement, size_t puddleSize, size_t threshSize)
 
     if (pool)
     {
+        InitMutex(&pool->mutex, MUTEX_FREE);
         pool->requirements = requirement;
         pool->handle = tlsf_init_autogrow(puddleSize, requirement, fetch_more_ram, release_ram, pool);
     }

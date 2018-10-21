@@ -19,9 +19,10 @@ void *ReallocPooled(void * p, void * memoryBLock, size_t newSize)
     
     void *ret = NULL;
 
-    if (pool)
+    if (pool && ObtainMutex(&pool->mutex))
     {
         ret = tlsf_realloc(pool->handle, memoryBLock, newSize);
+        ReleaseMutex(&pool->mutex);
     }
 
     return ret;
