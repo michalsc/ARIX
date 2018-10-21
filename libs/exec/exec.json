@@ -75,6 +75,7 @@
         [ "void",               "WaitPort", "struct MsgPort * port" ],
 
         [ "struct Mutex *",     "CreateMutex", "int initialState" ],
+        [ "void",               "InitMutex", "struct Mutex * mutex", "int initialState" ],
         [ "void",               "DeleteMutex", "struct Mutex * mutex" ],
         [ "int",                "ObtainMutex", "struct Mutex * mutex" ],
         [ "int",                "ReleaseMutex", "struct Mutex * mutex" ],
