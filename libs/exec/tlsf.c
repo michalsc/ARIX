@@ -9,7 +9,6 @@
 
 #include <exec/types.h>
 #include <exec/memory.h>
-#include <exec/mutex.h>
 #include <clib/exec_protos.h>
 
 #include <string.h>
@@ -108,8 +107,6 @@ typedef struct tlsf_area_s {
 
 typedef struct {
     tlsf_area_t *       memory_area;
-
-    struct Mutex        mutex;
 
     IPTR                total_size;
     IPTR                free_size;
@@ -363,8 +360,6 @@ void * tlsf_malloc(void *t, IPTR size, ULONG *flags)
 
     D(nbug("[Kernel:TLSF] %s(%p, %ld)\n", __PRETTY_FUNCTION__, tlsf, size));
 
-    ObtainMutex(&tlsf->mutex);
-
     // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
     //     ObtainSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
 
@@ -416,8 +411,6 @@ void * tlsf_malloc(void *t, IPTR size, ULONG *flags)
         {
             // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
             //     ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
-
-            ReleaseMutex(&tlsf->mutex);
 
             return NULL;
         }
@@ -471,8 +464,6 @@ void * tlsf_malloc(void *t, IPTR size, ULONG *flags)
 
     // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
     //     ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
-
-    ReleaseMutex(&tlsf->mutex);
     
     if (flags && (*flags & MEMF_CLEAR))
         bzero(&b->mem[0], size);
@@ -597,8 +588,6 @@ void * tlsf_malloc_aligned(void *t, IPTR size, IPTR align, ULONG *flags)
         return ptr;
     }
 
-    ObtainMutex(&tlsf->mutex);
-
     b = MEM_TO_BHDR(ptr);
 
     D(nbug("[Kernel:TLSF] %s: allocated region @%p\n", __PRETTY_FUNCTION__, ptr));
@@ -671,8 +660,6 @@ void * tlsf_malloc_aligned(void *t, IPTR size, IPTR align, ULONG *flags)
         }
     });
 
-    ReleaseMutex(&tlsf->mutex);
-
     // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
     //     ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
 
@@ -693,8 +680,6 @@ void tlsf_freevec(void *t, APTR ptr)
 
     // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
     //     ObtainSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
-
-    ObtainMutex(&tlsf->mutex);
 
     /* Mark block as free */
     SET_FREE_BLOCK(fb);
@@ -720,8 +705,6 @@ void tlsf_freevec(void *t, APTR ptr)
         /* Insert free block into the proper list */
         INSERT_FREE_BLOCK(tlsf, fb);
     }
-
-    ReleaseMutex(&tlsf->mutex);
 
     // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
     //     ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
@@ -761,7 +744,6 @@ void *tlsf_realloc(void *t, APTR ptr, IPTR new_size)
 
     // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
     //     ObtainSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
-    ObtainMutex(&tlsf->mutex);
     
     bnext = GET_NEXT_BHDR(b, GET_SIZE(b));
 
@@ -847,7 +829,6 @@ void *tlsf_realloc(void *t, APTR ptr, IPTR new_size)
 
     // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
     //     ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
-    ReleaseMutex(&tlsf->mutex);
 
     return b->mem;
 }
@@ -873,7 +854,6 @@ void *tlsf_allocabs(void *t, IPTR size, void *ptr)
 
     // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
     //     ObtainSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
-    ObtainMutex(&tlsf->mutex);
 
     /* Start searching here. It doesn't make sense to go through regions which are smaller */
     MAPPING_SEARCH(&region_size, &fl, &sl);
@@ -999,8 +979,7 @@ void *tlsf_allocabs(void *t, IPTR size, void *ptr)
 
     // if (((ULONG)(IPTR)mhe->mhe_MemHeader.mh_First) & MEMF_SEM_PROTECTED)
     //     ReleaseSemaphore((struct SignalSemaphore *)mhe->mhe_MemHeader.mh_Node.ln_Name);
-    ReleaseMutex(&tlsf->mutex);
-    
+
     return NULL;
 }
 
@@ -1103,7 +1082,6 @@ void * tlsf_init()
     if (tlsf)
     {
         bzero(tlsf, sizeof(tlsf_t));
-        InitMutex(&tlsf->mutex, MUTEX_FREE);
         tlsf->autodestroy_self = 1;
     }
 
@@ -1167,7 +1145,7 @@ void tlsf_destroy(void *t)
     tlsf_t * tlsf = t;
     D(nbug("[Kernel:TLSF] %s(%p)\n", __PRETTY_FUNCTION__, tlsf));
 
-    if (tlsf && ObtainMutex(&tlsf->mutex))
+    if (tlsf)
     {
         tlsf_area_t *area = tlsf->memory_area;
 
