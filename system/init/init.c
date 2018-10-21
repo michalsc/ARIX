@@ -49,7 +49,7 @@ void _start(int argc, char **argv)
     }
     arg[1] = b;
 
-    syscall(SYS_write, 1, "[INIT] Mounting filesystems\n", 32);
+    syscall(SYS_write, 1, "[INIT] Mounting filesystems\n", 28);
     do_mounts();
 
     syscall(SYS_write, 1, "[INIT] Booting ARIX\n", 20);
