@@ -17,5 +17,7 @@
 
 void FreeMem(void * ptr, size_t byteSize)
 {
+    ObtainMutex(&local_memory_lock);
     tlsf_freemem(local_memory_pool, ptr, byteSize);
+    ReleaseMutex(&local_memory_lock);
 }

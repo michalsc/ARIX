@@ -17,5 +17,7 @@
 
 void FreeVec(void *ptr)
 {
+    ObtainMutex(&local_memory_lock);
     tlsf_freevec(local_memory_pool, ptr);
+    ReleaseMutex(&local_memory_lock);
 }

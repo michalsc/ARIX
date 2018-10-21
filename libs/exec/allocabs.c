@@ -19,7 +19,11 @@
 
 void *AllocAbs(size_t byteSize, void * location)
 {
-    void *ptr = tlsf_allocabs(local_memory_pool, byteSize, location);
+    void *ptr = NULL;
+    
+    ObtainMutex(&local_memory_lock);
+    ptr = tlsf_allocabs(local_memory_pool, byteSize, location);
+    ReleaseMutex(&local_memory_lock);
 
     return ptr;
 }

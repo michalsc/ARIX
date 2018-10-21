@@ -18,7 +18,11 @@
 
 void *ReallocMem(void * memoryBlock, size_t newSize)
 {
-    void *ptr = tlsf_realloc(local_memory_pool, memoryBlock, newSize);
+    void *ptr = NULL;
+
+    ObtainMutex(&local_memory_lock);
+    ptr = tlsf_realloc(local_memory_pool, memoryBlock, newSize);
+    ReleaseMutex(&local_memory_lock);
 
     return ptr;
 }

@@ -19,7 +19,11 @@
 
 void *AllocMemAligned(size_t byteSize, size_t align, uint32_t requirements)
 {
-    void *ptr = tlsf_malloc_aligned(local_memory_pool, byteSize, align, &requirements);
+    void *ptr = NULL;
+
+    ObtainMutex(&local_memory_lock);
+    ptr = tlsf_malloc_aligned(local_memory_pool, byteSize, align, &requirements);
+    ReleaseMutex(&local_memory_lock);
 
     return ptr;
 }

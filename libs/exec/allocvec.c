@@ -19,7 +19,11 @@
 
 void *AllocVec(size_t byteSize, uint32_t requirements)
 {
-    void *ptr = tlsf_malloc(local_memory_pool, byteSize, &requirements);
+    void *ptr = NULL;
+
+    ObtainMutex(&local_memory_lock);
+    ptr = tlsf_malloc(local_memory_pool, byteSize, &requirements);
+    ReleaseMutex(&local_memory_lock);
 
     return ptr;
 }
