@@ -17,10 +17,28 @@
 
 #include "exec_intern.h"
 
-int ReleaseMutex(APTR mutex)
+/**
+ *  NAME
+ *      ReleaseMutex - Releases the mutex.
+ * 
+ *  SYNOPSIS
+ *      int ReleaseMutex(struct Mutex * mutex);
+ * 
+ *  FUNCTION
+ *      Releases the mutex and eventually wakes other threads waiting for it.
+ * 
+ *  INPUTS
+ *      mutex - The locked mutex.
+ * 
+ *  RESULT
+ *      TRUE  - if the mutex is successfuly released.
+ *      FALSE - in case of a problem with releasing the mutex.
+ * 
+ *  SEE ALSO
+ *      CreateMutex(), DeleteMutex(), AttemptMutex(), ObtainMutex()
+ */
+int ReleaseMutex(struct Mutex *m)
 {
-    struct Mutex *m = (struct Mutex *)mutex;
-
     bug("[EXEC] ReleaseMutex(%p)\n", m);
 
     if (m != NULL && m->m_Node.ln_Type == NT_MUTEX)

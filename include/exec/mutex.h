@@ -16,17 +16,16 @@ struct Mutex {
 #ifdef __cplusplus
 
 #include <exception>
-#ifndef CLIB_EXEC_PROTOS_H
+
 extern "C" {
-int ObtainMutex(APTR);
-int ReleaseMutex(APTR);
+    int ObtainMutex(struct Mutex *);
+    int ReleaseMutex(struct Mutex *);
 }
-#endif
 
 class MutexLocker {
-    APTR m;
+    struct Mutex *m;
 public:
-    explicit MutexLocker(APTR mutex) { m = mutex; if (ObtainMutex(m) == FALSE) throw std::exception(); }
+    explicit MutexLocker(struct Mutex * mutex) { m = mutex; if (ObtainMutex(m) == FALSE) throw std::exception(); }
     ~MutexLocker() { ReleaseMutex(m); }
 };
 

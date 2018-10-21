@@ -13,10 +13,24 @@
 
 #include "exec_intern.h"
 
-void DeleteMutex(APTR mutex)
+/**
+ *  NAME
+ *      DeleteMutex - Frees the Mutex.
+ * 
+ *  SYNOPSIS
+ *      void DeleteMutex(struct Mutex * mutex);
+ * 
+ *  FUNCTION
+ *      Releases the mutex memory .
+ * 
+ *  INPUTS
+ *      mutex - The mutex.
+ * 
+ *  SEE ALSO
+ *      CreateMutex(), AttemptMutex(), ObtainMutex(), ReleaseMutex()
+ */
+void DeleteMutex(struct Mutex *m)
 {
-    struct Mutex *m = (struct Mutex *)mutex;
-
     if (m != NULL && m->m_Node.ln_Type == NT_MUTEX)
     {
         FreeVec(m);

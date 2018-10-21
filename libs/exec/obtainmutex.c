@@ -17,10 +17,30 @@
 
 #include "exec_intern.h"
 
-int ObtainMutex(APTR mutex)
+/**
+ *  NAME
+ *      ObtainMutex - Obtain the mutex.
+ * 
+ *  SYNOPSIS
+ *      int ObtainMutex(struct Mutex * mutex);
+ * 
+ *  FUNCTION
+ *      Attempts to obtain the mutex. If the mutex was free and successfuly
+ *      obtained by this function, TRUE is returned. Otherwise the function
+ *      waits forever.
+ * 
+ *  INPUTS
+ *      mutex - The allocated and initialized mutex to be locked.
+ * 
+ *  RESULT
+ *      TRUE  - if the mutex is successfuly obtained,
+ *      FALSE - in case of a problem with waiting.
+ * 
+ *  SEE ALSO
+ *      CreateMutex(), DeleteMutex(), AttemptMutex(), ReleaseMutex()
+ */
+int ObtainMutex(struct Mutex *m)
 {
-    struct Mutex *m = (struct Mutex *)mutex;
-
     bug("[EXEC] AcquireMutex(%p)\n", m);
 
     /* Make sure the Mutex is really a mutex */
