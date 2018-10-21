@@ -31,8 +31,7 @@ void do_mounts()
 
 int __syscall_error(int code)
 {
-    (void)code;
-    return -1;
+    return code;
 }
 
 void _start(int argc, char **argv)

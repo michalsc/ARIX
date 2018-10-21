@@ -9,7 +9,6 @@
 
 int __syscall_error(int code)
 {
-    (void)code;
     /* Empty. Maybe copy the error code to stderr some day */
-    return -1;
+    return code;
 }
