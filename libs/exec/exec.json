@@ -73,6 +73,12 @@
         [ "void",               "DiscardMsg", "struct Message * msg" ],
         [ "void",               "WaitPort", "struct MsgPort * port" ],
 
+        [ "APTR",               "CreateMutex", "int initialState" ],
+        [ "void",               "DeleteMutex", "APTR mutex" ],
+        [ "int",                "AcquireMutex", "APTR mutex" ],
+        [ "int",                "ReleaseMutex", "APTR mutex" ],
+        [ "int",                "TryMutex", "APTR mutex" ],
+
         [ "void",               "CopyMem", "const void * source", "void * dest", "size_t size" ],
         [ "void",               "CopyMemQuick", "const void * source", "void * dest", "size_t size" ],
 

@@ -100,3 +100,8 @@ void __attribute__((destructor)) ExecDestroy()
     syscall(SYS_close, OutSocket);
     tlsf_destroy(local_memory_pool);
 }
+
+int __syscall_error(int err)
+{
+    return err;
+}
