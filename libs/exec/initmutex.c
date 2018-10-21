@@ -34,7 +34,7 @@
  */
 void InitMutex(struct Mutex *m, int initialState)
 {
-    bug("[EXEC] InitMutex()\n");
+    bug("[EXEC] InitMutex(%p)\n", m);
 
     if (initialState != MUTEX_LOCKED)
     {
