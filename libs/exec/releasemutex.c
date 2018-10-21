@@ -17,6 +17,8 @@
 
 #include "exec_intern.h"
 
+#define D(x) /* */
+
 /**
  *  NAME
  *      ReleaseMutex - Releases the mutex.
@@ -39,7 +41,7 @@
  */
 int ReleaseMutex(struct Mutex *m)
 {
-    bug("[EXEC] ReleaseMutex(%p)\n", m);
+    D(bug("[EXEC] ReleaseMutex(%p)\n", m));
 
     if (m != NULL && m->m_Node.ln_Type == NT_MUTEX)
     {

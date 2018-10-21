@@ -17,6 +17,8 @@
 
 #include "exec_intern.h"
 
+#define D(x) /* */
+
 /**
  *  NAME
  *      ObtainMutex - Obtain the mutex.
@@ -41,7 +43,7 @@
  */
 int ObtainMutex(struct Mutex *m)
 {
-    bug("[EXEC] AcquireMutex(%p)\n", m);
+    D(bug("[EXEC] AcquireMutex(%p)\n", m));
 
     /* Make sure the Mutex is really a mutex */
     if (m != NULL && m->m_Node.ln_Type == NT_MUTEX)

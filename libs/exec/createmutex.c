@@ -13,6 +13,8 @@
 
 #include "exec_intern.h"
 
+#define D(x) /* */
+
 /**
  *  NAME
  *      CreateMutex - Allocate and initialize a mutex
@@ -37,7 +39,7 @@
  */
 struct Mutex *CreateMutex(int initialState)
 {
-    bug("[EXEC] CreateMutex()\n");
+    D(bug("[EXEC] CreateMutex()\n"));
 
     if (initialState != MUTEX_LOCKED)
     {

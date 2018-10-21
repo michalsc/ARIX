@@ -13,6 +13,8 @@
 
 #include "exec_intern.h"
 
+#define D(x) /* */
+
 /**
  *  NAME
  *      InitMutex - Initializes memory region as mutex
@@ -34,7 +36,7 @@
  */
 void InitMutex(struct Mutex *m, int initialState)
 {
-    bug("[EXEC] InitMutex(%p)\n", m);
+    D(bug("[EXEC] InitMutex(%p)\n", m));
 
     if (initialState != MUTEX_LOCKED)
     {
