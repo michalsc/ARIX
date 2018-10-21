@@ -17,26 +17,33 @@
 
 #include "exec_intern.h"
 
-int TryMutex(APTR mutex)
+int ObtainMutex(APTR mutex)
 {
     struct Mutex *m = (struct Mutex *)mutex;
 
-    bug("[EXEC] TryMutex(%p)\n", m);
+    bug("[EXEC] AcquireMutex(%p)\n", m);
 
     if (m != NULL && m->m_Node.ln_Type == NT_MUTEX)
     {
-        if (__sync_bool_compare_and_swap(&m->m_Lock, 1, 0))
+        while(1)
         {
-            return 1;
-        }
-        else
-        {
-            return 0;
+            int err;
+
+            if (__sync_bool_compare_and_swap(&m->m_Lock, 1, 0))
+                break;
+
+            err = syscall(SYS_futex, FUTEX_WAIT, 0, NULL, NULL, 0);
+            if (err < 0 && err != -EAGAIN)
+            {
+                bug("[EXEC] error waiting for futex\n");
+                return 0;
+            }
         }
     }
     else
     {
         bug("[EXEC] Not a mutex!\n");
+
         return 0;
     }
 

@@ -75,9 +75,9 @@
 
         [ "APTR",               "CreateMutex", "int initialState" ],
         [ "void",               "DeleteMutex", "APTR mutex" ],
-        [ "int",                "AcquireMutex", "APTR mutex" ],
+        [ "int",                "ObtainMutex", "APTR mutex" ],
         [ "int",                "ReleaseMutex", "APTR mutex" ],
-        [ "int",                "TryMutex", "APTR mutex" ],
+        [ "int",                "AttemptMutex", "APTR mutex" ],
 
         [ "void",               "CopyMem", "const void * source", "void * dest", "size_t size" ],
         [ "void",               "CopyMemQuick", "const void * source", "void * dest", "size_t size" ],
