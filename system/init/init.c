@@ -1,3 +1,12 @@
+/*
+    Copyright © 2018 Michal Schulz <michal.schulz@gmx.de>
+    https://github.com/michalsc
+
+    This Source Code Form is subject to the terms of the
+    Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed
+    with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+*/
+
 #undef _GNU_SOURCE
 #define _GNU_SOURCE
 #include <sys/syscall.h>
@@ -18,6 +27,12 @@ void do_mounts()
     syscall(SYS_mount, "sysfs", "/sys", "sysfs", MS_NOSUID | MS_NOEXEC | MS_NODEV, NULL);
     syscall(SYS_mount, "devpts", "/dev/pts", "devpts", MS_NOSUID | MS_NOEXEC, NULL);
     syscall(SYS_mount, "tmpfs", "/dev/shm", "tmpfs", MS_NOSUID | MS_NODEV, NULL);
+}
+
+int __syscall_error(int code)
+{
+    (void)code;
+    return -1;
 }
 
 void _start(int argc, char **argv)
