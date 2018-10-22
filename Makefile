@@ -31,7 +31,7 @@ initrd: includes $(SUBDIRS)
 	@echo "* Appending ARIX initrd"
 	@cd $(ROOT_DIR)/Build-$(ARCH) && find ARIX | cpio -o -H newc 2>/dev/null | gzip >> $(ROOT_DIR)/Build-$(ARCH)/initrd
 
-includes:
+includes: echo_target
 	@echo "Generating header files"
 	@$(MAKE) -C include includes
 	@$(MAKE) -C libs includes
