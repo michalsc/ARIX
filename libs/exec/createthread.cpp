@@ -28,7 +28,7 @@
 #include "exec_intern.h"
 #include "exec_debug.h"
 
-int __thread_bootstrap(void *arg);
+void __thread_bootstrap(void *arg);
 
 void CreateThread(struct TagItem *tags)
 {
@@ -59,7 +59,7 @@ void CreateThread(struct TagItem *tags)
         tempTag);
 }
 
-int __thread_bootstrap(void *arg)
+void __thread_bootstrap(void *arg)
 {
     struct TagItem *tags = static_cast<struct TagItem *>(arg);
     struct TagItem *t = NULL;
@@ -123,6 +123,7 @@ int __thread_bootstrap(void *arg)
     D(bug("[EXEC] Finishing thread\n"));
 
     APTR ssp = (APTR)tags[0].ti_Data;
+    long __attribute__((noreturn)) (*sc)(long, ...) = (long (*)(long, ...))&syscall;
 
     FreeVec(tags);
     /*
@@ -134,5 +135,6 @@ int __thread_bootstrap(void *arg)
     */
     FreeVec(ssp);
 
-    return 0;
+    /* Get out of here... */
+    syscall(SYS_exit, 0);
 }
