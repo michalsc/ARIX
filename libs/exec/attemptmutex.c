@@ -15,37 +15,38 @@
 #include <exec/mutex.h>
 #include <clib/exec_protos.h>
 
+#include "exec_debug.h"
 #include "exec_intern.h"
 
 /**
  *  NAME
  *      AttemptMutex - Tries to obtain the mutex without waiting
- * 
+ *
  *  SYNOPSIS
  *      int AttemptMutex(struct Mutex * mutex);
- * 
+ *
  *  FUNCTION
  *      Attempts to obtain the mutex. If the mutex was free and successfuly
  *      obtained by this function, TRUE is returned. If the lock failed and
  *      mutex is still in posession of another thread, FALSE is returned.
- * 
+ *
  *  INPUTS
  *      mutex - The allocated and initialized mutex to be locked.
- * 
+ *
  *  RESULT
  *      TRUE  - if the mutex is successfuly obtained,
  *      FALSE - otherwise
- * 
+ *
  *  SEE ALSO
  *      CreateMutex(), DeleteMutex(), ObtainMutex(), ReleaseMutex()
  */
 int AttemptMutex(struct Mutex *m)
 {
-    bug("[EXEC] AttemptMutex(%p)\n", m);
+    D(bug("[EXEC] AttemptMutex(%p)\n", m));
 
     if (m != NULL && m->m_Node.ln_Type == NT_MUTEX)
     {
-        /* 
+        /*
             If mutex was free, set it to locked state and return TRUE,
             return FALSE otherwise.
         */

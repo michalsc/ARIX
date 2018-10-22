@@ -15,27 +15,26 @@
 #include <exec/mutex.h>
 #include <clib/exec_protos.h>
 
+#include "exec_debug.h"
 #include "exec_intern.h"
-
-#define D(x) /* */
 
 /**
  *  NAME
  *      ReleaseMutex - Releases the mutex.
- * 
+ *
  *  SYNOPSIS
  *      int ReleaseMutex(struct Mutex * mutex);
- * 
+ *
  *  FUNCTION
  *      Releases the mutex and eventually wakes other threads waiting for it.
- * 
+ *
  *  INPUTS
  *      mutex - The locked mutex.
- * 
+ *
  *  RESULT
  *      TRUE  - if the mutex is successfuly released.
  *      FALSE - in case of a problem with releasing the mutex.
- * 
+ *
  *  SEE ALSO
  *      CreateMutex(), DeleteMutex(), AttemptMutex(), ObtainMutex()
  */

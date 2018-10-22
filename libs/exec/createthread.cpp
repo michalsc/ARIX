@@ -23,7 +23,10 @@
 #include <exec/tasks.h>
 #include <exec/memory.h>
 
+#define DEBUG
+
 #include "exec_intern.h"
+#include "exec_debug.h"
 
 int __thread_bootstrap(void *arg);
 
@@ -32,12 +35,12 @@ void CreateThread(struct TagItem *tags)
     struct TagItem *tempTag = static_cast<struct TagItem *>(AllocVec(2*sizeof(struct TagItem), 0));
     IPTR stack_size = LibGetTagData(TASKTAG_STACKSIZE, 40960, tags);
     void *stack = NULL;
-    
+
     stack_size = (stack_size + 4095) & ~4095;
     stack = AllocVecAligned(stack_size, 32, MEMF_CLEAR);
 
-    bug("[EXEC] CreateThread(%p)\n", tags);
-    bug("[EXEC] Allocated %d KB stack at %p\n", stack_size >> 10, stack);
+    D(bug("[EXEC] CreateThread(%p)\n", tags));
+    D(bug("[EXEC] Allocated %d KB stack at %p\n", stack_size >> 10, stack));
 
     tempTag[0].ti_Tag = TASKTAG_AFFINITY + 1;
     tempTag[0].ti_Data = reinterpret_cast<IPTR>(stack);
@@ -46,12 +49,12 @@ void CreateThread(struct TagItem *tags)
 
     stack = (UBYTE *)stack + stack_size;
 
-    bug("[EXEC] Calling clone()\n");
+    D(bug("[EXEC] Calling clone()\n"));
 
     /* From this point on lock globally as long as the TagList is in use */
     ObtainMutex(&thread_sync_lock);
 
-    int ret = clone(__thread_bootstrap, stack, 
+    int ret = clone((int (*)(void*))__thread_bootstrap, stack,
         CLONE_VM | CLONE_THREAD | CLONE_SIGHAND | CLONE_FS | CLONE_FILES | CLONE_IO, // CLONE_PARENT,
         tempTag);
 }
@@ -83,8 +86,8 @@ int __thread_bootstrap(void *arg)
     /* Done with TagList, release thread synchronization lock */
     ReleaseMutex(&thread_sync_lock);
 
-    bug("[EXEC] CreateThread(): inside bootstrap\n");
-    bug("[EXEC] pid=%d, tid=%d\n", syscall(SYS_getpid), syscall(SYS_gettid));
+    D(bug("[EXEC] CreateThread(): inside bootstrap\n"));
+    D(bug("[EXEC] pid=%d, tid=%d\n", syscall(SYS_getpid), syscall(SYS_gettid)));
 
     switch(highest_arg)
     {
@@ -117,8 +120,19 @@ int __thread_bootstrap(void *arg)
             break;
     }
 
-    FreeVec((void*)tags[0].ti_Data);
+    D(bug("[EXEC] Finishing thread\n"));
+
+    APTR ssp = (APTR)tags[0].ti_Data;
+
     FreeVec(tags);
+    /*
+        This is wrong. First is the stack cleaned up, then the thread exits eventually fetching return
+        address from the (already deallocated) stack. Hopefully fixed with __builtin_return_address...
+
+        The proper approach will be to provide asm stubs issuing clone() syscall directly, subsequently
+        cleaning up the stack and releasing memory.
+    */
+    FreeVec(ssp);
 
     return 0;
 }

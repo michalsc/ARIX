@@ -15,29 +15,28 @@
 #include <exec/mutex.h>
 #include <clib/exec_protos.h>
 
+#include "exec_debug.h"
 #include "exec_intern.h"
-
-#define D(x) /* */
 
 /**
  *  NAME
  *      ObtainMutex - Obtain the mutex.
- * 
+ *
  *  SYNOPSIS
  *      int ObtainMutex(struct Mutex * mutex);
- * 
+ *
  *  FUNCTION
  *      Attempts to obtain the mutex. If the mutex was free and successfuly
  *      obtained by this function, TRUE is returned. Otherwise the function
  *      waits forever.
- * 
+ *
  *  INPUTS
  *      mutex - The allocated and initialized mutex to be locked.
- * 
+ *
  *  RESULT
  *      TRUE  - if the mutex is successfuly obtained,
  *      FALSE - in case of a problem with waiting.
- * 
+ *
  *  SEE ALSO
  *      CreateMutex(), DeleteMutex(), AttemptMutex(), ReleaseMutex()
  */
@@ -53,7 +52,7 @@ int ObtainMutex(struct Mutex *m)
         {
             int err;
 
-            /* 
+            /*
                 Test if Mutex is free, in that case set it to locked state. In case of
                 a success, the builtin returns true, in case of failure false is returned.
              */
