@@ -29,6 +29,7 @@ extern struct Library * ExecBase;
 static void * _handle = NULL;
 void * local_memory_pool = NULL;
 struct Mutex local_memory_lock;
+struct Mutex thread_sync_lock;
 int OutSocket = 0;
 
 struct timespec StartTime;
@@ -73,6 +74,7 @@ void __attribute__((constructor)) ExecInit()
     local_memory_pool = tlsf_init_autogrow(65536, 0, NULL, NULL, NULL);
     printf("[EXEC] Local memory pool @ %p\n", local_memory_pool);
     InitMutex(&local_memory_lock, MUTEX_FREE);
+    InitMutex(&thread_sync_lock, MUTEX_FREE);
     OutSocket = syscall(SYS_socket, AF_UNIX, SOCK_DGRAM, 0);
     syscall(SYS_clock_gettime, CLOCK_REALTIME, &StartTime);
     printf("[EXEC] Start time: %ld.%09ld\n", StartTime.tv_sec, StartTime.tv_nsec);

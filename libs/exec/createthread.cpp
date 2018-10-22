@@ -48,6 +48,9 @@ void CreateThread(struct TagItem *tags)
 
     bug("[EXEC] Calling clone()\n");
 
+    /* From this point on lock globally as long as the TagList is in use */
+    ObtainMutex(&thread_sync_lock);
+
     int ret = clone(__thread_bootstrap, stack, 
         CLONE_VM | CLONE_THREAD | CLONE_SIGHAND | CLONE_FS | CLONE_FILES | CLONE_IO, // CLONE_PARENT,
         tempTag);
@@ -76,6 +79,9 @@ int __thread_bootstrap(void *arg)
     {
         syscall(SYS_prctl, PR_SET_NAME, t->ti_Data);
     }
+
+    /* Done with TagList, release thread synchronization lock */
+    ReleaseMutex(&thread_sync_lock);
 
     bug("[EXEC] CreateThread(): inside bootstrap\n");
     bug("[EXEC] pid=%d, tid=%d\n", syscall(SYS_getpid), syscall(SYS_gettid));
@@ -113,4 +119,6 @@ int __thread_bootstrap(void *arg)
 
     FreeVec((void*)tags[0].ti_Data);
     FreeVec(tags);
+
+    return 0;
 }

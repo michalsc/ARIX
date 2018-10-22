@@ -25,6 +25,7 @@ extern std::list<struct MsgPort *> __ports;
 
 extern void * local_memory_pool;
 extern struct Mutex local_memory_lock;
+extern struct Mutex thread_sync_lock;
 extern int OutSocket;
 extern uint32_t UUID_Seed;
 extern struct timespec StartTime;
