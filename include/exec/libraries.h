@@ -12,9 +12,9 @@ struct Library {
 
 // Default functions which shall be implemented by every library!
 struct LibraryLVO {
-    struct Library *    (*Open)(void * handle, uint32_t version);
-    void *              (*Close)();
-    void *              (*Expunge)();
+    struct Library *    (*LibOpen)(void * handle, uint32_t version);
+    void *              (*LibClose)();
+    void *              (*LibExpunge)();
     void *              (*GetHandle)();
 };
 

@@ -54,7 +54,7 @@ struct Library * OpenLibrary(const char * name, uint32_t minVersion)
     // it returned NULL assume there was a failure and issue dlclose immediately.
     if (retval) {
         struct LibraryLVO *lvo = retval->lib_LVOTable;
-        struct Library * base = lvo->Open(handle, minVersion);
+        struct Library * base = lvo->LibOpen(handle, minVersion);
 
         D(bug("[EXEC] Open function returned %p\n", (void *)base));
 

@@ -27,7 +27,7 @@ void CloseLibrary(struct Library * library)
 
     if (library) {
         struct LibraryLVO * lvo = library->lib_LVOTable;
-        void * handle = lvo->Close();
+        void * handle = lvo->LibClose();
 
         D(bug("[EXEC] Close returned %p\n", handle));
 
