@@ -13,8 +13,7 @@
 
 #include <stdio.h>
 
-#define bug printf
-#define D(x) x
+#include "exec_debug.h"
 
 void CloseLibrary(struct Library * library)
 {

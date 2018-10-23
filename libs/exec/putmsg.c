@@ -24,7 +24,8 @@
 #include "exec_intern.h"
 #include <time.h>
 
-#define D(x) x
+#define DEBUG
+#include "exec_debug.h"
 
 void InternalPutMsg(uuid_t portID, struct Message *msg);
 
@@ -78,8 +79,8 @@ void InternalPutMsg(uuid_t portID, struct Message *msg)
 */
         syscall(SYS_sendmsg, OutSocket, &msghdr, 0);
 /*
-        sendto(OutSocket, 
-            &msg->mn_ReplyPort, msg->mn_Length + sizeof(struct Message) - offsetof(struct Message, mn_ReplyPort), 0, 
+        sendto(OutSocket,
+            &msg->mn_ReplyPort, msg->mn_Length + sizeof(struct Message) - offsetof(struct Message, mn_ReplyPort), 0,
             (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(uuid_t)
         );
 */

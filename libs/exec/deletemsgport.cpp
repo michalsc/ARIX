@@ -21,31 +21,32 @@
 #include <fcntl.h>
 #include <stdio.h>
 
+#include "exec_debug.h"
 #include "exec_intern.h"
 
 /**
  * NAME
  *      DeleteMsgPort - Deallocate the message port
- * 
+ *
  * SYNOPSIS
  *      void DeleteMsgPort(struct MsgPort * port);
- * 
+ *
  * FUNCTION
- *      Disconnects the unix socket from message port and closes the 
+ *      Disconnects the unix socket from message port and closes the
  *      descriptor. Subsequently releases the memory for incomming messages
  *      and for the message port itself.
- * 
+ *
  *      It is safe to call this function with port == NULL.
- * 
+ *
  * INPUTS
  *      port - Message port to be deleted or NULL.
- * 
+ *
  * SEE ALSO
  *      CreateMsgPort(), AddPort(), RemPort()
  */
 void DeleteMsgPort(struct MsgPort * port)
 {
-    printf("[EXEC] DeleteMsgPort(%p)\n", (void *)port);
+    D(bug("[EXEC] DeleteMsgPort(%p)\n", (void *)port));
 
     // Make sure non-null value was given.
     if (port)

@@ -18,6 +18,7 @@
 
 #include "tlsf.h"
 #include "exec_intern.h"
+#include "exec_debug.h"
 
 #include <stdio.h>
 
@@ -70,28 +71,28 @@ void * GetHandle()
 
 void __attribute__((constructor)) ExecInit()
 {
-    printf("[EXEC] ExecInit()\n");
+    bug("[EXEC] ExecInit()\n");
     local_memory_pool = tlsf_init_autogrow(65536, 0, NULL, NULL, NULL);
-    printf("[EXEC] Local memory pool @ %p\n", local_memory_pool);
+    bug("[EXEC] Local memory pool @ %p\n", local_memory_pool);
     InitMutex(&local_memory_lock, MUTEX_FREE);
     InitMutex(&thread_sync_lock, MUTEX_FREE);
     OutSocket = syscall(SYS_socket, AF_UNIX, SOCK_DGRAM, 0);
     syscall(SYS_clock_gettime, CLOCK_REALTIME, &StartTime);
-    printf("[EXEC] Start time: %ld.%09ld\n", StartTime.tv_sec, StartTime.tv_nsec);
+    bug("[EXEC] Start time: %ld.%09ld\n", StartTime.tv_sec, StartTime.tv_nsec);
 #if __SIZEOF_LONG__ > 4
     UUID_Seed = 2654435761 * ((StartTime.tv_sec >> 32) ^ (StartTime.tv_sec) ^ StartTime.tv_nsec);
 #else
     UUID_Seed = 2654435761 * ((StartTime.tv_sec) ^ StartTime.tv_nsec);
 #endif
-    printf("[EXEC] UUID Random seed=0x%08x\n", UUID_Seed);
+    bug("[EXEC] UUID Random seed=0x%08x\n", UUID_Seed);
 }
 
 void __attribute__((destructor)) ExecDestroy()
 {
-    printf("[EXEC] ExecDestroy()\n");
+    bug("[EXEC] ExecDestroy()\n");
 
     if (!__ports.empty()) {
-        printf("[EXEC] Not all MsgPorts were closed. Closing now...\n");
+        bug("[EXEC] Not all MsgPorts were closed. Closing now...\n");
 
         while (!__ports.empty()) {
             struct MsgPort *p = __ports.front();

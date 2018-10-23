@@ -24,44 +24,45 @@
 #include <string.h>
 #include <strings.h>
 
-#define D(x) x
+#define DEBUG
+#include "exec_debug.h"
 
 /**
  * NAME
  *      AddPort - Add the message port to the list of public ports
- * 
+ *
  * SYNOPSIS
  *      int AddPort(struct MsgPort *port, const char *name);
- * 
+ *
  * FUNCTION
  *      Adds given message port to the list of public ports and advertise
  *      it unter specified name. After this call any other application can
  *      find the message port by the name and thus send messages to it.
- * 
+ *
  *      The message ports in ARIX are identified by type 4 (random) uuid
- *      generated every time the CreateMsgPort function is called. The 
+ *      generated every time the CreateMsgPort function is called. The
  *      port IDs may vary even for the same application started twice or
  *      in parallel. Since a random guess of a 128 bit value is rather hard,
  *      public ports need to advertise themself by other means, here, a
  *      name.
- * 
- *      Since each public port name has to be unique, the port must be 
- *      removed form the public port list by a RemPort call as soon as 
+ *
+ *      Since each public port name has to be unique, the port must be
+ *      removed form the public port list by a RemPort call as soon as
  *      port is deleted.
- * 
+ *
  * INPUTS
  *      port - Message port to be added to the public port list.
  *      name - A null-terminated string with public port name.
- * 
+ *
  * RESULT
  *      != 0 - The message port has been successfuly added to the list
  *      == 0 - The message port could not be added, probably there is
  *             A port registerred under given name already
- * 
+ *
  * NOTE
  *      Further versions of exec.library may remove the port automatically
  *      upon application exit.
- * 
+ *
  * SEE ALSO
  *      FindPort(), RemPort(), CreateMsgPort(), DeleteMsgPort()
  */
@@ -74,7 +75,7 @@ int AddPort(struct MsgPort *port, const char * name)
     int messageLength = 0;
     int retval = 0;
 
-    printf("[EXEC] AddPort(%p, '%s')\n", (void *)port, name);
+    D(bug("[EXEC] AddPort(%p, '%s')\n", (void *)port, name));
 
     // Assert port and name are given
     if (port != NULL && name != NULL)
@@ -82,7 +83,7 @@ int AddPort(struct MsgPort *port, const char * name)
         // Calculate length of the message and allocate the buffer
         messageLength = strlen(name) + 1 + sizeof(struct MsgARIXAddPort);
         msg = (struct MsgARIXAddPort * )AllocVec(messageLength, MEMF_CLEAR);
-        
+
         if (msg)
         {
             // Create temporary port
@@ -99,17 +100,17 @@ int AddPort(struct MsgPort *port, const char * name)
                 CopyMem(&port->mp_ID, &msg->port, sizeof(uuid_t));
 
                 // Send the message to ARIX port
-                printf("[EXEC] Sending message...\n");
+                D(bug("[EXEC] Sending message...\n"));
                 PutMsg(arixPort, (struct Message *)msg);
 
                 // Expect a reply from ARIX server. It should tell us
                 // if the port has been successfuly added to the list
-                printf("[EXEC] Waiting for reply...\n");
+                D(bug("[EXEC] Waiting for reply...\n"));
                 WaitPort(reply);
                 m = (struct MsgARIXAddPort *)GetMsg(reply);
 
-                printf("[EXEC] Got message %p\n", (void*)m);
-                printf("[EXEC] AddPort() = %d\n", (int)m->hdr.ma_RetVal);
+                D(bug("[EXEC] Got message %p\n", (void*)m));
+                D(bug("[EXEC] AddPort() = %d\n", (int)m->hdr.ma_RetVal));
 
                 // Store the return value from ARIX
                 retval = m->hdr.ma_RetVal;

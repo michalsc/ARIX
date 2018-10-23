@@ -19,6 +19,8 @@
 #include <signal.h>
 
 #include "exec_intern.h"
+#define DEBUG
+#include "exec_debug.h"
 
 void Spawn(struct Hook * spawnHook)
 {
@@ -34,17 +36,17 @@ void Spawn(struct Hook * spawnHook)
         {
             /* Regenerate random seed and start time */
             syscall(SYS_clock_gettime, CLOCK_REALTIME, &StartTime);
-            printf("[EXEC] Spawn(): Start time: %ld.%09ld\n", StartTime.tv_sec, StartTime.tv_nsec);
+            D(bug("[EXEC] Spawn(): Start time: %ld.%09ld\n", StartTime.tv_sec, StartTime.tv_nsec));
 #if __SIZEOF_LONG__ > 4
             UUID_Seed = 2654435761 * ((StartTime.tv_sec >> 32) ^ (StartTime.tv_sec) ^ StartTime.tv_nsec);
 #else
             UUID_Seed = 2654435761 * ((StartTime.tv_sec) ^ StartTime.tv_nsec);
 #endif
-            printf("[EXEC] Spawn(): UUID Random seed=0x%08x\n", UUID_Seed);
+            D(bug("[EXEC] Spawn(): UUID Random seed=0x%08x\n", UUID_Seed));
 
             if (!__ports.empty())
             {
-                printf("[EXEC] Spawn(): Renaming all MsgPorts\n");
+                D(bug("[EXEC] Spawn(): Renaming all MsgPorts\n"));
 
                 for (auto port: __ports)
                 {
@@ -58,7 +60,7 @@ void Spawn(struct Hook * spawnHook)
                     // If socket failed return NULL.
                     if (port->mp_Socket < 0)
                     {
-                        printf("[EXEC] Spawn(): Cannot create socket\n");
+                        D(bug("[EXEC] Spawn(): Cannot create socket\n"));
                     }
 
                     // Put the socket in non-blocking mode.
@@ -79,15 +81,15 @@ void Spawn(struct Hook * spawnHook)
                         // Number of retries exhausted? Just fail...
                         if (--maxtry < 0)
                         {
-                            printf("[EXEC] Spawn(): too many tries. giving up\n");
+                            D(bug("[EXEC] Spawn(): too many tries. giving up\n"));
                             return;
                         }
 
-                        printf("[EXEC] Spawn(): Binding to port ID {%08x-%04x-%04x-%04x-%02x%02x%02x%02x%02x%02x}\n",
+                        D(bug("[EXEC] Spawn(): Binding to port ID {%08x-%04x-%04x-%04x-%02x%02x%02x%02x%02x%02x}\n",
                                port->mp_ID.time_low, port->mp_ID.time_med, port->mp_ID.time_hi_and_version,
                                port->mp_ID.clock_seq_hi_and_reserved << 8 | port->mp_ID.clock_seq_low,
                                port->mp_ID.node[0], port->mp_ID.node[1], port->mp_ID.node[2],
-                               port->mp_ID.node[3], port->mp_ID.node[4], port->mp_ID.node[5]);
+                               port->mp_ID.node[3], port->mp_ID.node[4], port->mp_ID.node[5]));
 
                         // Try to bind socket to the ID in unix socket namespace.
                         err = syscall(SYS_bind, port->mp_Socket, (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(uuid_t));

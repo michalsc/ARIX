@@ -23,28 +23,29 @@
 #include <string.h>
 #include <strings.h>
 
-#define D(x) x
+#define DEBUG
+#include "exec_debug.h"
 
 /**
  * NAME
  *      FindPort - Find public message port by name
- * 
+ *
  * SYNOPSIS
  *      uuid_t FindPort(const char *name);
- * 
+ *
  * FUNCTION
  *      Searches public port list for given name and returns message port
  *      ID (uuid) which can be subsequently used to send messages to that
- *      port. Once ID is obtained, messages can be send to even if the 
+ *      port. Once ID is obtained, messages can be send to even if the
  *      owner has removed the message port from the public list.
- * 
+ *
  * INPUTS
  *      name - A null-terminated string with public port name of interest.
- * 
+ *
  * RESULT
  *      uuid_t - The ID of the message port or zero uuid if the port has not
  *               been found.
- * 
+ *
  * SEE ALSO
  *      AddPort(), RemPort()
 */
@@ -57,7 +58,7 @@ uuid_t FindPort(const char * name)
     struct MsgPort *reply = NULL;
     int messageLength = 0;
 
-    printf("[EXEC] FindPort('%s')\n", name);
+    D(bug("[EXEC] FindPort('%s')\n", name));
 
     // Assert port name is given
     if (name)
@@ -81,23 +82,23 @@ uuid_t FindPort(const char * name)
                 CopyMem(name, msg->name, strlen(name));
 
                 // Send message to ARIX
-                printf("[EXEC] Sending message...\n");
+                D(bug("[EXEC] Sending message...\n"));
                 PutMsg(arixPort, (struct Message *)msg);
 
                 // Wait for an answer...
-                printf("[EXEC] Waiting for reply...\n");
+                D(bug("[EXEC] Waiting for reply...\n"));
                 WaitPort(reply);
                 m = (struct MsgARIXFindPort *)GetMsg(reply);
-                
+
                 // And store it
                 id = m->port;
 
-                printf("[EXEC] Got message %p\n", (void *)m);
-                printf("[EXEC] FindPort() = {%08x-%04x-%04x-%04x-%02x%02x%02x%02x%02x%02x}\n",
+                D(bug("[EXEC] Got message %p\n", (void *)m));
+                D(bug("[EXEC] FindPort() = {%08x-%04x-%04x-%04x-%02x%02x%02x%02x%02x%02x}\n",
                        id.time_low, id.time_med, id.time_hi_and_version,
                        id.clock_seq_hi_and_reserved << 8 | id.clock_seq_low,
                        id.node[0], id.node[1], id.node[2],
-                       id.node[3], id.node[4], id.node[5]);
+                       id.node[3], id.node[4], id.node[5]));
 
                 // Clean up
                 DiscardMsg((struct Message *)m);

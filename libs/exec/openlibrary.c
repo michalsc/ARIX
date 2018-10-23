@@ -13,8 +13,8 @@
 
 #include <stdio.h>
 
-#define bug printf
-#define D(x) x
+#define DEBUG
+#include "exec_debug.h"
 
 // Full path resolving not implemented yet
 // Idea: use separate namespace for all arix libraries?

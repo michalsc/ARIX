@@ -11,29 +11,28 @@
 #include <exec/memory.h>
 #include <clib/exec_protos.h>
 
+#include "exec_debug.h"
 #include "exec_intern.h"
-
-#define D(x) /* */
 
 /**
  *  NAME
  *      CreateMutex - Allocate and initialize a mutex
- * 
+ *
  *  SYNOPSIS
  *      struct Mutex * CreateMutex(int initialState);
- * 
+ *
  *  FUNCTION
  *      Allocates memory for the mutex and sets its initial state to given
  *      value. You *must* delete the mutex by calling DeleteMutex()!
- * 
+ *
  *  INPUTS
  *      initialState - Initial state of the mutex. It can be one ot two
  *              values, either MUTEX_LOCKED or MUTEX_FREE.
- * 
+ *
  *  RESULT
- *      Mutex - Initialized mutex which can be used to guarantee exclusive 
+ *      Mutex - Initialized mutex which can be used to guarantee exclusive
  *              access across several threads of the process.
- * 
+ *
  *  SEE ALSO
  *      DeleteMutex(), ObtainMutex(), ReleaseMutex(), AttemptMutex()
  */

@@ -21,6 +21,8 @@
 #include <time.h>
 
 #include "exec_intern.h"
+#define DEBUG
+#include "exec_debug.h"
 
 struct Message *GetMsg(struct MsgPort *port)
 {
@@ -39,10 +41,10 @@ struct Message *GetMsg(struct MsgPort *port)
         };
 
         msg = port->mp_ReceiveBuffer;
-        
+
         io.iov_base = &msg->mn_ReplyPort;
         io.iov_len = 4096 - offsetof(struct Message, mn_ReplyPort);
-        
+
         //int nbytes = recv(port->mp_Socket, &msg->mn_ReplyPort, 4096 - offsetof(struct Message, mn_ReplyPort), 0);
         int nbytes = syscall(SYS_recvmsg, port->mp_Socket, &msghdr, 0);
         if (nbytes <= 0)
@@ -55,7 +57,7 @@ struct Message *GetMsg(struct MsgPort *port)
         // Ancillary data received. attach it past the message data and update message headers
         // accordingly.
         if (msghdr.msg_controllen > 0) {
-            printf("[EXEC] Control data of size %zu received\n", msghdr.msg_controllen);
+            D(bug("[EXEC] Control data of size %zu received\n", msghdr.msg_controllen));
             msg->mn_Control = (void *)((intptr_t)msg + msglength);
             msg->mn_ControlLength = msghdr.msg_controllen;
             CopyMem(msghdr.msg_control, msg->mn_Control, msg->mn_ControlLength);

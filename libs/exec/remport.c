@@ -24,29 +24,30 @@
 #include <string.h>
 #include <strings.h>
 
-#define D(x) x
+#define DEBUG
+#include "exec_debug.h"
 
 /**
  * NAME
  *      RemPort - Remove the message port from the list of public ports
- * 
+ *
  * SYNOPSIS
  *      void RemPort(struct MsgPort *port);
- * 
+ *
  * FUNCTION
  *      Removes given message port from the list of public ports. After
  *      this call subsequent attempts to find the port using its name
- *      will fail. The message port is still active though and 
+ *      will fail. The message port is still active though and
  *      applications which already obtained its ID may still continue to
  *      use it.
- * 
+ *
  * INPUTS
  *      port - Message port to be removed from the public port list.
- * 
+ *
  * NOTE
  *      Further versions of exec.library may remove the port automatically
  *      upon application exit or deletion of message port.
- * 
+ *
  * SEE ALSO
  *      FindPort(), AddPort(), CreateMsgPort(), DeleteMsgPort()
 */
@@ -57,7 +58,7 @@ void RemPort(struct MsgPort *port)
     struct MsgARIXRemPort _msg, *msg = &_msg;
     struct MsgPort *reply = NULL;
 
-    printf("[EXEC] RemPort(%p)\n", (void *)port);
+    D(bug("[EXEC] RemPort(%p)\n", (void *)port));
 
     // Create reply port
     reply = CreateMsgPort();
@@ -72,17 +73,17 @@ void RemPort(struct MsgPort *port)
         CopyMem(&port->mp_ID, &msg->port, sizeof(uuid_t));
 
         // Send message to ARIX
-        printf("[EXEC] Sending message...\n");
+        D(bug("[EXEC] Sending message...\n"));
         PutMsg(arixPort, (struct Message *)msg);
 
         // And wait for a reply
-        printf("[EXEC] Waiting for reply...\n");
+        D(bug("[EXEC] Waiting for reply...\n"));
         WaitPort(reply);
         msg = (struct MsgARIXRemPort *)GetMsg(reply);
 
         // All done. Clean up the mess (reply port and received message)
-        printf("[EXEC] Got message %p\n", (void *)msg);
-        printf("[EXEC] RemPort() = %d\n", (int)msg->hdr.ma_RetVal);
+        D(bug("[EXEC] Got message %p\n", (void *)msg));
+        D(bug("[EXEC] RemPort() = %d\n", (int)msg->hdr.ma_RetVal));
 
         DiscardMsg((struct Message *)msg);
         DeleteMsgPort(reply);
