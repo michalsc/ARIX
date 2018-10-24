@@ -38,6 +38,7 @@ std::string ARIXFile::arix2unix(std::string arix_path)
 
 ARIXFile::ARIXFile(const char * p, int mode)
 {
+    #if 0
     int fd_vol;
     std::string path(p);
     std::string volume;
@@ -56,7 +57,7 @@ ARIXFile::ARIXFile(const char * p, int mode)
         if (it != __files->end()) {
             f = it->second;
         }
-        
+
         if (f) {
             volume = f->__volume;
             path = path.substr(1);
@@ -83,7 +84,7 @@ ARIXFile::ARIXFile(const char * p, int mode)
 
             if (*(_p.rbegin()) != '/')
                 _p.push_back('/');
-            
+
             path = _p + path;
         }
     }
@@ -185,10 +186,10 @@ ARIXFile::ARIXFile(const char * p, int mode)
     }
 
     printf("__fd = %d\n", __fd);
-    
+
     // Generate random uuid for the file
     int maxtry = 1000;
-    
+
     do {
         __id = GetRandomID(NT_FILE);
     } while(!__files->empty() && (__files->count(__id) != 0 && --maxtry > 0));
@@ -202,4 +203,5 @@ ARIXFile::ARIXFile(const char * p, int mode)
     printf(o.str().c_str());
 
     (*__files)[__id] = this;
+    #endif
 }

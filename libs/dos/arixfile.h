@@ -13,6 +13,8 @@
 #include <uuid/uuid.h>
 #include <unordered_map>
 
+#include "path.h"
+
 enum EntryType {
     Volume, Assign
 };
@@ -27,14 +29,14 @@ struct ARIXAssign : public ARIXEntry {
 };
 
 class ARIXFile {
-    std::string __volume;
-    std::string __path;
+    Path    __path;
     uuid_t  __id;
     int     __fd;
 public:
     ARIXFile(const char * path, int mode);
     static std::string arix2unix(std::string path);
 
+    Path    path() { return __path; }
     int     fd() { return __fd; }
     uuid_t  id() { return __id; }
 };

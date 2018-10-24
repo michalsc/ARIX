@@ -22,6 +22,7 @@
 #include <stdio.h>
 
 #include "arixfile.h"
+#include "path.h"
 #include "../../system/arix/arix_messages.h"
 
 extern struct Library *DOSBase;
@@ -65,6 +66,8 @@ struct MsgPort * __pr_MsgPort;
 std::unordered_map<uuid_t, ARIXFile *> *__files;
 uuid_t __pr_CurrentDir;
 struct Library * UtilityBase;
+
+
 
 void __attribute__((constructor)) DOSInit()
 {
@@ -142,6 +145,9 @@ void __attribute__((constructor)) DOSInit()
     printf("[DOS] PROGDIR: lock = %d\n", __pr_HomeDirLock);
 
     __AssignsDirLock = syscall(SYS_openat, __TmpDirLock, ".assigns", O_RDONLY | O_DIRECTORY);
+
+    Path::PathFromDOS("SYS:Libs//Test");
+    Path::PathFromDOS("Some Volume:file");
 /*
     ARIXFile *f = new ARIXFile("sys:test_file.txt", O_RDONLY);
     f = new ARIXFile("progdir:a", O_RDONLY);

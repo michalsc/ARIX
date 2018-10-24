@@ -18,6 +18,11 @@ class Path {
     std::string __path;
 
 public:
+    void setVolume(std::string vol) { __volume = vol; }
+    void setPath(std::string path) { __path = path; }
+    std::string volume() { return __volume; }
+    std::string path() { return __path; }
+
     static Path PathFromDOS(std::string);
     static Path PathFromUNIX(std::string);
 };
