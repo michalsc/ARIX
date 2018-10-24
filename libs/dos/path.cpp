@@ -18,3 +18,10 @@ Path Path::PathFromDOS(std::string path)
 
     return p;
 }
+
+Path Path::PathFromUNIX(std::string path)
+{
+    Path p;
+
+    return p;
+}
