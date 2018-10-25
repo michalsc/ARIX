@@ -36,7 +36,7 @@ public:
     ARIXFile(const char * path, int mode);
     static std::string arix2unix(std::string path);
 
-    Path    path() { return __path; }
+    const Path & path() { return __path; }
     int     fd() { return __fd; }
     uuid_t  id() { return __id; }
 };
