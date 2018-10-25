@@ -23,7 +23,7 @@ static std::string str_toupper(std::string s) {
     return s;
 }
 
-Path Path::PathFromDOS(std::string path)
+Path Path::PathFromDOS(const std::string & path)
 {
     Path p;
 
@@ -86,46 +86,33 @@ Path Path::PathFromDOS(std::string path)
     /* Canonicalize path and check if it does not try to go outside the volume */
     std::vector<std::string> path_array;
     bool success = true;
-    while (p.__path != "")
+    std::size_t lastpos = 0;
+    int cnt = 10;
+    do
     {
-        std::size_t pos = p.__path.find('/');
+        pos = p.__path.find('/', lastpos);
+        std::string elem = p.__path.substr(lastpos, pos - lastpos);
 
-        if (pos != std::string::npos) {
-            std::string elem = p.__path.substr(0, pos);
-            if (elem != ".")
+        if (elem != ".")
+        {
+            if (elem == "" || elem == "..")
             {
-                if (elem == "" || elem == "..")
-                {
-                    if (path_array.size() > 0)
-                        path_array.pop_back();
-                    else
-                    {
-                        success = false;
-                        break;
-                    }
-                }
-                else
-                    path_array.push_back(elem);
-            }
-            p.__path = p.__path.substr(pos + 1);
-        } else {
-            if (p.__path == "")
-                continue;
-            else if (p.__path == "..") {
                 if (path_array.size() > 0)
                     path_array.pop_back();
-                else {
+                else
+                {
                     success = false;
+                    break;
                 }
             }
             else
-                path_array.push_back(p.__path);
-            p.__path = "";
+                path_array.push_back(elem);
         }
-    }
+        lastpos = pos + 1;
+    } while (pos != std::string::npos);
 
     if (!success) {
-        bug("Path excaping the volume boundary");
+        bug("Path excaping the volume boundary\n");
     }
     else {
         p.__path = path_array[0];
@@ -141,7 +128,7 @@ Path Path::PathFromDOS(std::string path)
     return p;
 }
 
-Path Path::PathFromUNIX(std::string path)
+Path Path::PathFromUNIX(const std::string & path)
 {
     Path p;
 

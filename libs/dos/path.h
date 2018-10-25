@@ -18,13 +18,13 @@ class Path {
     std::string __path;
 
 public:
-    void setVolume(std::string vol) { __volume = vol; }
-    void setPath(std::string path) { __path = path; }
-    std::string volume() { return __volume; }
-    std::string path() { return __path; }
+    void setVolume(const std::string & vol) { __volume = vol; }
+    void setPath(const std::string & path) { __path = path; }
+    const std::string & volume() const { return __volume; }
+    const std::string & path() const { return __path; }
 
-    static Path PathFromDOS(std::string);
-    static Path PathFromUNIX(std::string);
+    static Path PathFromDOS(const std::string &);
+    static Path PathFromUNIX(const std::string &);
 };
 
 #endif /* _PATH_H */
