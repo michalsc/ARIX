@@ -9,8 +9,11 @@
 
 #include <clib/dos_protos.h>
 
+#include "dos_private.h"
+
 int Close(uuid_t handle)
 {
+
     (void)handle;
     return 0;
 }
