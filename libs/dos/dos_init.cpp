@@ -146,8 +146,6 @@ void __attribute__((constructor)) DOSInit()
 
     __AssignsDirLock = syscall(SYS_openat, __TmpDirLock, ".assigns", O_RDONLY | O_DIRECTORY);
 
-    Path::PathFromDOS("SYS:Libs//Test");
-    Path::PathFromDOS("Some Volume:file");
 /*
     ARIXFile *f = new ARIXFile("sys:test_file.txt", O_RDONLY);
     f = new ARIXFile("progdir:a", O_RDONLY);
