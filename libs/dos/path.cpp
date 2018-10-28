@@ -295,62 +295,64 @@ Path Path::PathFromUNIX(const std::string & path)
             p.__path += "/" + it;
 
         /* Check volumes */
-        int fd = openat(__TmpDirLock, ".volumes", O_RDONLY | O_DIRECTORY);
+        int fd = syscall(SYS_openat, __TmpDirLock, ".volumes", O_RDONLY | O_DIRECTORY);
         D(bug("volumes fd = %d\n", fd));
 
-        int len = 0;
-        int bestmatch = 0;
-
-        do {
-            struct dirent64 de, *d=&de;
-            len = syscall(SYS_getdents64, fd, &de, sizeof(de));
-            if (len == 0)
-                break;
+        if (fd > 0)
+        {
+            int len = 0;
+            int bestmatch = 0;
 
             do {
-                D(bug("len: %d\nentry: %s\n", d->d_reclen, d->d_name));
-                if ((d->d_name[0] == '.' && d->d_name[1] == 0) ||
-                    (d->d_name[0] == '.' && d->d_name[1] == '.' && d->d_name[2] == 0))
-                {
+                struct dirent64 de, *d=&de;
+                len = syscall(SYS_getdents64, fd, &de, sizeof(de));
+                if (len == 0)
+                    break;
 
-                }
-                else
-                {
-                    D(bug("checking volume '%s'\n", d->d_name));
-                    int sz = readlinkat(fd, d->d_name, linkbuf, 511);
-                    linkbuf[sz] = 0;
-                    D(bug("link pointing to: %s\n", linkbuf));
-                    std::string b(linkbuf);
-
-                    if (*b.rbegin() != '/')
-                        b.push_back('/');
-
-                    if (b == p.__path.substr(0, b.length()))
+                do {
+                    D(bug("len: %d\nentry: %s\n", d->d_reclen, d->d_name));
+                    if ((d->d_name[0] == '.' && d->d_name[1] == 0) ||
+                        (d->d_name[0] == '.' && d->d_name[1] == '.' && d->d_name[2] == 0))
                     {
-                        if (bestmatch < b.length())
+                        D(bug("skipping entry...\n"));
+                    }
+                    else
+                    {
+                        D(bug("checking volume '%s'\n", d->d_name));
+                        int sz = syscall(SYS_readlinkat, fd, d->d_name, linkbuf, 511);
+                        linkbuf[sz] = 0;
+                        D(bug("link pointing to: %s\n", linkbuf));
+                        std::string b(linkbuf);
+
+                        if (*b.rbegin() != '/')
+                            b.push_back('/');
+
+                        if (b == p.__path.substr(0, b.length()))
                         {
-                            p.__volume = d->d_name;
-                            bestmatch = b.length();
-                            found_match = true;
+                            if (bestmatch < b.length())
+                            {
+                                p.__volume = d->d_name;
+                                bestmatch = b.length();
+                                found_match = true;
+                            }
                         }
                     }
-                }
 
-                len -= d->d_reclen;
-                d = (struct dirent64 *)((intptr_t)d + d->d_reclen);
-            } while (len > 0);
-        } while(true);
+                    len -= d->d_reclen;
+                    d = (struct dirent64 *)((intptr_t)d + d->d_reclen);
+                } while (len > 0);
+            } while(true);
 
-        if (found_match)
-            p.__path = p.__path.substr(bestmatch);
+            if (found_match)
+                p.__path = p.__path.substr(bestmatch);
 
-        close(fd);
+            syscall(SYS_close, fd);
+        }
 
         /* Worst guess ever, assume this is a path within UNIX: assign */
         if (!found_match)
         {
             p.__volume = "UNIX";
-            p.__path = path.substr(1);
         }
 
         D(bug("[DOS] Volume: %s, Path: %s\n", p.__volume.c_str(), p.__path.c_str()));
