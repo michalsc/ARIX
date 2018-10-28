@@ -23,21 +23,45 @@
 #include <vector>
 #include <fcntl.h>
 
+#define DEBUG
+#include "dos_debug.h"
 #include "dos_private.h"
+#include "path.h"
 
-static std::string str_toupper(std::string s) {
-    std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c){ return std::toupper(c); });
-    return s;
+int ARIXFile::Close()
+{
+    int err = -EBADF;
+
+    if (__fd > 0)
+    {
+        err = syscall(SYS_close, __fd);
+        __fd = 0;
+    }
+
+    return err;
 }
 
-// Converts ARIX path of any kind (relative, absolute, etc) to unix path
-std::string ARIXFile::arix2unix(std::string arix_path)
+size_t ARIXFile::Read(void * buffer, size_t length)
 {
+    int err = syscall(SYS_read, __fd, buffer, length);
 
+    return err;
+}
+
+size_t ARIXFile::Write(const void * buffer, size_t length)
+{
+    int err = syscall(SYS_write, __fd, buffer, length);
+
+    return err;
 }
 
 ARIXFile::ARIXFile(const char * p, int mode)
 {
+    __path = Path::PathFromDOS(p);
+
+    D(bug("[DOS] ARIXFile::ARIXFile(%s, %d)\n", p, mode));
+    D(bug("[DOS] Volume=%s, Path=%s\n", __path.volume(), __path.path()));
+
     #if 0
     int fd_vol;
     std::string path(p);

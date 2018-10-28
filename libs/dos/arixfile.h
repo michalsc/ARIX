@@ -34,7 +34,9 @@ class ARIXFile {
     int     __fd;
 public:
     ARIXFile(const char * path, int mode);
-    static std::string arix2unix(std::string path);
+    int Close();
+    size_t Read(void * buffer, size_t length);
+    size_t Write(const void * buffer, size_t length);
 
     const Path & path() { return __path; }
     int     fd() { return __fd; }
