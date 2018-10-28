@@ -21,6 +21,8 @@
         [ "intptr_t",           "SetIoErr", "intptr_t new_error" ],
         [ "intptr_t",           "IoErr" ],
 
+        [ "int",                "SetComment", "const char * fileName", "const char * comment" ],
+
         [ "uuid_t",             "Open", "const char * name", "int mode" ],
         [ "int",                "Close", "uuid_t handle" ],
         [ "size_t",             "Read", "uuid_t handle", "void * buffer", "size_t length" ],
