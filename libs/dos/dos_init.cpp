@@ -61,6 +61,7 @@ intptr_t __pr_result_2;
 char *__pr_HomePath;
 int __pr_HomeDirLock;
 int __AssignsDirLock;
+int __VolumesDirLock;
 int __TmpDirLock;
 struct MsgPort * __pr_MsgPort;
 std::unordered_map<uuid_t, ARIXFile *> *__files;
@@ -145,6 +146,9 @@ void __attribute__((constructor)) DOSInit()
     printf("[DOS] PROGDIR: lock = %d\n", __pr_HomeDirLock);
 
     __AssignsDirLock = syscall(SYS_openat, __TmpDirLock, ".assigns", O_RDONLY | O_DIRECTORY);
+    __VolumesDirLock = syscall(SYS_openat, __TmpDirLock, ".volumes", O_RDONLY | O_DIRECTORY);
+
+    SetComment("progdir:init", "Some boring comment");
 
 /*
     ARIXFile *f = new ARIXFile("sys:test_file.txt", O_RDONLY);
