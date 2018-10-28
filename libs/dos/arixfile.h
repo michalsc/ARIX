@@ -12,6 +12,7 @@
 
 #include <uuid/uuid.h>
 #include <unordered_map>
+#include <fcntl.h>
 
 #include "path.h"
 
@@ -33,7 +34,10 @@ class ARIXFile {
     uuid_t  __id;
     int     __fd;
 public:
-    ARIXFile(const char * path, int mode);
+    ARIXFile(const char * path, int mode = O_RDONLY);
+    ARIXFile(const Path &p, int mode = O_RDONLY);
+    ~ARIXFile();
+
     int Close();
     size_t Read(void * buffer, size_t length);
     size_t Write(const void * buffer, size_t length);

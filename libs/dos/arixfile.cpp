@@ -41,6 +41,11 @@ int ARIXFile::Close()
     return err;
 }
 
+ARIXFile::~ARIXFile()
+{
+    Close();
+}
+
 size_t ARIXFile::Read(void * buffer, size_t length)
 {
     int err = syscall(SYS_read, __fd, buffer, length);
@@ -60,7 +65,21 @@ ARIXFile::ARIXFile(const char * p, int mode)
     __path = Path::PathFromDOS(p);
 
     D(bug("[DOS] ARIXFile::ARIXFile(%s, %d)\n", p, mode));
-    D(bug("[DOS] Volume=%s, Path=%s\n", __path.volume(), __path.path()));
+    D(bug("[DOS] Volume=%s, Path=%s\n", __path.volume().c_str(), __path.path().c_str()));
+
+    /* Handle PROGDIR case */
+    if (__path.volume() == "PROGDIR")
+    {
+        D(bug("[DOS] PROGDIR: type, calling openat relative to HomeDirLock\n"));
+        __fd = syscall(SYS_openat, __pr_HomeDirLock, __path.path().c_str(), mode);
+        D(bug("[DOS] retval = %d\n", __fd));
+    }
+    else
+    {
+        /* Check all volumes first */
+
+    }
+
 
     #if 0
     int fd_vol;
