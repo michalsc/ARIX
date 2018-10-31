@@ -34,11 +34,7 @@ size_t Write(uuid_t handle, const void *buffer, size_t length)
     if (f != NULL)
     {
         bytesWritten = f->Write(buffer, length);
-
-        if (bytesWritten < 0)
-            err = bytesWritten;
-        else
-            err = 0;
+        err = f->lastError();
     }
 
     SetIoErr(-err);

@@ -34,11 +34,7 @@ size_t Read(uuid_t handle, void *buffer, size_t length)
     if (f != NULL)
     {
         bytesRead = f->Read(buffer, length);
-
-        if (bytesRead < 0)
-            err = bytesRead;
-        else
-            err = 0;
+        err = f->lastError();
     }
 
     SetIoErr(-err);
