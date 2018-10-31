@@ -33,6 +33,7 @@ class ARIXFile {
     Path    __path;
     uuid_t  __id;
     int     __fd;
+    int     __err;
 public:
     ARIXFile(const char * path, int mode = O_RDONLY);
     ARIXFile(const Path &p, int mode = O_RDONLY);
@@ -44,6 +45,7 @@ public:
 
     const Path & path() { return __path; }
     int     fd() { return __fd; }
+    int     lastError() { return __err; }
     uuid_t  id() { return __id; }
 };
 
