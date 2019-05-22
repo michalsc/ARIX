@@ -39,4 +39,4 @@ includes: echo_target
 $(SUBDIRS): includes
 	@$(MAKE) -C $@ all
 
-.PHONY: echo_target 4all includes initrd $(SUBDIRS)
+.PHONY: echo_target all includes initrd $(SUBDIRS)
