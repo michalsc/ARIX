@@ -15,7 +15,7 @@ export CXXFLAGS := -Os -std=c++11 -I$(INCLUDE_DIR) $(USER_CXXFLAGS)
 export LDFLAGS := $(USER_LDFLAGS)
 export SFDC := $(ROOT_DIR)/tools/sfdc/sfdc.py
 
-SUBDIRS := libs system test
+SUBDIRS := libs devs system test
 
 all: echo_target includes $(SUBDIRS)
 
@@ -35,6 +35,7 @@ includes: echo_target
 	@echo "Generating header files"
 	@$(MAKE) -C include includes
 	@$(MAKE) -C libs includes
+	@$(MAKE) -C devs includes
 
 $(SUBDIRS): includes
 	@$(MAKE) -C $@ all
