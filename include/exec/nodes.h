@@ -72,7 +72,7 @@ struct MinNode
 #define NT_DEATHMESSAGE 19
 #define NT_HIDD         20      /* AROS specific                            */
 
-
+#define NT_IOREQUEST    251
 #define NT_MUTEX        252
 #define NT_FILE         253
 
