@@ -24,7 +24,10 @@ void WaitPort(struct MsgPort *port)
 {
     D(bug("[EXEC] WaitPort(%p)\n", port));
 
-    if (port && port->mp_Socket > 0)
+    if (port)
+        ObtainMutex(&port->mp_Lock);
+
+    if (port && IsListEmpty(&port->mp_MsgList) && port->mp_Socket > 0)
     {
         struct pollfd p[1] = {
             {port->mp_Socket, POLLIN, 0}};
@@ -42,4 +45,7 @@ void WaitPort(struct MsgPort *port)
             }
         }
     }
+
+    if (port)
+        ReleaseMutex(&port->mp_Lock);
 }
