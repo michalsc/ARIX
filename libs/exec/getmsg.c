@@ -26,6 +26,29 @@
 
 struct Message *GetMsg(struct MsgPort *port)
 {
+    struct Message *msg = NULL;
+
+    if (port)
+    {
+        ObtainMutex(&port->mp_Lock);
+
+        if (IsListEmpty(&port->mp_MsgList))
+        {
+            msg = InternalGetMsg(port);
+        }
+        else
+        {
+            msg = (struct Message *)REMHEAD(&port->mp_MsgList);
+        }
+
+        ReleaseMutex(&port->mp_Lock);
+    }
+
+    return msg;
+}
+
+struct Message *InternalGetMsg(struct MsgPort *port)
+{
     struct Message * msg = NULL;
 
     if (port && port->mp_Socket > 0)
