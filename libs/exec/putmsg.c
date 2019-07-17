@@ -27,8 +27,6 @@
 #define DEBUG
 #include "exec_debug.h"
 
-void InternalPutMsg(uuid_t portID, struct Message *msg);
-
 void PutMsg(uuid_t portID, struct Message * msg)
 {
     msg->mn_Type = NT_MESSAGE;
