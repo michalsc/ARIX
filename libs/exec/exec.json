@@ -77,7 +77,11 @@
 
         [ "void *",             "CreateIORequest", "struct MsgPort * ioReplyPort", "size_t size"],
         [ "void",               "DeleteIORequest", "struct IORequest * io"],
-        [ "LONG",               "DoIO", "struct IORequest * io"],
+        [ "int",                "DoIO", "struct IORequest * io"],
+        [ "void",               "SendIO", "struct IORequest * io"],
+        [ "struct IORequest *", "CheckIO", "struct IORequest * io"],
+        [ "int",                "AbortIO", "struct IORequest * io"],
+        [ "int",                "WaitIO", "struct IORequest * io"],
 
         [ "struct Mutex *",     "CreateMutex", "int initialState" ],
         [ "void",               "InitMutex", "struct Mutex * mutex", "int initialState" ],
