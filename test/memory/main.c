@@ -29,7 +29,7 @@ int main(int argc, char **argv)
     (void)argv;
     struct timespec t0, t1;
     uuid_t empty = MAKE_UUID(0, 0, 0, 0, 0);
-    struct Message msg = { NULL, NULL, 0, empty, 0, 0, 0 };
+    struct Message msg = { { NULL, NULL, 0, 0, NULL }, NULL, NULL, 0, empty, 0, 0, 0 };
     uuid_t arixPort = MAKE_UUID(0x00000001, 0x0000, 0x4000, 0x8000 | NT_MSGPORT, 0x000000000000);
     struct MsgPort *reply = CreateMsgPort();
     

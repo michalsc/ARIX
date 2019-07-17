@@ -3,17 +3,22 @@
 
 #include <stdint.h>
 #include <uuid/uuid.h>
+#include <exec/mutex.h>
+#include <exec/lists.h>
 
 struct MsgPort
 {
     uuid_t      mp_ID;
     int         mp_Socket;
+    struct Mutex mp_Lock;
+    struct List mp_MsgList;
     void *      mp_MsgPool;
     void *      mp_ReceiveBuffer;
 };
 
 struct Message
 {
+    struct Node mn_Node;
     struct MsgPort * mn_Owner;
     void *      mn_Control;
     uint16_t    mn_ControlLength;
