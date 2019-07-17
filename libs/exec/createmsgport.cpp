@@ -62,6 +62,12 @@ struct MsgPort * CreateMsgPort()
 
     if (port)
     {
+        // Initialize lock
+        InitMutex(&port->mp_Lock, MUTEX_LOCKED);
+
+        // Initialize list for incomming messages
+        NEWLIST(&port->mp_MsgList);
+
         // Create socket
         port->mp_Socket = syscall(SYS_socket, AF_UNIX, SOCK_DGRAM, 0);
 
@@ -120,6 +126,9 @@ struct MsgPort * CreateMsgPort()
             // Try to bind socket to the ID in unix socket namespace.
             err = syscall(SYS_bind, port->mp_Socket, (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(uuid_t));
         } while (err != 0);
+
+        // Unlock the port
+        ReleaseMutex(&port->mp_Lock);
     }
 
     __ports.push_back(port);
