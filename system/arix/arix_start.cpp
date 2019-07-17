@@ -55,13 +55,14 @@ int is_init()
     return pid == 1;
 }
 
-/* 
+/*
     This is the entry point entered when linux kernel loads the file and begins
     the code execution
 */
 int main(int argc, char **argv)
 {
     int dir_assigns;
+    int dir_volumes;
     char *sys_path;
 
     (void)argc;
@@ -123,9 +124,9 @@ int main(int argc, char **argv)
     /* Unshare mount namespace */
     syscall(SYS_unshare, CLONE_NEWNS);
     /* All mounts under /tmp are private and do not propagate outside this namespace */
-    syscall(SYS_mount, "none", "/tmp", NULL, MS_REC | MS_PRIVATE, NULL);
+    //syscall(SYS_mount, "none", "/tmp", NULL, MS_REC | MS_PRIVATE, NULL);
     /*
-        Mount tmpfs there. The mount is invisible outside ARIX process, however ARIX can 
+        Mount tmpfs there. The mount is invisible outside ARIX process, however ARIX can
         pass file descriptor from it to the outside world through messages
     */
     syscall(SYS_mount, "none", ARIX_TEMP_PATH, "tmpfs", 0, NULL);
@@ -133,7 +134,10 @@ int main(int argc, char **argv)
 
     syscall(SYS_mkdirat, dir_tmp, ".assigns", 0755);
     dir_assigns = syscall(SYS_openat, dir_tmp, ".assigns", O_RDONLY | O_DIRECTORY);
-    
+
+    syscall(SYS_mkdirat, dir_tmp, ".volumes", 0755);
+    dir_volumes = syscall(SYS_openat, dir_tmp, ".volumes", O_RDONLY | O_DIRECTORY);
+
     /* Synthesize UNIX: assign */
     syscall(SYS_mkdirat, dir_assigns, "UNIX", 0755);
     syscall(SYS_symlinkat, "/", dir_assigns, "UNIX/0");

@@ -32,4 +32,24 @@ uuid_t Open(const char * name, int mode)
     }
     (void)mode;
     return MAKE_UUID(0, 0, 0, 0, 0);
+
+    #if 0
+        // Generate random uuid for the file
+        int maxtry = 1000;
+
+        do {
+            __id = GetRandomID(NT_FILE);
+        } while(!__files->empty() && (__files->count(__id) != 0 && --maxtry > 0));
+
+        if (maxtry == 0) {
+            bug("[DOS:ARIXFile] Error obtaining unique id\n");
+            __err = -ENOMEM;
+        }
+
+        std::ostringstream o;
+        o << "[DOS] ARIXFile::ARIXFile(): id=" << __id << " after " << 1000 - maxtry << " attempts" << std::endl;;
+        D(bug(o.str().c_str()));
+
+        (*__files)[__id] = this;
+    #endif
 }

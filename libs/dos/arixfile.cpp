@@ -22,22 +22,188 @@
 #include <algorithm>
 #include <vector>
 #include <fcntl.h>
+#include <dirent.h>
+#include <strings.h>
 
+#define DEBUG
+#include "dos_debug.h"
 #include "dos_private.h"
+#include "path.h"
 
-static std::string str_toupper(std::string s) {
-    std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c){ return std::toupper(c); });
-    return s;
+int ARIXFile::Close()
+{
+    __err = -EBADF;
+
+    if (__fd > 0)
+    {
+        __err = syscall(SYS_close, __fd);
+        __fd = 0;
+    }
+
+    return __err;
 }
 
-// Converts ARIX path of any kind (relative, absolute, etc) to unix path
-std::string ARIXFile::arix2unix(std::string arix_path)
+ARIXFile::~ARIXFile()
 {
+    Close();
+}
 
+size_t ARIXFile::Read(void * buffer, size_t length)
+{
+    intptr_t bytesRead = syscall(SYS_read, __fd, buffer, length);
+
+    if (bytesRead < 0)
+    {
+        __err = bytesRead;
+    }
+    else
+    {
+        __err = 0;
+    }
+
+    return (size_t)bytesRead;
+}
+
+size_t ARIXFile::Write(const void * buffer, size_t length)
+{
+    intptr_t bytesWritten = syscall(SYS_write, __fd, buffer, length);
+
+    if (bytesWritten < 0)
+    {
+        __err = bytesWritten;
+    }
+    else
+    {
+        __err = 0;
+    }
+
+    return (size_t)bytesWritten;
 }
 
 ARIXFile::ARIXFile(const char * p, int mode)
 {
+    int refFD = 0;
+    bool assignType = false;
+    __path = Path::PathFromDOS(p);
+
+    D(bug("[DOS] ARIXFile::ARIXFile(%s, %d)\n", p, mode));
+    D(bug("[DOS] Volume=%s, Path=%s\n", __path.volume().c_str(), __path.path().c_str()));
+
+    /* Handle PROGDIR case */
+    if (__path.volume() == "PROGDIR")
+    {
+        D(bug("[DOS] PROGDIR: type, calling openat relative to HomeDirLock\n"));
+        refFD = syscall(SYS_dup, __pr_HomeDirLock);
+    }
+
+    /* If no success check all volumes */
+    if (refFD == 0)
+    {
+        int fd = syscall(SYS_openat, __TmpDirLock, ".volumes", O_RDONLY | O_DIRECTORY);
+        if (fd > 0)
+        {
+            int len = 0;
+
+            do {
+                struct dirent64 de, *d=&de;
+                len = syscall(SYS_getdents64, fd, &de, sizeof(de));
+                if (len == 0)
+                    break;
+
+                do {
+                    D(bug("len: %d\nentry: %s\n", d->d_reclen, d->d_name));
+                    if ((d->d_name[0] == '.' && d->d_name[1] == 0) ||
+                        (d->d_name[0] == '.' && d->d_name[1] == '.' && d->d_name[2] == 0))
+                    {
+                        D(bug("skipping entry...\n"));
+                    }
+                    else
+                    {
+                        if (strcasecmp(d->d_name, __path.volume().c_str()) == 0)
+                        {
+                            __path.setVolume(d->d_name);
+                            refFD = syscall(SYS_openat, fd, d->d_name, O_RDONLY | O_DIRECTORY);
+                        }
+                    }
+                    len -= d->d_reclen;
+                    d = (struct dirent64 *)((intptr_t)d + d->d_reclen);
+                } while (refFD == 0 && len > 0);
+            } while(refFD == 0);
+
+            syscall(SYS_close, fd);
+        }
+    }
+
+    /* Still no success. Check devices? */
+    if (refFD == 0)
+    {
+
+    }
+
+    /* Finally check assigns... */
+    if (refFD == 0)
+    {
+        int fd = syscall(SYS_openat, __TmpDirLock, ".assigns", O_RDONLY | O_DIRECTORY);
+        if (fd > 0)
+        {
+            int len = 0;
+
+            do {
+                struct dirent64 de, *d=&de;
+                len = syscall(SYS_getdents64, fd, &de, sizeof(de));
+                if (len == 0)
+                    break;
+
+                do {
+                    D(bug("len: %d\nentry: %s\n", d->d_reclen, d->d_name));
+                    if ((d->d_name[0] == '.' && d->d_name[1] == 0) ||
+                        (d->d_name[0] == '.' && d->d_name[1] == '.' && d->d_name[2] == 0))
+                    {
+                        D(bug("skipping entry...\n"));
+                    }
+                    else
+                    {
+                        if (strcasecmp(d->d_name, __path.volume().c_str()) == 0)
+                        {
+                            __path.setVolume(d->d_name);
+                            refFD = syscall(SYS_openat, fd, d->d_name, O_RDONLY | O_DIRECTORY);
+                            assignType = true;
+                        }
+                    }
+                    len -= d->d_reclen;
+                    d = (struct dirent64 *)((intptr_t)d + d->d_reclen);
+                } while (refFD == 0 && len > 0);
+            } while(refFD == 0);
+
+            syscall(SYS_close, fd);
+        }
+    }
+
+    /* If refFD is a valid descriptor then try to open requested path relative to this fd */
+    if (refFD > 0)
+    {
+        if (assignType)
+        {
+            /* Assign type */
+        }
+        else
+        {
+            /* Not an assign type. Just try to open the file */
+            __fd = syscall(SYS_openat, refFD, __path.path().c_str(), mode);
+        }
+        syscall(SYS_close, refFD);
+    }
+
+    if (__fd > 0)
+    {
+        __err = 0;
+    }
+    else
+    {
+        __err = __fd;
+    }
+
+    #if 0
     int fd_vol;
     std::string path(p);
     std::string volume;
@@ -56,7 +222,7 @@ ARIXFile::ARIXFile(const char * p, int mode)
         if (it != __files->end()) {
             f = it->second;
         }
-        
+
         if (f) {
             volume = f->__volume;
             path = path.substr(1);
@@ -83,7 +249,7 @@ ARIXFile::ARIXFile(const char * p, int mode)
 
             if (*(_p.rbegin()) != '/')
                 _p.push_back('/');
-            
+
             path = _p + path;
         }
     }
@@ -185,10 +351,10 @@ ARIXFile::ARIXFile(const char * p, int mode)
     }
 
     printf("__fd = %d\n", __fd);
-    
+
     // Generate random uuid for the file
     int maxtry = 1000;
-    
+
     do {
         __id = GetRandomID(NT_FILE);
     } while(!__files->empty() && (__files->count(__id) != 0 && --maxtry > 0));
@@ -202,4 +368,5 @@ ARIXFile::ARIXFile(const char * p, int mode)
     printf(o.str().c_str());
 
     (*__files)[__id] = this;
+    #endif
 }
