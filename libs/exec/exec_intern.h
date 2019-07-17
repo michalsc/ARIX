@@ -40,6 +40,8 @@ struct PrivPool {
 extern "C" {
 #endif
 
+void InternalPutMsg(uuid_t portID, struct Message *msg);
+struct Message * InternalGetMsg(struct MsgPort *port);
 struct TagItem *LibNextTagItem(struct TagItem **tagListPtr);
 struct TagItem *LibFindTagItem(Tag tagValue, const struct TagItem *tagList);
 IPTR LibGetTagData(Tag tagValue, IPTR defaultVal, const struct TagItem *tagList);
