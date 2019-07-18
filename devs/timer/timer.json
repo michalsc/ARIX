@@ -22,6 +22,7 @@
         [ "void *",             "GetHandle" ],
         [ "void",               "BeginIO", "struct IORequest * request" ],
         [ "int",                "AbortIO", "struct IORequest * request" ],
+        [ "void",               "FinalizeIO", "struct IORequest * request" ],
         [ "void",               "AddTime", "struct timespec * dest", "const struct timespec * src" ],
         [ "void",               "SubTime", "struct timespec * dest", "const struct timespec * src" ],
         [ "int",                "CmpTime", "const struct timespec * left", "const struct timespec * right" ],

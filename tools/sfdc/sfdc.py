@@ -105,7 +105,7 @@ extern "C" {
         print("    {0} (*{1})({2});".format(func[0], func[1], string.join(func[2:], ", ")))
     print("};")
     print("")
-    start_idx = { "resource": 0, "library": 4, "device": 6 }
+    start_idx = { "resource": 0, "library": 4, "device": 7 }
     for func in cfg["functions"][start_idx.get(cfg["configuration"]["type"], lambda: 0):]:
         print("{0} {1}({2});".format(func[0], func[1], string.join(func[2:], ", ")))
 
@@ -136,7 +136,7 @@ def generate_inline(cfg):
 #endif
 """.format(cfg["configuration"]["name"].upper(), cfg["configuration"]["base.name"]))
 
-    start_idx = { "resource": 0, "library": 4, "device": 6 }
+    start_idx = { "resource": 0, "library": 4, "device": 7 }
     for func in cfg["functions"][start_idx.get(cfg["configuration"]["type"], lambda: 0):]:
         if func[0] == "void":
             ret = ""
@@ -186,7 +186,7 @@ def generate_defines(cfg):
 #   define __{0}_LIBBASE {1}
 #endif
 """.format(cfg["configuration"]["name"].upper(), cfg["configuration"]["base.name"]))
-    start_idx = { "resource": 0, "library": 4, "device": 6 }
+    start_idx = { "resource": 0, "library": 4, "device": 7 }
     for func in cfg["functions"][start_idx.get(cfg["configuration"]["type"], lambda: 0):]:
         if func[0] == "void":
             ret = ""

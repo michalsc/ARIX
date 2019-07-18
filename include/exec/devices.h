@@ -17,7 +17,7 @@ struct Unit {
 
 struct IORequest;
 
-// Default functions which shall be implemented by every library!
+// Default functions which shall be implemented by every device!
 struct DeviceLVO {
     struct Device *     (*LibOpen)(void * handle, uint32_t version);
     void *              (*LibClose)();
@@ -25,6 +25,7 @@ struct DeviceLVO {
     void *              (*GetHandle)();
     void                (*BeginIO)(struct IORequest * io);
     int                 (*AbortIO)(struct IORequest * io);
+    void                (*FinalizeIO)(struct IORequest * io);
 };
 
 #endif // _EXEC_DEVICES_H
