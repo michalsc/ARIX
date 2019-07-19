@@ -10,7 +10,7 @@ FILES     := openlibrary allocmem freemem reschedule addhead addtail insert remh
              getsymboladdress allocabs avl reallocpooled getmsg waitport putmsg createmsgport \
              replymsg discardmsg findport addport deletemsgport remport testport getrandomid \
              createthread tags exec_debug createmutex deletemutex obtainmutex releasemutex initmutex \
-             attemptmutex createiorequest deleteiorequest doio
+             attemptmutex createiorequest deleteiorequest doio waitio
 
 include $(ROOT_DIR)/config/make_shared.mk
 include $(ROOT_DIR)/config/make_bottom.mk
