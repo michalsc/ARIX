@@ -16,5 +16,5 @@
 void DeleteIORequest(struct IORequest *io)
 {
     if (io != NULL)
-        FreeMem(io, io->io_Message.mn_Length);
+        FreeMem(io, io->io_Message.mn_Length + sizeof(struct Message));
 }
