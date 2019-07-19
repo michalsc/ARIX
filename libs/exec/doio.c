@@ -9,8 +9,9 @@
 
 #include <exec/devices.h>
 #include <exec/io.h>
+#include <clib/exec_protos.h>
 
-LONG DoIO(struct IORequest *request)
+int32_t DoIO(struct IORequest *request)
 {
     struct DeviceLVO *lvo = NULL;
 
@@ -34,7 +35,7 @@ LONG DoIO(struct IORequest *request)
 
     /* If BeginIO has cleared the quick flag, wait for completion of the request */
     if ((request->io_Flags & IOF_QUICK) == 0) {
-        /* WaitIO... */
+        WaitIO(request);
     }
 
     return request->io_Error;
