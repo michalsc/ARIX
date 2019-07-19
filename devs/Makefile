@@ -1,4 +1,4 @@
-DEVS := timer
+DEVS := example timer
 OBJDIR := $(BUILD_DIR)/$(CURDIR)
 
 includes:

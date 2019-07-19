@@ -1,0 +1,26 @@
+{
+    "configuration": {
+        "name": "example",
+        "type": "device",
+        "version.major": 1,
+        "version.minor": 0,
+        "base.type": "Library",
+        "base.name": "ExampleBase"
+    },
+    "cdef": [
+        "#include <exec/devices.h>",
+        "#include <exec/io.h>",
+        "#include <stddef.h>",
+        "#include <stdint.h>",
+        "#include <unistd.h>"
+    ],
+    "functions": [
+        [ "struct Library *",   "Open", "void * handle", "uint32_t version" ],
+        [ "void *",             "Close" ],
+        [ "void *",             "Expunge" ],
+        [ "void *",             "GetHandle" ],
+        [ "void",               "BeginIO", "struct IORequest * request" ],
+        [ "int",                "AbortIO", "struct IORequest * request" ],
+        [ "void",               "FinalizeIO", "struct IORequest * request" ]
+    ]
+}
