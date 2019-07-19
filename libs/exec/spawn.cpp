@@ -29,7 +29,7 @@ void Spawn(struct Hook * spawnHook)
 #ifndef SYS_fork
         pid_t pid = (pid_t)syscall(SYS_clone, SIGCHLD, 0);
 #else
-        pid_t pid = (pid_t)syscall(SYS_flock);
+        pid_t pid = (pid_t)syscall(SYS_fork);
 #endif
 
         if (pid > 0)
