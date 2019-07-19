@@ -11,18 +11,23 @@ typedef struct
     uint8_t nodeID[6];
 } uuid_node_t;
 
-typedef struct 
+typedef union 
 {
+
+        struct {
     uint32_t    time_low;
     uint16_t    time_med;
     uint16_t    time_hi_and_version;
     uint8_t     clock_seq_hi_and_reserved;
     uint8_t     clock_seq_low;
     uint8_t     node[6];
+        };
+        uint64_t u64[2];
+
 } uuid_t;
 
 #define MAKE_UUID(a, b, c, d, e)           \
-    {                                      \
+    {{                                     \
         (a), (b), (c),                     \
             ((d) >> 8) & 0xFF, (d)&0xFF,   \
         {                                  \
@@ -33,7 +38,10 @@ typedef struct
                 ((e) >> 8) & 0xFF,         \
                 (e)&0xFF                   \
         }                                  \
-    }
+    }}
+
+#define UUID_EQUALS(a, b) (                \
+        ((a).u64[0] == (b).u64[0] && ((a).u64[1] == (b).u64[1])))
 
 typedef enum {
     UUID_NAMESPACE_DNS = 1,
