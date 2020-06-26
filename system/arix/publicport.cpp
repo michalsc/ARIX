@@ -12,13 +12,13 @@
 #include <iostream>
 
 
-bool PublicPortList::addPort(const uuid_t &uuid, std::string name)
+bool PublicPortList::addPort(const ID &id, std::string name)
 {
     bool can_add = true;
 
 std::cout << "[ARIX] PublicPortList::addPort(" << name << ")" << std::endl;
 
-    if (portList.find(uuid) != portList.end()) {
+    if (portList.find(id) != portList.end()) {
         can_add = false;
     }
     else {
@@ -33,30 +33,30 @@ std::cout << "[ARIX] PublicPortList::addPort(" << name << ")" << std::endl;
 std::cout << "[ARIX] can_add=" << can_add << std::endl;
 
     if (can_add) {
-        portList[uuid] = name;
+        portList[id] = name;
     }
 
     return can_add;
 }
 
-void PublicPortList::remPort(const uuid_t &uuid)
+void PublicPortList::remPort(const ID &id)
 {
 std::cout << "[ARIX] PublicPortList::remPort()" << std::endl;
 
-    portList.erase(uuid);
+    portList.erase(id);
 }
 
-uuid_t PublicPortList::findPort(const std::string name)
+ID PublicPortList::findPort(const std::string name)
 {
-    uuid_t uuid = MAKE_UUID(0, 0, 0, 0, 0);
+    ID id = NULL_ID;
 
     std::cout << "[ARIX] PublicPortList::findPort(" << name << ")" << std::endl;
 
     for (auto it: portList) {
         if (it.second == name) {
-            uuid = it.first;
+            id = it.first;
             break;
         }
     }
-    return uuid;
+    return id;
 }

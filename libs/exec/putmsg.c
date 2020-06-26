@@ -27,25 +27,25 @@
 #define DEBUG
 #include "exec_debug.h"
 
-void PutMsg(uuid_t portID, struct Message * msg)
+void PutMsg(struct ID portID, struct Message * msg)
 {
     msg->mn_Type = NT_MESSAGE;
     InternalPutMsg(portID, msg);
 }
 
-void InternalPutMsg(uuid_t portID, struct Message *msg)
+void InternalPutMsg(struct ID portID, struct Message *msg)
 {
 //    printf("[EXEC] PutMsg(%p, %p)\n", port, msg);
 
     if (msg)
     {
         struct sockaddr_un name = { AF_UNIX, {0,} };
-        uuid_t *u = (uuid_t *)&name.sun_path[1];
+        struct ID *u = (struct ID *)&name.sun_path[1];
         struct iovec io = {
             &msg->mn_ReplyPort, msg->mn_Length + sizeof(struct Message) - offsetof(struct Message, mn_ReplyPort)
         };
         struct msghdr msghdr = {
-            &name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(uuid_t), // msg_name, msg_namelen
+            &name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(struct ID), // msg_name, msg_namelen
             &io, 1,         // msg_iov, msg_iolen
             NULL, 0,        // msg_control, msg_controllen
             0

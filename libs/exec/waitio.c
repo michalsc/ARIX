@@ -46,7 +46,7 @@ int32_t WaitIO(struct IORequest *request)
 
     ForeachNodeSafe(&inputPort->mp_MsgList, msg, next)
     {
-        if (UUID_EQUALS(msg->io_ID, request->io_ID))
+        if (msg->io_ID.raw == request->io_ID.raw)
         {
             /* Yes, there is message with the same ID, remove it from queue */
             REMOVE(msg);
@@ -66,7 +66,7 @@ int32_t WaitIO(struct IORequest *request)
             if (msg != NULL)
             {
                 /* Does the ID match? */
-                if (!UUID_EQUALS(msg->io_ID, request->io_ID))
+                if (msg->io_ID.raw != request->io_ID.raw)
                 {
                     /* No, add it to the queue of received messages */
                     ADDTAIL(&request->io_Message.mn_Owner->mp_MsgList, msg);

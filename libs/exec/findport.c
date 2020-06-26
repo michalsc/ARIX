@@ -49,11 +49,11 @@
  * SEE ALSO
  *      AddPort(), RemPort()
 */
-uuid_t FindPort(const char * name)
+struct ID FindPort(const char * name)
 {
     /* Port to ARIX master who stores public list of message ports */
-    uuid_t arixPort = MAKE_UUID(0x00000001, 0x0000, 0x4000, 0x8000 | NT_MSGPORT, 0x000000000000);
-    uuid_t id = MAKE_UUID(0, 0, 0, 0, 0);
+    struct ID arixPort = ARIX_PORT_ID;
+    struct ID id = NULL_ID;
     struct MsgARIXFindPort *msg = NULL;
     struct MsgPort *reply = NULL;
     int messageLength = 0;
@@ -94,11 +94,8 @@ uuid_t FindPort(const char * name)
                 id = m->port;
 
                 D(bug("[EXEC] Got message %p\n", (void *)m));
-                D(bug("[EXEC] FindPort() = {%08x-%04x-%04x-%04x-%02x%02x%02x%02x%02x%02x}\n",
-                       id.time_low, id.time_med, id.time_hi_and_version,
-                       id.clock_seq_hi_and_reserved << 8 | id.clock_seq_low,
-                       id.node[0], id.node[1], id.node[2],
-                       id.node[3], id.node[4], id.node[5]));
+                D(bug("[EXEC] FindPort() = {%010llx-%02x-%04x}\n", 
+                    id.raw >> 24, (id.raw >> 16) & 0xff, id.raw & 0xffff));
 
                 // Clean up
                 DiscardMsg((struct Message *)m);

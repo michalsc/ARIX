@@ -3,12 +3,13 @@
 
 #include <exec/ports.h>
 #include <exec/devices.h>
-#include <uuid/uuid.h>
+#include <exec/id.h>
+#include <stddef.h>
 
 struct IORequest
 {
     struct Message  io_Message;
-    uuid_t          io_ID;
+    struct ID       io_ID;
     struct Device * io_Device;
     struct Unit *   io_Unit;
     UWORD           io_Command;

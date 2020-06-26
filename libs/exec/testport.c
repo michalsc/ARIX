@@ -38,10 +38,10 @@
  * SEE ALSO
  *      FindPort(), PutMsg()
  */
-int TestPort(uuid_t portID)
+int TestPort(struct ID portID)
 {
     struct sockaddr_un name = { AF_UNIX, {0,} };
-    uuid_t *u = (uuid_t *)&name.sun_path[1];
+    struct ID *u = (struct ID *)&name.sun_path[1];
     *u = portID;
     int sock;
     int ret = -1;
@@ -49,7 +49,7 @@ int TestPort(uuid_t portID)
     sock = syscall(SYS_socket, AF_UNIX, SOCK_DGRAM, 0);
     if (sock > 0)
     {
-        ret = syscall(SYS_connect, sock, (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(uuid_t));
+        ret = syscall(SYS_connect, sock, (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(struct ID));
         syscall(SYS_close, sock);
     }
 

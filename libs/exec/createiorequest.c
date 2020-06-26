@@ -31,7 +31,7 @@ void * CreateIORequest(struct MsgPort *ioReplyPort, size_t size)
         retval->io_Message.mn_Owner = ioReplyPort;
         retval->io_Message.mn_ReplyPort = ioReplyPort->mp_ID;
         retval->io_Message.mn_Length = size - sizeof(struct Message);
-        retval->io_ID = GetRandomID(NT_IOREQUEST);
+        retval->io_ID = GetID(NT_IOREQUEST);
     }
 
     return retval;

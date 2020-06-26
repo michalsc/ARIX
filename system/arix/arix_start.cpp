@@ -39,10 +39,7 @@ void messageLoop(struct MsgPort *arix);
 
 #define ARIX_TEMP_PATH "/tmp/.arix/"
 
-struct MsgPort ARIXPort = {
-    MAKE_UUID(0x00000001, 0x0000, 0x4000, 0x8000 | NT_MSGPORT, 0x000000000000),
-    0,
-    NULL, NULL};
+struct MsgPort ARIXPort;
 
 int dir_tmp;
 
@@ -96,9 +93,12 @@ int main(int argc, char **argv)
 
     std::cout << "[ARIX] " << &version[7] << std::endl;
 
+    ARIXPort.mp_ID = ARIX_PORT_ID;
+    NEWLIST(&ARIXPort.mp_MsgList);
     ARIXPort.mp_Socket = socket(AF_UNIX, SOCK_DGRAM, 0);
     ARIXPort.mp_MsgPool = CreatePool(MEMF_CLEAR, 8192, 8192);
     ARIXPort.mp_ReceiveBuffer = AllocVecPooled(ARIXPort.mp_MsgPool, 4096);
+    InitMutex(&ARIXPort.mp_Lock, MUTEX_FREE);
 
     int flags = fcntl(ARIXPort.mp_Socket, F_GETFL);
     fcntl(ARIXPort.mp_Socket, F_SETFL, flags | O_NONBLOCK);
@@ -113,7 +113,7 @@ int main(int argc, char **argv)
     CopyMem(&ARIXPort.mp_ID, &serverSocketAddr.sun_path[1], sizeof(uuid_t));
 
     /* Bind the UNIX domain address to the created socket */
-    if (bind(ARIXPort.mp_Socket, (struct sockaddr *)&serverSocketAddr, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(uuid_t)))
+    if (bind(ARIXPort.mp_Socket, (struct sockaddr *)&serverSocketAddr, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(ID)))
     {
         printf("[ARIX] Failed to create master MsgPort. Is ARIX already running?\n");
         return 1;
@@ -226,7 +226,7 @@ void messageLoop(struct MsgPort * arix)
                     {
                         struct MsgARIXFindPort *m = reinterpret_cast<struct MsgARIXFindPort *>(msg);
                         m->port = PublicPorts.findPort(m->name);
-                        uuid_t zero = MAKE_UUID(0, 0, 0, 0, 0);
+                        ID zero = NULL_ID;
                         if (m->port == zero)
                         {
                             m->hdr.ma_RetVal = 0;

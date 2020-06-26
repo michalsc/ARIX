@@ -15,25 +15,15 @@
 #include <stdio.h>
 
 #include "exec_intern.h"
-
-/* 
-    Fallback pseudo random number generator. UUID_Seed will be set
-    by exec.library once the library loads
-*/
-uint32_t UUID_Seed = 0;
-
-static uint8_t getRand()
-{
-    UUID_Seed = ((UUID_Seed * 1103515245) + 12345) & 0x7fffffff;
-    return UUID_Seed & 0xff;
-}
+#include "exec_debug.h"
+#include "exec_random.h"
 
 /*
     Get "unique" uuid by reading from random number generator. 
     Since the uuid is used for a message port, set the NT_MSGPORT
     node type in clock_seq_low.
 */
-uuid_t GetRandomID(uint8_t type)
+uuid_t GetRandomUUID(uint8_t type)
 {
     union {
         uuid_t uuid;
@@ -51,7 +41,7 @@ uuid_t GetRandomID(uint8_t type)
         syscall(SYS_close, fd);
     } else {
         for (int i=0; i < 16; i++) {
-            id.data[i] = getRand();
+            id.data[i] = RandomNumberGenerator::get();
         }
     }
 

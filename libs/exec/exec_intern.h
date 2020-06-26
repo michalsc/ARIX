@@ -21,6 +21,7 @@
 
 extern std::list<struct MsgPort *> __ports;
 
+
 #endif
 
 extern void * local_memory_pool;
@@ -40,7 +41,7 @@ struct PrivPool {
 extern "C" {
 #endif
 
-void InternalPutMsg(uuid_t portID, struct Message *msg);
+void InternalPutMsg(struct ID portID, struct Message *msg);
 struct Message * InternalGetMsg(struct MsgPort *port);
 struct TagItem *LibNextTagItem(struct TagItem **tagListPtr);
 struct TagItem *LibFindTagItem(Tag tagValue, const struct TagItem *tagList);

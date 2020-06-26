@@ -69,7 +69,7 @@
 int AddPort(struct MsgPort *port, const char * name)
 {
     /* Port to ARIX master who stores public list of message ports */
-    uuid_t arixPort = MAKE_UUID(0x00000001, 0x0000, 0x4000, 0x8000 | NT_MSGPORT, 0x000000000000);
+    struct ID arixPort = ARIX_PORT_ID;
     struct MsgARIXAddPort *msg = NULL;
     struct MsgPort *reply = NULL;
     int messageLength = 0;

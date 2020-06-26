@@ -22,7 +22,7 @@
 #include <strings.h>
 #include "exec_intern.h"
 
-void InternalPutMsg(uuid_t portID, struct Message *msg);
+void InternalPutMsg(struct ID portID, struct Message *msg);
 
 void ReplyMsg(struct Message * msg)
 {

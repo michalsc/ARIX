@@ -7,17 +7,17 @@
     with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-#include <uuid/uuid.h>
+#include <exec/id.h>
 #include <string>
 #include <map>
 
 class PublicPortList {
 public:
     PublicPortList() {}
-    uuid_t findPort(const std::string name);
-    bool addPort(const uuid_t &uuid, std::string name);
-    void remPort(const uuid_t &uuid);
+    ID findPort(const std::string name);
+    bool addPort(const ID &id, std::string name);
+    void remPort(const ID &id);
 private:
-    std::map<uuid_t, std::string> portList;
+    std::map<ID, std::string> portList;
 };
 

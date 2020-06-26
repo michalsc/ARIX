@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <sys/syscall.h>
 #include <exec/types.h>
+#include <exec/id.h>
 #include <exec/libraries.h>
 #include <clib/exec_protos.h>
 #include <sys/socket.h>
@@ -19,6 +20,7 @@
 #include "tlsf.h"
 #include "exec_intern.h"
 #include "exec_debug.h"
+#include "exec_random.h"
 
 #include <stdio.h>
 
@@ -32,6 +34,7 @@ void * local_memory_pool = NULL;
 struct Mutex local_memory_lock;
 struct Mutex thread_sync_lock;
 int OutSocket = 0;
+struct ID ARIXPort = ARIX_PORT_ID;
 
 struct timespec StartTime;
 
@@ -69,6 +72,8 @@ void * GetHandle()
     return NULL;
 }
 
+void InitializeIDSeq();
+
 void __attribute__((constructor)) ExecInit()
 {
     bug("[EXEC] ExecInit()\n");
@@ -79,12 +84,8 @@ void __attribute__((constructor)) ExecInit()
     OutSocket = syscall(SYS_socket, AF_UNIX, SOCK_DGRAM, 0);
     syscall(SYS_clock_gettime, CLOCK_REALTIME, &StartTime);
     bug("[EXEC] Start time: %ld.%09ld\n", StartTime.tv_sec, StartTime.tv_nsec);
-#if __SIZEOF_LONG__ > 4
-    UUID_Seed = 2654435761 * ((StartTime.tv_sec >> 32) ^ (StartTime.tv_sec) ^ StartTime.tv_nsec);
-#else
-    UUID_Seed = 2654435761 * ((StartTime.tv_sec) ^ StartTime.tv_nsec);
-#endif
-    bug("[EXEC] UUID Random seed=0x%08x\n", UUID_Seed);
+    RandomNumberGenerator::seed();
+    InitializeIDSeq();
 }
 
 void __attribute__((destructor)) ExecDestroy()

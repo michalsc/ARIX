@@ -21,6 +21,9 @@
 #include "exec_intern.h"
 #define DEBUG
 #include "exec_debug.h"
+#include "exec_random.h"
+
+void InitializeIDSeq();
 
 void Spawn(struct Hook * spawnHook)
 {
@@ -37,12 +40,8 @@ void Spawn(struct Hook * spawnHook)
             /* Regenerate random seed and start time */
             syscall(SYS_clock_gettime, CLOCK_REALTIME, &StartTime);
             D(bug("[EXEC] Spawn(): Start time: %ld.%09ld\n", StartTime.tv_sec, StartTime.tv_nsec));
-#if __SIZEOF_LONG__ > 4
-            UUID_Seed = 2654435761 * ((StartTime.tv_sec >> 32) ^ (StartTime.tv_sec) ^ StartTime.tv_nsec);
-#else
-            UUID_Seed = 2654435761 * ((StartTime.tv_sec) ^ StartTime.tv_nsec);
-#endif
-            D(bug("[EXEC] Spawn(): UUID Random seed=0x%08x\n", UUID_Seed));
+            RandomNumberGenerator::seed();
+            InitializeIDSeq();
 
             if (!__ports.empty())
             {
@@ -51,7 +50,7 @@ void Spawn(struct Hook * spawnHook)
                 for (auto port: __ports)
                 {
                     struct sockaddr_un name;
-                    uuid_t *sock_id = (uuid_t *)&name.sun_path[1];
+                    ID *sock_id = (ID *)&name.sun_path[1];
 
                     syscall(SYS_close, port->mp_Socket);
 
@@ -75,7 +74,7 @@ void Spawn(struct Hook * spawnHook)
                     do
                     {
                         // Get ID and copy it to the name
-                        port->mp_ID = GetRandomID(NT_MSGPORT);
+                        port->mp_ID = GetID(NT_MSGPORT);
                         *sock_id = port->mp_ID;
 
                         // Number of retries exhausted? Just fail...
@@ -85,14 +84,11 @@ void Spawn(struct Hook * spawnHook)
                             return;
                         }
 
-                        D(bug("[EXEC] Spawn(): Binding to port ID {%08x-%04x-%04x-%04x-%02x%02x%02x%02x%02x%02x}\n",
-                               port->mp_ID.time_low, port->mp_ID.time_med, port->mp_ID.time_hi_and_version,
-                               port->mp_ID.clock_seq_hi_and_reserved << 8 | port->mp_ID.clock_seq_low,
-                               port->mp_ID.node[0], port->mp_ID.node[1], port->mp_ID.node[2],
-                               port->mp_ID.node[3], port->mp_ID.node[4], port->mp_ID.node[5]));
+                        D(bug("[EXEC] Spawn(): Binding to port ID {%010llx-%02x-%04x}\n",
+                               port->mp_ID.raw >> 24, (port->mp_ID.raw >> 16) & 0xff, port->mp_ID.raw & 0xffff));
 
                         // Try to bind socket to the ID in unix socket namespace.
-                        err = syscall(SYS_bind, port->mp_Socket, (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(uuid_t));
+                        err = syscall(SYS_bind, port->mp_Socket, (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(ID));
                     } while (err != 0);
                 }
             }

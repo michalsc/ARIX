@@ -28,9 +28,9 @@ int main(int argc, char **argv)
     (void)argc;
     (void)argv;
     struct timespec t0, t1;
-    uuid_t empty = MAKE_UUID(0, 0, 0, 0, 0);
+    struct ID empty = NULL_ID;
     struct Message msg = { { NULL, NULL, 0, 0, NULL }, NULL, NULL, 0, empty, 0, 0, 0 };
-    uuid_t arixPort = MAKE_UUID(0x00000001, 0x0000, 0x4000, 0x8000 | NT_MSGPORT, 0x000000000000);
+    struct ID arixPort = ARIX_PORT_ID;
     struct MsgPort *reply = CreateMsgPort();
     
     msg.mn_ReplyPort = reply->mp_ID;

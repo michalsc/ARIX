@@ -73,7 +73,7 @@ struct Library * UtilityBase;
 void __attribute__((constructor)) DOSInit()
 {
     printf("[DOS] DOSInit()\n");
-    uuid_t arixPort = MAKE_UUID(0x00000001, 0x0000, 0x4000, 0x8000 | NT_MSGPORT, 0x000000000000);
+    struct ID arixPort = ARIX_PORT_ID;
 
     if (!TestPort(arixPort))
     {

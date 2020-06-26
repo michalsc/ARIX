@@ -11,25 +11,25 @@ struct MsgARIX {
 
 struct MsgARIXAddPort {
     struct MsgARIX  hdr;
-    uuid_t          port;
+    struct ID       port;
     char            name[];
 };
 
 struct MsgARIXFindPort {
     struct MsgARIX  hdr;
-    uuid_t          port;
+    struct ID       port;
     char            name[];
 };
 
 struct MsgARIXRemPort {
     struct MsgARIX  hdr;
-    uuid_t          port;
+    struct ID       port;
 };
 
 struct MsgARIXGetUniqueID {
     struct MsgARIX  hdr;
     uint8_t         type;
-    uuid_t          id;
+    struct ID       id;
 };
 
 struct MsgARIXGetTempPath {
