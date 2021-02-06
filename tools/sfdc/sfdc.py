@@ -32,7 +32,7 @@ def generate_basefile(cfg):
     ))
     print("")
     for func in cfg["functions"]:
-        print(func[0] + " " + func[1] + "(" + string.join(func[2:], ", ")
+        print(func[0] + " " + func[1] + "(" + ", ".join(func[2:])
         + ");")
     print("")
     print("static const struct " + cfg["configuration"]["base.name"] + "LVO __lvo = {")
@@ -102,12 +102,12 @@ extern "C" {
 """)
     print("struct {0}LVO {{".format(cfg["configuration"]["base.name"]))
     for func in cfg["functions"]:
-        print("    {0} (*{1})({2});".format(func[0], func[1], string.join(func[2:], ", ")))
+        print("    {0} (*{1})({2});".format(func[0], func[1], ", ".join(func[2:])))
     print("};")
     print("")
     start_idx = { "resource": 0, "library": 4, "device": 7 }
     for func in cfg["functions"][start_idx.get(cfg["configuration"]["type"], lambda: 0):]:
-        print("{0} {1}({2});".format(func[0], func[1], string.join(func[2:], ", ")))
+        print("{0} {1}({2});".format(func[0], func[1], ", ".join(func[2:])))
 
     print("""
 #ifdef __cplusplus
@@ -152,17 +152,17 @@ def generate_inline(cfg):
 }}""".format(
     func[0], 
     func[1], 
-    string.join(func_lvo, ", "), 
+    ", ".join(func_lvo), 
     ret,
     cfg["configuration"]["base.name"],
-    string.join(params, ", ")
+    ", ".join(params)
 ))
         params_p = ["({0})".format(s) for s in params]
         params_p.append("__{0}_LIBBASE".format(cfg["configuration"]["name"].upper()))
         print("""
 #define {0}({1}) \\
     __inline_{0}({2})
-""".format(func[1], string.join(params, ", "), string.join(params_p, ", ")
+""".format(func[1], ", ".join(params), ", ".join(params_p)
 ))
     print("""
 #endif /* INLINE_{0}_H */
@@ -201,15 +201,15 @@ def generate_defines(cfg):
 }})""".format(
     func[0], 
     func[1], 
-    string.join(params, ", "), 
+    ", ".join(params), 
     ret,
     cfg["configuration"]["base.name"],
-    string.join(params_p, ", ")
+    ", ".join(params_p)
 ))
         print("""
 #define {0}({1}) \\
     __define_{0}_WB({2}, __{3}_LIBBASE)
-""".format(func[1], string.join(params, ", "), string.join(params_p, ", "), cfg["configuration"]["name"].upper()
+""".format(func[1], ", ".join(params), ", ".join(params_p), cfg["configuration"]["name"].upper()
 ))
     print("""
 #endif /* DEFINES_{0}_H */
