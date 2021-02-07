@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <sys/mount.h>
 #include <sys/mman.h>
-//#include <proto/kernel.h>
+
 #include "../../libs/kernel/sc_mount.c"
 #include "../../libs/kernel/sc_mkdir.c"
 #include "../../libs/kernel/sc_write.c"
@@ -40,11 +40,6 @@ void do_mounts()
     SC_mount("tmpfs", "/dev/shm", "tmpfs", MS_NOSUID | MS_NODEV, NULL);
 }
 
-int __syscall_error(int code)
-{
-    return code;
-}
-
 void _start(int argc, char **argv)
 {
     (void)argc;
@@ -62,13 +57,9 @@ void _start(int argc, char **argv)
     };
 
     int mem = SC_memfd_create("hellomsg", MFD_ALLOW_SEALING);
-    //int mem = syscall(SYS_memfd_create, "hellomsg", MFD_ALLOW_SEALING);
     SC_write(mem, "Hello!", 6);
-    //syscall(SYS_write, mem, "Hello!", 6);
     SC_lseek(mem, 0, SEEK_SET);
-    //syscall(SYS_lseek, mem, 0, SEEK_SET);
     SC_fcntl(mem, F_ADD_SEALS, F_SEAL_GROW | F_SEAL_SHRINK | F_SEAL_WRITE | F_SEAL_SEAL);
-    //syscall(SYS_fcntl, mem, F_ADD_SEALS, F_SEAL_GROW | F_SEAL_SHRINK | F_SEAL_WRITE | F_SEAL_SEAL);
 
     *--b = 0;
     while (mem != 0)
@@ -79,14 +70,10 @@ void _start(int argc, char **argv)
     arg[1] = b;
 
     SC_write(1, "[INIT] Mounting filesystems\n", 28);
-    //syscall(SYS_write, 1, "[INIT] Mounting filesystems\n", 28);
     do_mounts();
 
     SC_write(1, "[INIT] Booting ARIX\n", 20);
-    //syscall(SYS_write, 1, "[INIT] Booting ARIX\n", 20);
     SC_execve("/ARIX/System/ARIX", (const char**)arg, (const char**)env);
-    //syscall(SYS_execve, "/ARIX/System/ARIX", arg, env);
 
     SC_exit(0);
-    //syscall(SYS_exit, 0);
 }
