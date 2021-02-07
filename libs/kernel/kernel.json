@@ -1,0 +1,38 @@
+{
+    "configuration": {
+        "name": "kernel",
+        "type": "library",
+        "version.major": 60,
+        "version.minor": 0,
+        "base.type": "Library",
+        "base.name": "KernelBase"
+    },
+    "cdef": [
+        "#include <sys/types.h>",
+        "#include <sys/stat.h>",
+        "#include <fcntl.h>",
+        "#include <unistd.h>",
+        "#include <stdint.h>"
+    ],
+    "functions": [
+        [ "struct Library *",   "Open", "void * handle", "uint32_t version" ],
+        [ "void *",             "Close" ],
+        [ "void *",             "Expunge" ],
+        [ "void *",             "GetHandle" ],
+        [ "void __attribute__((noreturn))", "SC_exit", "int status"],
+        [ "int",                "SC_execve", "const char * pathname", "const char ** argv", "const char ** envp"],
+        [ "int",                "SC_open", "const char * path", "int flags"],
+        [ "int",                "SC_close", "int fd"],
+        [ "int",                "SC_openat", "int dirfd", "const char * path", "int flags"],
+        [ "int",                "SC_creat", "const char * path", "mode_t mode"],
+        [ "ssize_t",            "SC_write", "int fd", "const void * buf", "size_t count"],
+        [ "ssize_t",            "SC_read", "int fd", "void * buf", "size_t count"],
+        [ "off_t",              "SC_lseek", "int fd", "off_t offset", "int whence"],
+        [ "int",                "SC_fcntl", "int fd", "int cmd", "long arg"],
+        [ "int",                "SC_mkdir", "const char * path", "mode_t mode"],
+        [ "int",                "SC_mkdirat", "int dirfd", "const char * path", "mode_t mode"],
+        [ "int",                "SC_memfd_create", "const char * name", "unsigned int flags"],
+
+        [ "int",                "SC_mount", "const char * source", "const char * target", "const char * filesystemtype", "unsigned long mountflags", "const void * data"]
+    ]
+}
