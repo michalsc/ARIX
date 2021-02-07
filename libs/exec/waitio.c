@@ -16,6 +16,8 @@
 #include <clib/exec_protos.h>
 #include "exec_intern.h"
 
+#include <proto/kernel.h>
+
 /*
     Warning - message passing is not yet thread safe!!!
 */
@@ -84,7 +86,7 @@ int32_t WaitIO(struct IORequest *request)
 
                 while(1)
                 {
-                    if (syscall(SYS_ppoll, p, 1, NULL, NULL) > 0)
+                    if (SC_ppoll(p, 1, NULL, NULL) > 0)
                     {
                         if (p[0].revents & POLLIN)
                         {

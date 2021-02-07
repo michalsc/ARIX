@@ -17,6 +17,8 @@
 #include <poll.h>
 #include <stdio.h>
 
+#include <proto/kernel.h>
+
 #include "exec_debug.h"
 #include "exec_intern.h"
 
@@ -34,7 +36,7 @@ void WaitPort(struct MsgPort *port)
 
         while(1)
         {
-            if (syscall(SYS_ppoll, p, 1, NULL, NULL) > 0)
+            if (SC_ppoll(p, 1, NULL, NULL) > 0)
             {
                 D(bug("[EXEC] There's something in the port, WaitPort will return now\n"));
 

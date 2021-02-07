@@ -17,6 +17,8 @@
 #include <uuid/uuid.h>
 #include <clib/exec_protos.h>
 
+#include <proto/kernel.h>
+
 /**
  * NAME
  *      TestPort - Verify existence of message port
@@ -46,11 +48,11 @@ int TestPort(struct ID portID)
     int sock;
     int ret = -1;
 
-    sock = syscall(SYS_socket, AF_UNIX, SOCK_DGRAM, 0);
+    sock = SC_socket(AF_UNIX, SOCK_DGRAM, 0);
     if (sock > 0)
     {
-        ret = syscall(SYS_connect, sock, (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(struct ID));
-        syscall(SYS_close, sock);
+        ret = SC_connect(sock, (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(struct ID));
+        SC_close(sock);
     }
 
     return (ret == 0) ? 1:0;
