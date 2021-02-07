@@ -20,6 +20,8 @@
 #include <sys/socket.h>
 #include <time.h>
 
+#include <proto/kernel.h>
+
 #include "exec_intern.h"
 #define DEBUG
 #include "exec_debug.h"
@@ -69,7 +71,7 @@ struct Message *InternalGetMsg(struct MsgPort *port)
         io.iov_len = 4096 - offsetof(struct Message, mn_ReplyPort);
 
         //int nbytes = recv(port->mp_Socket, &msg->mn_ReplyPort, 4096 - offsetof(struct Message, mn_ReplyPort), 0);
-        int nbytes = syscall(SYS_recvmsg, port->mp_Socket, &msghdr, 0);
+        int nbytes = SC_recvmsg(port->mp_Socket, &msghdr, 0);
         if (nbytes <= 0)
         {
             return NULL;

@@ -15,6 +15,8 @@
 #include <exec/mutex.h>
 #include <clib/exec_protos.h>
 
+#include <proto/kernel.h>
+
 #include "exec_debug.h"
 #include "exec_intern.h"
 
@@ -64,7 +66,7 @@ int ObtainMutex(struct Mutex *m)
                 if and only if the futex is still locked, otherwise it returns immediately
                 so that another lock attempt can be made.
             */
-            err = syscall(SYS_futex, &m->m_Lock, FUTEX_WAIT, MUTEX_LOCKED, NULL, NULL, 0);
+            err = SC_futex(&m->m_Lock, FUTEX_WAIT, MUTEX_LOCKED, NULL, NULL, 0);
 
             /* Error was there? Report a failure */
             if (err < 0 && err != -EAGAIN)

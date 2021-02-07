@@ -14,6 +14,8 @@
 #include <string.h>
 #include <sys/mman.h>
 
+#include <proto/kernel.h>
+
 #include "tlsf.h"
 
 #undef USE_MACROS
@@ -1070,12 +1072,7 @@ void bzero(void *ptr, IPTR len)
 
 void * tlsf_init()
 {
-#ifdef SYS_mmap2
-    tlsf_t *tlsf = (tlsf_t*)syscall(SYS_mmap2, NULL, sizeof(tlsf_t), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-#else
-    tlsf_t *tlsf = (tlsf_t*)syscall(SYS_mmap, NULL, sizeof(tlsf_t), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-#endif
-    //mmap(NULL, sizeof(tlsf_t), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    tlsf_t *tlsf = (tlsf_t*)SC_mmap(NULL, sizeof(tlsf_t), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 
     D(nbug("[TLSF] tlsf_init.\n[TLSF] tlsf=%p\n", tlsf));
 
@@ -1093,12 +1090,9 @@ static APTR fetch_more_ram_mmap(void *data, IPTR *size)
     (void)data;
     // Align size to 4K boundary. TODO: Align to actual page size of hardware
     *size = (*size + 4095) & ~4095;
-#ifdef SYS_mmap2
-    APTR ptr = (APTR)syscall(SYS_mmap2, NULL, *size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-#else
-    APTR ptr = (APTR)syscall(SYS_mmap, NULL, *size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-#endif
-    //mmap(NULL, *size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+
+    APTR ptr = (APTR)SC_mmap(NULL, *size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+
     D(nbug("[TLSF] fetch_more_ram_mmap(%p, %ld) = %p\n", data, *size, ptr));
     return ptr;
 }
@@ -1107,7 +1101,7 @@ static void release_ram_mmap(void *data, APTR ptr, IPTR size)
 {
     (void)data;
     D(nbug("[TLSF] release_ram_mmap(%p, %p, %ld)\n", data, ptr, size));
-    syscall(SYS_munmap, ptr, size);
+    SC_munmap(ptr, size);
 }
 
 void *tlsf_init_autogrow(IPTR puddle_size, ULONG requirements, autogrow_get grow_function, autogrow_release release_function, APTR autogrow_data)
@@ -1168,8 +1162,7 @@ D(nbug("next=%p\n", (void *)next));
 
         if (tlsf->autodestroy_self)
         {
-            syscall(SYS_munmap, tlsf, sizeof(tlsf_t));
-            //munmap(tlsf, sizeof(tlsf_t));
+            SC_munmap(tlsf, sizeof(tlsf_t));
         }
     }
     D(nbug("tlsf destroy done\n"));

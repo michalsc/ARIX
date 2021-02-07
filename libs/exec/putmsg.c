@@ -21,6 +21,8 @@
 #include <sys/un.h>
 #include <sys/uio.h>
 
+#include <proto/kernel.h>
+
 #include "exec_intern.h"
 #include <time.h>
 
@@ -75,7 +77,7 @@ void InternalPutMsg(struct ID portID, struct Message *msg)
                msg->mn_ReplyPort->mp_ID.node[0], msg->mn_ReplyPort->mp_ID.node[1], msg->mn_ReplyPort->mp_ID.node[2],
                msg->mn_ReplyPort->mp_ID.node[3], msg->mn_ReplyPort->mp_ID.node[4], msg->mn_ReplyPort->mp_ID.node[5]);
 */
-        syscall(SYS_sendmsg, OutSocket, &msghdr, 0);
+        SC_sendmsg(OutSocket, &msghdr, 0);
 /*
         sendto(OutSocket,
             &msg->mn_ReplyPort, msg->mn_Length + sizeof(struct Message) - offsetof(struct Message, mn_ReplyPort), 0,

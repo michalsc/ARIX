@@ -13,9 +13,10 @@
 #include <sched.h>
 #include <clib/exec_protos.h>
 
+#include <proto/kernel.h>
+
 void Reschedule()
 {
-    syscall(SYS_sched_yield);
-    //sched_yield();
+    SC_sched_yield();
 }
  

@@ -15,6 +15,8 @@
 #include <exec/mutex.h>
 #include <clib/exec_protos.h>
 
+#include <proto/kernel.h>
+
 #include "exec_debug.h"
 #include "exec_intern.h"
 
@@ -50,7 +52,7 @@ int ReleaseMutex(struct Mutex *m)
         if (__sync_bool_compare_and_swap(&m->m_Lock, MUTEX_LOCKED, MUTEX_FREE))
         {
             /* If mutex is free send Wake signal to one waiting for the same mutex */
-            err = syscall(SYS_futex, &m->m_Lock, FUTEX_WAKE, 1, NULL, NULL, 0);
+            err = SC_futex(&m->m_Lock, FUTEX_WAKE, 1, NULL, NULL, 0);
             if (err < 0)
             {
                 bug("[EXEC] Error releasing futex with err=%d\n", -err);
