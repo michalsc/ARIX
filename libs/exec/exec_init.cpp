@@ -22,6 +22,8 @@
 #include "exec_debug.h"
 #include "exec_random.h"
 
+#include <proto/kernel.h>
+
 #include <stdio.h>
 
 #include <list>
@@ -81,8 +83,8 @@ void __attribute__((constructor)) ExecInit()
     bug("[EXEC] Local memory pool @ %p\n", local_memory_pool);
     InitMutex(&local_memory_lock, MUTEX_FREE);
     InitMutex(&thread_sync_lock, MUTEX_FREE);
-    OutSocket = syscall(SYS_socket, AF_UNIX, SOCK_DGRAM, 0);
-    syscall(SYS_clock_gettime, CLOCK_REALTIME, &StartTime);
+    OutSocket = SC_socket(AF_UNIX, SOCK_DGRAM, 0);
+    SC_clock_gettime(CLOCK_REALTIME, &StartTime);
     bug("[EXEC] Start time: %ld.%09ld\n", StartTime.tv_sec, StartTime.tv_nsec);
     RandomNumberGenerator::seed();
     InitializeIDSeq();
@@ -103,7 +105,7 @@ void __attribute__((destructor)) ExecDestroy()
         }
     }
 
-    syscall(SYS_close, OutSocket);
+    SC_close(OutSocket);
     tlsf_destroy(local_memory_pool);
 }
 

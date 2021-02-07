@@ -21,6 +21,8 @@
 #include <fcntl.h>
 #include <stdio.h>
 
+#include <proto/kernel.h>
+
 #include "exec_debug.h"
 #include "exec_intern.h"
 
@@ -55,7 +57,7 @@ void DeleteMsgPort(struct MsgPort * port)
         __ports.remove(port);
 
         // Close unix socket
-        syscall(SYS_close, port->mp_Socket);
+        SC_close(port->mp_Socket);
 
         // And release the memory
         DeletePool(port->mp_MsgPool);

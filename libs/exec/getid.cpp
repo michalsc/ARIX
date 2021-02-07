@@ -8,12 +8,13 @@
 */
 #define _GNU_SOURCE
 #include <unistd.h>
-#include <sys/syscall.h>
 
 #include <clib/exec_protos.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <time.h>
+
+#include <proto/kernel.h>
 
 #include "exec_intern.h"
 #include "exec_debug.h"
@@ -25,10 +26,10 @@ namespace {
 
 void InitializeIDSeq()
 {
-    int fd = syscall(SYS_openat, AT_FDCWD, "/dev/urandom", O_RDONLY);
+    int fd = SC_open("/dev/urandom", O_RDONLY);
     if (fd > 0) {
-        syscall(SYS_read, fd, seq, sizeof(seq));
-        syscall(SYS_close, fd);
+        SC_read(fd, seq, sizeof(seq));
+        SC_close(fd);
     } else {
         for (int i=0; i < 256; i++) {
             seq[i] = RandomNumberGenerator::get<uint16_t>();
@@ -41,7 +42,7 @@ ID GetID(uint8_t type)
     ID newID;
     timespec t;
 
-    syscall(SYS_clock_gettime, CLOCK_MONOTONIC, &t);
+    SC_clock_gettime(CLOCK_MONOTONIC, &t);
     newID.raw = (uint64_t)((t.tv_sec * 1000 + t.tv_nsec / 1000000)) << 24;
     newID.raw |= type << 16;
     newID.raw |= seq[type]++;

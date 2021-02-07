@@ -13,6 +13,8 @@
 #include <stdarg.h>
 #include <string.h>
 
+#include <proto/kernel.h>
+
 void bug(const char * format, ...)
 {
     char buffer[512];
@@ -23,5 +25,5 @@ void bug(const char * format, ...)
     va_end(arg);
     buffer[511] = 0;
 
-    syscall(SYS_write, 1, buffer, strlen(buffer));
+    SC_write(1, buffer, strlen(buffer));
 }

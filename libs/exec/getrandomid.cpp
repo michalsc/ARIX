@@ -8,11 +8,13 @@
 */
 #define _GNU_SOURCE
 #include <unistd.h>
-#include <sys/syscall.h>
+//#include <sys/syscall.h>
 
 #include <clib/exec_protos.h>
 #include <fcntl.h>
 #include <stdio.h>
+
+#include <proto/kernel.h>
 
 #include "exec_intern.h"
 #include "exec_debug.h"
@@ -35,10 +37,10 @@ uuid_t GetRandomUUID(uint8_t type)
         enough entropy. If opening /dev/urandom fails for some reason, fall back to 
         pseudo random number generator.
     */
-    int fd = syscall(SYS_openat, AT_FDCWD, "/dev/urandom", O_RDONLY);
+    int fd = SC_open("/dev/urandom", O_RDONLY);
     if (fd > 0) {
-        syscall(SYS_read, fd, id.data, 16);
-        syscall(SYS_close, fd);
+        SC_read(fd, id.data, 16);
+        SC_close(fd);
     } else {
         for (int i=0; i < 16; i++) {
             id.data[i] = RandomNumberGenerator::get();
