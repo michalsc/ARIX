@@ -5,7 +5,7 @@
 
 #include "syscall.h"
 
-int SC_clock_gettime(clockid_t clockid, struct timespec *tp)
+int SC_munmap(void *addr, size_t length)
 {
-    return sc2(SYS_clock_gettime, clockid, (long)tp);
+    return sc2(SYS_munmap, (long)addr, length);
 }

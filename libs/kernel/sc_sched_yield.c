@@ -5,7 +5,7 @@
 
 #include "syscall.h"
 
-int SC_clock_gettime(clockid_t clockid, struct timespec *tp)
+int SC_sched_yield()
 {
-    return sc2(SYS_clock_gettime, clockid, (long)tp);
+    return sc0(SYS_sched_yield);
 }

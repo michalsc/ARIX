@@ -5,7 +5,7 @@
 
 #include "syscall.h"
 
-int SC_clock_gettime(clockid_t clockid, struct timespec *tp)
+ssize_t SC_recvmsg(int sockfd, const struct msghdr *msg, int flags)
 {
-    return sc2(SYS_clock_gettime, clockid, (long)tp);
+    return sc3(SYS_recvmsg, sockfd, (long)msg, flags);
 }
