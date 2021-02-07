@@ -5,8 +5,7 @@
 
 #include "syscall.h"
 
-void SC_exit(int status)
+int SC_socket(int domain, int type, int protocol)
 {
-    sc1nr(SYS_exit, status);
+    return sc3(SYS_socket, domain, type, protocol);
 }
-

@@ -5,8 +5,8 @@
 
 #include "syscall.h"
 
-void SC_exit(int status)
+int SC_clock_getres(clockid_t clockid, struct timespec *res)
 {
-    sc1nr(SYS_exit, status);
+    return sc2(SYS_clock_getres, clockid, (long)res);
 }
 
