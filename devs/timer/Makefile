@@ -1,8 +1,9 @@
 OBJNAME   := timer
 OBJTYPE   := device
 TARGETDIR := Devs
-LDLIBS    := c
+LDLIBS    := 
 GLOBAL    := LibBase TimerBase
+AUTOLIBS  := kernel
 LOCAL     := *
 FILES     := timer_init addtime subtime cmptime nanosleep getsystime getuptime beginio
 
