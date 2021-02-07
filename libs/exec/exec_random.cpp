@@ -14,6 +14,8 @@
 #include <exec/id.h>
 #include <time.h>
 
+#include <proto/kernel.h>
+
 #include "exec_random.h"
 #include "exec_debug.h"
 
@@ -23,7 +25,7 @@ void RandomNumberGenerator::seed()
 { 
     struct timespec t;
     bug("[EXEC] Setting up random seed: ");
-    syscall(SYS_clock_gettime, CLOCK_REALTIME, &t);
+    SC_clock_gettime(CLOCK_REALTIME, &t);
 #if __SIZEOF_LONG__ > 4
     _seed = 2654435761 * ((t.tv_sec >> 32) ^ (t.tv_sec) ^ t.tv_nsec);
 #else

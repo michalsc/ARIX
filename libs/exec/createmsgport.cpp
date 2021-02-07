@@ -9,7 +9,7 @@
 #undef _GNU_SOURCE
 #define _GNU_SOURCE
 #include <unistd.h>
-#include <sys/syscall.h>
+//#include <sys/syscall.h>
 
 #include <exec/types.h>
 #include <exec/ports.h>
@@ -22,6 +22,8 @@
 #include <clib/exec_protos.h>
 #include <fcntl.h>
 #include <stdio.h>
+
+#include <proto/kernel.h>
 
 #define DEBUG
 #include "exec_debug.h"
@@ -69,7 +71,7 @@ struct MsgPort * CreateMsgPort()
         NEWLIST(&port->mp_MsgList);
 
         // Create socket
-        port->mp_Socket = syscall(SYS_socket, AF_UNIX, SOCK_DGRAM, 0);
+        port->mp_Socket = SC_socket(AF_UNIX, SOCK_DGRAM, 0);
 
         // If socket failed return NULL.
         if (port->mp_Socket < 0)
@@ -80,15 +82,15 @@ struct MsgPort * CreateMsgPort()
         }
 
         // Put the socket in non-blocking mode.
-        int flags = syscall(SYS_fcntl, port->mp_Socket, F_GETFL);
-        syscall(SYS_fcntl, port->mp_Socket, F_SETFL, flags | O_NONBLOCK);
+        int flags = SC_fcntl(port->mp_Socket, F_GETFL, 0);
+        SC_fcntl(port->mp_Socket, F_SETFL, flags | O_NONBLOCK);
 
         // Create memory pool for incomming messages.
         port->mp_MsgPool = CreatePool(0, 8192, 8192);
         if (port->mp_MsgPool == NULL)
         {
             D(bug("[EXEC] Cannot create memory pool\n"));
-            syscall(SYS_close, port->mp_Socket);
+            SC_close(port->mp_Socket);
             FreeMem(port, sizeof(struct MsgPort));
             return NULL;
         }
@@ -112,7 +114,7 @@ struct MsgPort * CreateMsgPort()
             {
                 D(bug("[EXEC] too many tries. giving up\n"));
                 DeletePool(port->mp_MsgPool);
-                syscall(SYS_close, port->mp_Socket);
+                SC_close(port->mp_Socket);
                 FreeMem(port, sizeof(struct MsgPort));
                 return NULL;
             }
@@ -121,7 +123,7 @@ struct MsgPort * CreateMsgPort()
                 port->mp_ID.raw >> 24, (port->mp_ID.raw >> 16) & 0xff, port->mp_ID.raw & 0xffff));
 
             // Try to bind socket to the ID in unix socket namespace.
-            err = syscall(SYS_bind, port->mp_Socket, (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(ID));
+            err = SC_bind(port->mp_Socket, (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(ID));
         } while (err != 0);
 
         // Unlock the port
