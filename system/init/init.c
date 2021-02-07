@@ -29,21 +29,15 @@ long __stack_chk_guard;
 void do_mounts()
 {
     SC_mount("proc", "/proc", "proc", MS_NOSUID | MS_NOEXEC | MS_NODEV, NULL);
-    //syscall(SYS_mount, "proc", "/proc", "proc", MS_NOSUID | MS_NOEXEC | MS_NODEV, NULL);
     SC_mount("devtmpfs", "/dev", "devtmpfs", MS_NOSUID, "mode=755");
-    //syscall(SYS_mount, "devtmpfs", "/dev", "devtmpfs", MS_NOSUID, "mode=755");
     SC_mount("tmpfs", "/tmp", "tmpfs", MS_NODEV, NULL);
-    //syscall(SYS_mount, "tmpfs", "/tmp", "tmpfs", MS_NODEV, NULL);
-    SC_mkdir("/dev/ptr", 0755);
+
+    SC_mkdir("/dev/pts", 0755);
     SC_mkdir("/dev/shm", 0777);
-    //syscall(SYS_mkdirat, AT_FDCWD, "/dev/pts", 0755);
-    //syscall(SYS_mkdirat, AT_FDCWD, "/dev/shm", 0777);
+
     SC_mount("sysfs", "/sys", "sysfs", MS_NOSUID | MS_NOEXEC | MS_NODEV, NULL);
-    //syscall(SYS_mount, "sysfs", "/sys", "sysfs", MS_NOSUID | MS_NOEXEC | MS_NODEV, NULL);
     SC_mount("devpts", "/dev/pts", "devpts", MS_NOSUID | MS_NOEXEC, NULL);
-    //syscall(SYS_mount, "devpts", "/dev/pts", "devpts", MS_NOSUID | MS_NOEXEC, NULL);
     SC_mount("tmpfs", "/dev/shm", "tmpfs", MS_NOSUID | MS_NODEV, NULL);
-    //syscall(SYS_mount, "tmpfs", "/dev/shm", "tmpfs", MS_NOSUID | MS_NODEV, NULL);
 }
 
 int __syscall_error(int code)
