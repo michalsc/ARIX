@@ -7,7 +7,7 @@
 
 struct Mutex {
     struct Node m_Node;
-    int32_t     m_Lock;
+    uint32_t    m_Lock;
 };
 
 #define MUTEX_LOCKED    0
