@@ -1,8 +1,23 @@
 cmake_minimum_required(VERSION 3.14.0)
 project(ARIX VERSION 60.0)
 
+include(cmake/verstring.cmake)
+include(cmake/arix.cmake)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 17)
 
-add_subdirectory(include)
+set(SFDC ${CMAKE_SOURCE_DIR}/tools/sfdc/sfdc.py)
 
+set(SUPPORTED_ARCHS "aarch64")
+set(ARCH ${CMAKE_SYSTEM_PROCESSOR} CACHE STRING "One of target machines: ${SUPPORTED_ARCHS}")
+set_property(CACHE ARCH PROPERTY STRINGS ${SUPPORTED_ARCHS})
+
+if (${ARCH} IN_LIST SUPPORTED_ARCHS)
+    message("-- Selected target arch: ${ARCH}")
+else()
+    message(FATAL_ERROR "Wrong target arch specified: ${ARCH}")
+endif()
+
+add_subdirectory(include)
+add_subdirectory(libs)
