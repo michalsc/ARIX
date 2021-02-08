@@ -5,7 +5,6 @@
 
 #define _GNU_SOURCE
 #include <unistd.h>
-#include <sys/syscall.h>
 
 #include <exec/types.h>
 #include <exec/memory.h>

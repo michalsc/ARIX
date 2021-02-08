@@ -7,12 +7,7 @@
     with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-#define _GNU_SOURCE
-#include <unistd.h>
-#include <sys/syscall.h>
-#include <sched.h>
 #include <clib/exec_protos.h>
-
 #include <proto/kernel.h>
 
 void Reschedule()
