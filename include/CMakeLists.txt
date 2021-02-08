@@ -1,6 +1,5 @@
-add_custom_target(
-    includes ALL
-)
+
+add_custom_target(includes ALL)
 
 add_custom_command(
     TARGET includes PRE_BUILD
