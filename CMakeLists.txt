@@ -5,7 +5,7 @@ include(cmake/verstring.cmake)
 include(cmake/arix.cmake)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD 11)
 
 set(SFDC ${CMAKE_SOURCE_DIR}/tools/sfdc/sfdc.py)
 
