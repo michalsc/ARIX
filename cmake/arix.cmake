@@ -67,8 +67,8 @@ function(arix_finish TARGET)
     if (NOT ${CMAKE_HOST_SYSTEM_NAME} STREQUAL ${CMAKE_SYSTEM_NAME})
         include_directories(${CMAKE_BINARY_DIR}/sys_include)
     endif()
-    build_headers()
     if(${PROJECT_TYPE} STREQUAL "library")
+        build_headers()
         add_custom_command(
             OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version.script
             COMMAND ${CMAKE_COMMAND} -E echo "{ global: ${GLOBAL_SYMBOLS}; local: ${LOCAL_SYMBOLS}; };" > ${CMAKE_CURRENT_BINARY_DIR}/version.script
@@ -77,6 +77,9 @@ function(arix_finish TARGET)
         target_sources(${TARGET} PRIVATE
             ${CMAKE_CURRENT_BINARY_DIR}/__base_file
             ${CMAKE_CURRENT_BINARY_DIR}/version.script
+        )
+        add_dependencies(${TARGET}
+            includes.${PROJECT_NAME}.${PROJECT_TYPE}
         )
     endif()
 endfunction(arix_finish)
