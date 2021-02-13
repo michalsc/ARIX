@@ -12,7 +12,6 @@ add_library(uuid SHARED
 )
 
 add_dependencies(uuid 
-    includes.uuid.library
     includes.exec.library
 )
 

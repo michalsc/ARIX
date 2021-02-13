@@ -12,10 +12,6 @@ add_library(kernel SHARED
     sc_sendto sc_sendmsg sc_recvfrom sc_recvmsg sc_clock_nanosleep
 )
 
-add_dependencies(kernel 
-    includes.kernel.library
-)
-
 install(TARGETS kernel DESTINATION SYS/Libs)
 
 arix_finish(kernel)

@@ -10,10 +10,6 @@ add_library(debug SHARED
     vbug
 )
 
-add_dependencies(debug 
-    includes.debug.library
-)
-
 target_link_libraries(debug PUBLIC c uuid)
 
 install(TARGETS debug DESTINATION SYS/Libs)
