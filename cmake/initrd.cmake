@@ -1,0 +1,23 @@
+find_program(CPIO cpio REQUIRED)
+find_program(GZIP gzip REQUIRED)
+find_program(FIND find REQUIRED)
+
+execute_process(COMMAND ${FIND} ARIX
+    WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
+    OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/find.out
+)
+
+execute_process(COMMAND ${CPIO} -o -H newc
+    WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
+    INPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/find.out
+    OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/cpio.out
+    ERROR_QUIET
+)
+
+execute_process(COMMAND ${GZIP} -f ${CMAKE_CURRENT_BINARY_DIR}/cpio.out)
+
+execute_process(COMMAND ${CMAKE_COMMAND} -E cat ${CMAKE_CURRENT_BINARY_DIR}/cpio.out.gz ${CMAKE_INSTALL_PREFIX}/initrd
+    OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/initrd.out
+)
+
+file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/initrd.out ${CMAKE_INSTALL_PREFIX}/initrd)
