@@ -28,6 +28,10 @@ function(build_headers)
                       DEPENDS ${CMAKE_BINARY_DIR}/sys_include/clib/${PROJECT_NAME}_protos.h
                       )
 
+    add_dependencies(includes
+        ${PROJECT_NAME}.includes
+    )
+
     add_custom_command(
         OUTPUT ${CMAKE_BINARY_DIR}/sys_include/proto/${PROJECT_NAME}.h
         COMMAND mkdir -p ${CMAKE_BINARY_DIR}/sys_include/proto/
