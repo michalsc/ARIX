@@ -10,7 +10,10 @@ add_library(debug SHARED
     vbug
 )
 
-target_link_libraries(debug PUBLIC c uuid)
+
+import_library(libc "c")
+
+target_link_libraries(debug PRIVATE libc)
 
 install(TARGETS debug DESTINATION SYS/Libs)
 
