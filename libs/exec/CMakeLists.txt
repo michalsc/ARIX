@@ -23,9 +23,10 @@ add_dependencies(exec
 import_library(libc "c")
 import_library(dl "dl")
 import_library(cpp "stdc++")
+import_library(gcc "gcc")
 
 target_link_libraries(exec PRIVATE 
-    libc dl cpp kernel)
+    libc dl cpp gcc kernel)
 
 install(TARGETS exec DESTINATION ARIX/Libs)
 
