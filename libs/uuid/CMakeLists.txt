@@ -11,10 +11,6 @@ add_library(uuid SHARED
     uuid_init
 )
 
-add_dependencies(uuid 
-    includes.exec.library
-)
-
 install(TARGETS uuid DESTINATION SYS/Libs)
 
 arix_finish(uuid)
