@@ -12,7 +12,7 @@ add_library(utility SHARED
 )
 
 add_dependencies(utility 
-    includes.exec.library
+    exec.includes
 )
 
 target_link_libraries(utility PRIVATE

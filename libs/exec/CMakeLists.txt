@@ -17,7 +17,7 @@ add_library(exec SHARED
 )
 
 add_dependencies(exec
-    includes.kernel.library
+    kernel.includes
 )
 
 import_library(libc "c")

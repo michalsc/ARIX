@@ -22,7 +22,7 @@ function(project_type TYPE)
 endfunction(project_type)
 
 function(build_headers)
-    add_custom_target(includes.${PROJECT_NAME}.${PROJECT_TYPE} ALL
+    add_custom_target(${PROJECT_NAME}.includes ALL
                       DEPENDS ${CMAKE_BINARY_DIR}/sys_include/proto/${PROJECT_NAME}.h
                       DEPENDS ${CMAKE_BINARY_DIR}/sys_include/inline/${PROJECT_NAME}.h
                       DEPENDS ${CMAKE_BINARY_DIR}/sys_include/defines/${PROJECT_NAME}.h
@@ -79,7 +79,7 @@ function(arix_finish TARGET)
             ${CMAKE_CURRENT_BINARY_DIR}/version.script
         )
         add_dependencies(${TARGET}
-            includes.${PROJECT_NAME}.${PROJECT_TYPE}
+            ${PROJECT_NAME}.includes
         )
     endif()
 endfunction(arix_finish)
