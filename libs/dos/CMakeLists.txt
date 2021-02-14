@@ -19,6 +19,6 @@ import_library(cpp "stdc++")
 target_link_libraries(dos PRIVATE 
     libc cpp exec)
 
-install(TARGETS dos DESTINATION SYS/Libs)
+install(TARGETS dos DESTINATION ARIX/Libs)
 
 arix_finish(dos)

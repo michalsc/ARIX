@@ -27,6 +27,6 @@ import_library(cpp "stdc++")
 target_link_libraries(exec PRIVATE 
     libc dl cpp kernel)
 
-install(TARGETS exec DESTINATION SYS/Libs)
+install(TARGETS exec DESTINATION ARIX/Libs)
 
 arix_finish(exec)

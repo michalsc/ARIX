@@ -11,6 +11,6 @@ add_library(uuid SHARED
     uuid_init
 )
 
-install(TARGETS uuid DESTINATION SYS/Libs)
+install(TARGETS uuid DESTINATION ARIX/Libs)
 
 arix_finish(uuid)

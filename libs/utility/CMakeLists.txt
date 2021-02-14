@@ -19,6 +19,6 @@ target_link_libraries(utility PRIVATE
     exec
 )
 
-install(TARGETS utility DESTINATION SYS/Libs)
+install(TARGETS utility DESTINATION ARIX/Libs)
 
 arix_finish(utility)

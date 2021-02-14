@@ -15,6 +15,6 @@ import_library(libc "c")
 
 target_link_libraries(debug PRIVATE libc)
 
-install(TARGETS debug DESTINATION SYS/Libs)
+install(TARGETS debug DESTINATION ARIX/Libs)
 
 arix_finish(debug)

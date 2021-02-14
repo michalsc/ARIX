@@ -19,6 +19,6 @@ add_dependencies(init
     kernel.includes
 )
 
-install(TARGETS init DESTINATION SYS/System)
+install(TARGETS init DESTINATION ARIX/System)
 
 arix_finish(init)
