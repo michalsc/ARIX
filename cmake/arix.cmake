@@ -15,10 +15,9 @@ function(project_type TYPE)
             VERBATIM
         )
 
-        
+        set(GLOBAL_SYMBOLS "LibBase" PARENT_SCOPE)
+        set(LOCAL_SYMBOLS "*" PARENT_SCOPE)
     endif()
-    set(GLOBAL_SYMBOLS "LibBase" PARENT_SCOPE)
-    set(LOCAL_SYMBOLS "*" PARENT_SCOPE)
 endfunction(project_type)
 
 function(build_headers)
