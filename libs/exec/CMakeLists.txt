@@ -24,7 +24,7 @@ import_library(libc "c")
 import_library(dl "dl")
 import_library(cpp "stdc++")
 
-target_link_libraries(exec PUBLIC 
+target_link_libraries(exec PRIVATE 
     libc dl cpp kernel)
 
 install(TARGETS exec DESTINATION SYS/Libs)
