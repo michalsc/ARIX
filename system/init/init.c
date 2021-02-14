@@ -18,6 +18,10 @@
 static const char __attribute__((used)) version[] = "\0$VER: System/init 60.0 " VERSION_STRING_DATE;
 int __loc_errno;
 long __stack_chk_guard;
+void __stack_chk_fail(void)
+{
+    SC_exit(-1);
+}
 
 void do_mounts()
 {
