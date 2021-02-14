@@ -30,5 +30,3 @@ add_subdirectory(system)
 add_subdirectory(initrd)
 
 install(SCRIPT cmake/initrd.cmake)
-
-message(${CMAKE_SYSTEM_PROCESSOR})
