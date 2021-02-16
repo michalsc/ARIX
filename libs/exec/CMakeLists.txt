@@ -26,7 +26,7 @@ import_library(cpp "stdc++")
 import_library(gcc "gcc")
 
 target_link_libraries(exec PRIVATE 
-    libc dl cpp gcc kernel)
+    libc dl cpp gcc kernel tinystl)
 
 install(TARGETS exec DESTINATION ARIX/Libs)
 

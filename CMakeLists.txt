@@ -24,6 +24,7 @@ else()
     message(FATAL_ERROR "Wrong target arch specified: ${ARCH}")
 endif()
 
+add_subdirectory(external/tiny-stl)
 add_subdirectory(include)
 add_subdirectory(libs)
 add_subdirectory(system)
