@@ -25,10 +25,9 @@
 #include <proto/kernel.h>
 
 #include <stdio.h>
+#include <tinystl/list>
 
-#include <list>
-
-std::list<struct MsgPort *> __ports;
+tinystd::list<struct MsgPort *> __ports;
 
 extern struct Library * ExecBase;
 static void * _handle = NULL;
