@@ -62,6 +62,9 @@
         
         [ "int",                "SC_mount", "const char * source", "const char * target", "const char * filesystemtype", "unsigned long mountflags", "const void * data"],
 
-        [ "int",                "SC_sched_yield"]
+        [ "pid_t",              "SC_getpid" ],
+        [ "pid_t",              "SC_getppid" ],
+        [ "pid_t",              "SC_gettid" ],
+        [ "int",                "SC_sched_yield" ]
     ]
 }
