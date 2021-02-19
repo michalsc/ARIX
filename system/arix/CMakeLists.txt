@@ -8,7 +8,7 @@ add_executable(ARIX
 import_library(cpp "stdc++")
 
 target_link_libraries(ARIX PRIVATE 
-    exec cpp)
+    exec kernel cpp)
 
 add_dependencies(init
     exec.includes
