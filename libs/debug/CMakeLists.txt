@@ -10,10 +10,7 @@ add_library(debug SHARED
     vbug
 )
 
-
-import_library(libc "c")
-
-target_link_libraries(debug PRIVATE libc)
+target_link_libraries(debug PRIVATE kernel)
 
 install(TARGETS debug DESTINATION ARIX/Libs)
 
