@@ -26,7 +26,7 @@ def generate_basefile(cfg):
     for cdef in cfg["cdef"]:
         print(cdef)
     print("")
-    print("static const char __attribute__((used, section(\".text\"))) __idString[] = \"\\0$VER: {0}.{1} {2}.{3} \" VERSION_STRING_DATE \"\\0\";".format(
+    print("static const char __attribute__((used, section(\".text.unlikely.id\"))) __idString[] = \"\\0$VER: {0}.{1} {2}.{3} \" VERSION_STRING_DATE \"\\0\";".format(
         cfg["configuration"]["name"], cfg["configuration"]["type"],
         cfg["configuration"]["version.major"], cfg["configuration"]["version.minor"]
     ))

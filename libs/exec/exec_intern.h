@@ -17,9 +17,9 @@
 
 #ifdef __cplusplus
 
-#include <list>
+#include <tinystl/list>
 
-extern std::list<struct MsgPort *> __ports;
+extern tinystd::list<struct MsgPort *> __ports;
 
 
 #endif

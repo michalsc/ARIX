@@ -13,6 +13,7 @@
 #include <exec/types.h>
 #include <exec/id.h>
 #include <exec/libraries.h>
+#include <exec/memory.h>
 #include <clib/exec_protos.h>
 #include <sys/socket.h>
 #include <time.h>
@@ -25,10 +26,9 @@
 #include <proto/kernel.h>
 
 #include <stdio.h>
+#include <tinystl/list>
 
-#include <list>
-
-std::list<struct MsgPort *> __ports;
+tinystd::list<struct MsgPort *> __ports;
 
 extern struct Library * ExecBase;
 static void * _handle = NULL;
@@ -75,6 +75,57 @@ void * GetHandle()
 }
 
 void InitializeIDSeq();
+
+
+void * mungwall_malloc(size_t size)
+{
+    ULONG flags = MEMF_CLEAR;
+    size_t orig_size = size;
+    size = (size + 3) & ~3;
+
+    bug("[exec] mungwall_alloc(%d)\n", size);
+    uint32_t *ptr = reinterpret_cast<uint32_t *>(tlsf_malloc(local_memory_pool, size + 32, &flags));
+    ptr[0] = orig_size;
+    ptr[1] = 0xdeadbeef;
+    ptr[2] = 0xdeadbeef;
+    ptr[3] = 0xdeadbeef;
+
+    ptr[4 + size/4] = 0xcafebabe;
+    ptr[5 + size/4] = 0xcafebabe;
+    ptr[6 + size/4] = 0xcafebabe;
+    ptr[7 + size/4] = 0xcafebabe;
+
+    return &ptr[4];
+}
+
+void mungwall_free(void *ptr, size_t size)
+{
+    uint32_t *p = reinterpret_cast<uint32_t *>(ptr);
+    size_t orig_size = size;
+    size = (size + 3) & ~3;
+    p -= 4;
+    if (*p != (unsigned int)orig_size) {
+#ifndef NDEBUG
+        bug("[exec] Size mismatch at mungwall_free!! %d != %d\n", *p, (uint32_t)size);
+#endif
+    }
+
+    if (p[1] != 0xdeadbeef || p[2] != 0xdeadbeef || p[3] != 0xdeadbeef)
+    {
+#ifndef NDEBUG
+        bug("[exec] mungwall_free(): left wall damaged %08x%08x%08x\n", p[1], p[2], p[3]);
+#endif
+    }
+    if (p[4 + size/4] != 0xcafebabe || p[5+size/4] != 0xcafebabe || p[6+size/4] != 0xcafebabe || p[7+size/4] != 0xcafebabe)
+    {
+#ifndef NDEBUG
+        bug("[exec] mungwall_free(): right wall damaged %08x%08x%08x%08x\n", p[4 + size/4], p[5+size/4], p[6+size/4],p[7+size/4]);
+#endif
+    }
+
+    tlsf_freevec(local_memory_pool, p);
+}
+
 
 void __attribute__((constructor)) ExecInit()
 {

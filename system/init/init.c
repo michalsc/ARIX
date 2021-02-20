@@ -13,18 +13,15 @@
 #include <sys/mount.h>
 #include <sys/mman.h>
 
-#include "../../libs/kernel/sc_mount.c"
-#include "../../libs/kernel/sc_mkdir.c"
-#include "../../libs/kernel/sc_write.c"
-#include "../../libs/kernel/sc_memfd_create.c"
-#include "../../libs/kernel/sc_lseek.c"
-#include "../../libs/kernel/sc_exit.c"
-#include "../../libs/kernel/sc_fcntl.c"
-#include "../../libs/kernel/sc_execve.c"
+#include <clib/kernel_protos.h>
 
 static const char __attribute__((used)) version[] = "\0$VER: System/init 60.0 " VERSION_STRING_DATE;
 int __loc_errno;
 long __stack_chk_guard;
+void __stack_chk_fail(void)
+{
+    SC_exit(-1);
+}
 
 void do_mounts()
 {

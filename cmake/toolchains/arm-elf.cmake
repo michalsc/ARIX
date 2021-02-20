@@ -1,4 +1,4 @@
-set(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_SYSTEM_NAME ARIX)
 set(CMAKE_SYSTEM_PROCESSOR arm)
 
 set(CROSS_COMPILE arm-none-eabi)
