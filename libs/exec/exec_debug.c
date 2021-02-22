@@ -14,16 +14,15 @@
 #include <string.h>
 
 #include <proto/kernel.h>
+#include <proto/debug.h>
 
 void bug(const char * format, ...)
 {
-    char buffer[512];
-
-    va_list arg;
-    va_start(arg, format);
-    vsnprintf(buffer, 511, format, arg);
-    va_end(arg);
-    buffer[511] = 0;
-
-    SC_write(1, buffer, strlen(buffer));
+    if (DebugBase != NULL)
+    {
+        va_list arg;
+        va_start(arg, format);
+        VBug(format, arg);
+        va_end(arg);
+    }
 }
