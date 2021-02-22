@@ -126,9 +126,12 @@ void mungwall_free(void *ptr, size_t size)
     tlsf_freevec(local_memory_pool, p);
 }
 
+struct Library *DebugBase = NULL;
 
 void __attribute__((constructor)) ExecInit()
 {
+    DebugBase = OpenLibrary("debug.library", 0);
+
     bug("[EXEC] ExecInit()\n");
     local_memory_pool = tlsf_init_autogrow(65536, 0, NULL, NULL, NULL);
     bug("[EXEC] Local memory pool @ %p\n", local_memory_pool);

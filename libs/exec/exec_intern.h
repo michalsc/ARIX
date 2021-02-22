@@ -21,6 +21,7 @@
 
 extern tinystd::list<struct MsgPort *> __ports;
 
+extern struct Library *DebugBase;
 
 #endif
 
