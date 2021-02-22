@@ -66,10 +66,10 @@ void _start(int argc, char **argv)
     }
     arg[1] = b;
 
-    SC_write(1, "[INIT] Mounting filesystems\n", 28);
+    //SC_write(1, "[INIT] Mounting filesystems\n", 28);
     do_mounts();
 
-    SC_write(1, "[INIT] Booting ARIX\n", 20);
+    //SC_write(1, "[INIT] Booting ARIX\n", 20);
     SC_execve("/ARIX/System/ARIX", (const char**)arg, (const char**)env);
 
     SC_exit(0);
