@@ -37,7 +37,7 @@ uuid_t GetRandomUUID(uint8_t type)
         enough entropy. If opening /dev/urandom fails for some reason, fall back to 
         pseudo random number generator.
     */
-    int fd = SC_open("/dev/urandom", O_RDONLY);
+    int fd = SC_open("/dev/random", O_RDONLY);
     if (fd > 0) {
         SC_read(fd, id.data, 16);
         SC_close(fd);
