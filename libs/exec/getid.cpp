@@ -20,12 +20,22 @@
 #include "exec_debug.h"
 #include "exec_random.h"
 
+#define USE_GETRANDOM 1
+
 namespace {
     uint16_t seq[256];
 }
 
 void InitializeIDSeq()
 {
+#if USE_GETRANDOM
+    bug("[EXEC] Initializing random IDs\n");
+
+    SC_getrandom(&seq[0], 256, 0);
+    SC_getrandom(&seq[128], 256, 0);
+
+    bug("[EXEC] Random init done\n");
+#else
     int fd = SC_open("/dev/urandom", O_RDONLY);
     if (fd > 0) {
         SC_read(fd, seq, sizeof(seq));
@@ -35,6 +45,7 @@ void InitializeIDSeq()
             seq[i] = RandomNumberGenerator::get<uint16_t>();
         }
     }
+#endif
 }
 
 ID GetID(uint8_t type)
