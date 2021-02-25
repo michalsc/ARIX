@@ -17,10 +17,13 @@
 #include <exec/ports.h>
 #include <exec/tasks.h>
 #include <proto/exec.h>
+#include <proto/kernel.h>
+#include <proto/debug.h>
 #include <uuid/uuid.h>
 
 #include <linux/limits.h>
 #include <sys/mount.h>
+#include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
 #include <sched.h>
@@ -45,9 +48,19 @@ int dir_tmp;
 
 static const char __attribute__((used)) version[] = "\0$VER: ARIX 60.0 " VERSION_STRING_DATE;
 
+struct Library *DebugBase = NULL;
+
+static inline void Bug(const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    VBug(format, args);
+    va_end(args);
+}
+
 int is_init()
 {
-    pid_t pid = (pid_t)syscall(SYS_getpid);
+    pid_t pid = SC_getpid();
 
     return pid == 1;
 }
@@ -60,24 +73,28 @@ int main(int argc, char **argv)
 {
     int dir_assigns;
     int dir_volumes;
+    int dir_devices;
+
     char *sys_path;
 
     (void)argc;
     (void)argv;
 
-    std::cout << "argc = " << argc << std::endl;
+    DebugBase = OpenLibrary("debug.library", 0);
+
+    Bug("[ARIX] argc = %d\n", argc);
     for (int i=0; i < argc; i++)
     {
-        std::cout << "argv[" << i << "] = " << argv[i] << std::endl;
+        Bug("[ARIX] argv[%d] = '%s'\n", i, argv[i]);
     }
 
     if (argc > 1)
     {
         char buff[256];
         int fd = atoi(argv[1]);
-        int count = syscall(SYS_read, fd, buff, 256);
-        std::cout << "read from fd " << fd << " got " << count << " bytes: '" << buff << "'" << std::endl;
-        syscall(SYS_close, fd);
+        int count = SC_read(fd, buff, 256);
+        Bug("[ARIX] read from fd %d got %d bytes: '%s'\n", fd, count, buff);
+        SC_close(fd);
     }
 
     struct sockaddr_un serverSocketAddr;
@@ -91,20 +108,20 @@ int main(int argc, char **argv)
 
     (void)buffer;
 
-    std::cout << "[ARIX] " << &version[7] << std::endl;
+    Bug("[ARIX] %s\n", &version[7]);
 
     ARIXPort.mp_ID = ARIX_PORT_ID;
     NEWLIST(&ARIXPort.mp_MsgList);
-    ARIXPort.mp_Socket = socket(AF_UNIX, SOCK_DGRAM, 0);
+    ARIXPort.mp_Socket = SC_socket(AF_UNIX, SOCK_DGRAM, 0);
     ARIXPort.mp_MsgPool = CreatePool(MEMF_CLEAR, 8192, 8192);
     ARIXPort.mp_ReceiveBuffer = AllocVecPooled(ARIXPort.mp_MsgPool, 4096);
     InitMutex(&ARIXPort.mp_Lock, MUTEX_FREE);
 
-    int flags = fcntl(ARIXPort.mp_Socket, F_GETFL);
-    fcntl(ARIXPort.mp_Socket, F_SETFL, flags | O_NONBLOCK);
+    int flags = SC_fcntl(ARIXPort.mp_Socket, F_GETFL, 0);
+    SC_fcntl(ARIXPort.mp_Socket, F_SETFL, flags | O_NONBLOCK);
 
     if (ARIXPort.mp_Socket < 0) {
-        printf("[ARIX] Cannot create server socket\n");
+        Bug("[ARIX] Cannot create server socket\n");
         return 1;
     }
 
@@ -113,38 +130,46 @@ int main(int argc, char **argv)
     CopyMem(&ARIXPort.mp_ID, &serverSocketAddr.sun_path[1], sizeof(uuid_t));
 
     /* Bind the UNIX domain address to the created socket */
-    if (bind(ARIXPort.mp_Socket, (struct sockaddr *)&serverSocketAddr, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(ID)))
+    if (SC_bind(ARIXPort.mp_Socket, (struct sockaddr *)&serverSocketAddr, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(ID)))
     {
-        printf("[ARIX] Failed to create master MsgPort. Is ARIX already running?\n");
+        Bug("[ARIX] Failed to create master MsgPort. Is ARIX already running?\n");
         return 1;
     }
 
     /* Prepare temporary directory for assigns and volumes */
-    syscall(SYS_mkdirat, AT_FDCWD, ARIX_TEMP_PATH, 0755);
+    SC_mkdir(ARIX_TEMP_PATH, 0755);
     /* Unshare mount namespace */
-    syscall(SYS_unshare, CLONE_NEWNS);
+    SC_unshare(CLONE_NEWNS);
     /* All mounts under /tmp are private and do not propagate outside this namespace */
-    //syscall(SYS_mount, "none", "/tmp", NULL, MS_REC | MS_PRIVATE, NULL);
+    //SC_mount("none", "/tmp", NULL, MS_REC | MS_PRIVATE, NULL);
     /*
         Mount tmpfs there. The mount is invisible outside ARIX process, however ARIX can
         pass file descriptor from it to the outside world through messages
     */
-    syscall(SYS_mount, "none", ARIX_TEMP_PATH, "tmpfs", 0, NULL);
-    dir_tmp = syscall(SYS_openat, AT_FDCWD, ARIX_TEMP_PATH, O_RDONLY | O_DIRECTORY);
+    SC_mount("none", ARIX_TEMP_PATH, "tmpfs", 0, NULL);
+    dir_tmp = SC_open(ARIX_TEMP_PATH, O_RDONLY | O_DIRECTORY);
 
-    syscall(SYS_mkdirat, dir_tmp, ".assigns", 0755);
-    dir_assigns = syscall(SYS_openat, dir_tmp, ".assigns", O_RDONLY | O_DIRECTORY);
+    SC_mkdirat(dir_tmp, ".assigns", 0755);
+    dir_assigns = SC_openat(dir_tmp, ".assigns", O_RDONLY | O_DIRECTORY);
 
-    syscall(SYS_mkdirat, dir_tmp, ".volumes", 0755);
-    dir_volumes = syscall(SYS_openat, dir_tmp, ".volumes", O_RDONLY | O_DIRECTORY);
+    SC_mkdirat(dir_tmp, ".volumes", 0755);
+    dir_volumes = SC_openat(dir_tmp, ".volumes", O_RDONLY | O_DIRECTORY);
+
+    SC_mkdirat(dir_tmp, ".devices", 0755);
+    dir_devices = SC_openat(dir_tmp, ".devices", O_RDONLY | O_DIRECTORY);
+
+    /* Synthesize RAM: device (Ram Disk Volume) */
+    SC_mkdirat(dir_devices, "RAM", 0755);
+    SC_mount("none", ARIX_TEMP_PATH "/.devices/RAM", "tmpfs", 0, NULL);
+    SC_symlinkat(ARIX_TEMP_PATH "/.devices/RAM/", dir_volumes, "Ram Disk");
 
     /* Synthesize UNIX: assign */
-    syscall(SYS_mkdirat, dir_assigns, "UNIX", 0755);
-    syscall(SYS_symlinkat, "/", dir_assigns, "UNIX/0");
+    SC_mkdirat(dir_assigns, "UNIX", 0755);
+    SC_symlinkat("/", dir_assigns, "UNIX/0");
 
     /* Get path to the file */
     sys_path = static_cast<char*>(AllocVec(PATH_MAX, MEMF_CLEAR));
-    size_t path_length = syscall(SYS_readlinkat, AT_FDCWD, "/proc/self/exe", sys_path, PATH_MAX);
+    size_t path_length = SC_readlink("/proc/self/exe", sys_path, PATH_MAX);
 
     /* Remove executable name from the path */
     while(path_length > 0 && sys_path[path_length] != '/')
@@ -163,8 +188,8 @@ int main(int argc, char **argv)
     sys_path = static_cast<char *>(ReallocMem(sys_path, path_length + 1));
 
     /* Synthesize SYS: assign */
-    syscall(SYS_mkdirat, dir_assigns, "SYS", 0755);
-    syscall(SYS_symlinkat, sys_path, dir_assigns, "SYS/0");
+    SC_mkdirat(dir_assigns, "SYS", 0755);
+    SC_symlinkat(sys_path, dir_assigns, "SYS/0");
 
     struct TagItem tags[] = {
         { TASKTAG_PC,           (IPTR)messageLoop },
@@ -178,22 +203,22 @@ int main(int argc, char **argv)
 
     struct Library *base = OpenLibrary("dos.library", 0);
 
-    std::cout << "[ARIX] DOSBase = " << (void*)base << std::endl;
+    Bug("[ARIX] DOSBase = %p\n", base);
 
-    std::cout << "[ARIX] Idling here..." << std::endl;
+    Bug("[ARIX] Idling here...\n");
 
     while(1) {
         struct timespec tv;
         tv.tv_sec = 1;
         tv.tv_nsec = 0;
 
-        syscall(SYS_nanosleep, &tv, NULL);
+        SC_clock_nanosleep(CLOCK_MONOTONIC, 0, &tv, NULL);
     }
 }
 
 void messageLoop(struct MsgPort * arix)
 {
-    std::cout << "[ARIX] Starting message loop on port " << (void*)arix << std::endl;
+    Bug("[ARIX] Starting message loop on port %p\n", (void*)arix);
 
     while (1)
     {
@@ -261,7 +286,7 @@ void messageLoop(struct MsgPort * arix)
                         break;
                     }
                     default:
-                        std::cout << "[ARIX] Unhandeld request " << msg->ma_Request << std::endl;
+                        Bug("[ARIX] Unhandeld request %08x\n", msg->ma_Request);
                         break;
                     }
                 }

@@ -1,0 +1,6 @@
+add_subdirectory(kernel)
+add_subdirectory(debug)
+add_subdirectory(exec)
+add_subdirectory(utility)
+add_subdirectory(uuid)
+add_subdirectory(dos)
