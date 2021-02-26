@@ -3,11 +3,11 @@
 
 #include <errno.h>
 
-#ifdef __aarch64__
-
 extern int __loc_errno;
 
-static inline long sc0(long nr)
+#ifdef __aarch64__
+
+static inline __attribute__((always_inline)) long sc0(long nr)
 {
     register long ret __asm__("x0");
     register long _nr __asm__("x8") = nr;
@@ -22,7 +22,7 @@ static inline long sc0(long nr)
     return ret;
 }
 
-static inline long sc1(long nr, long a1)
+static inline __attribute__((always_inline)) long sc1(long nr, long a1)
 {
     register long ret __asm__("x0");
     register long _a1 __asm__("x0") = a1;
@@ -38,7 +38,7 @@ static inline long sc1(long nr, long a1)
     return ret;
 }
 
-static inline void __attribute__((noreturn)) sc1nr(long nr, long a1)
+static inline __attribute__((always_inline)) void __attribute__((noreturn)) sc1nr(long nr, long a1)
 {
     register long _a1 __asm__("x0") = a1;
     register long _nr __asm__("x8") = nr;
@@ -47,7 +47,7 @@ static inline void __attribute__((noreturn)) sc1nr(long nr, long a1)
     while(1);
 }
 
-static inline long sc2(long nr, long a1, long a2)
+static inline __attribute__((always_inline)) long sc2(long nr, long a1, long a2)
 {
     register long ret __asm__("x0");
     register long _a1 __asm__("x0") = a1;
@@ -64,7 +64,7 @@ static inline long sc2(long nr, long a1, long a2)
     return ret;
 }
 
-static inline long sc3(long nr, long a1, long a2, long a3)
+static inline __attribute__((always_inline)) long sc3(long nr, long a1, long a2, long a3)
 {
     register long ret __asm__("x0");
     register long _a1 __asm__("x0") = a1;
@@ -82,7 +82,7 @@ static inline long sc3(long nr, long a1, long a2, long a3)
     return ret;
 }
 
-static inline long sc4(long nr, long a1, long a2, long a3, long a4)
+static inline __attribute__((always_inline)) long sc4(long nr, long a1, long a2, long a3, long a4)
 {
     register long ret __asm__("x0");
     register long _a1 __asm__("x0") = a1;
@@ -101,7 +101,7 @@ static inline long sc4(long nr, long a1, long a2, long a3, long a4)
     return ret;
 }
 
-static inline long sc5(long nr, long a1, long a2, long a3, long a4, long a5)
+static inline __attribute__((always_inline)) long sc5(long nr, long a1, long a2, long a3, long a4, long a5)
 {
     register long ret __asm__("x0");
     register long _a1 __asm__("x0") = a1;
@@ -121,7 +121,7 @@ static inline long sc5(long nr, long a1, long a2, long a3, long a4, long a5)
     return ret;
 }
 
-static inline long sc6(long nr, long a1, long a2, long a3, long a4, long a5, long a6)
+static inline __attribute__((always_inline)) long sc6(long nr, long a1, long a2, long a3, long a4, long a5, long a6)
 {
     register long ret __asm__("x0");
     register long _a1 __asm__("x0") = a1;

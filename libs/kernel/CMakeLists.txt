@@ -11,6 +11,7 @@ add_library(kernel SHARED
     sc_socket sc_bind sc_connect sc_ppoll sc_sched_yield sc_futex sc_mmap sc_munmap
     sc_sendto sc_sendmsg sc_recvfrom sc_recvmsg sc_clock_nanosleep sc_getpid sc_getppid
     sc_gettid sc_unshare sc_symlink sc_symlinkat sc_readlink sc_readlinkat sc_getrandom
+    sc_prctl sc_clone
 )
 
 target_link_options(kernel
@@ -24,6 +25,7 @@ add_library(kernel.static STATIC
     sc_socket sc_bind sc_connect sc_ppoll sc_sched_yield sc_futex sc_mmap sc_munmap
     sc_sendto sc_sendmsg sc_recvfrom sc_recvmsg sc_clock_nanosleep sc_getpid sc_getppid
     sc_gettid sc_unshare sc_symlink sc_symlinkat sc_readlink sc_readlinkat sc_getrandom
+    sc_prctl sc_clone
 )
 set_target_properties(kernel.static PROPERTIES OUTPUT_NAME kernel)
 

@@ -71,7 +71,9 @@
         [ "pid_t",              "SC_getppid" ],
         [ "pid_t",              "SC_gettid" ],
         [ "int",                "SC_sched_yield" ],
-
+        [ "int",                "SC_prctl", "int option", "unsigned long arg2", "unsigned long arg3", "unsigned long arg4", "unsigned long arg5" ],
+        [ "int",                "SC_clone", "unsigned long flags", "void * stack", "int * parent_tid", "unsigned long tls", "int * child_tid" ],
+        
         [ "ssize_t",            "SC_getrandom", "void * buf", "size_t buflen", "unsigned int flags" ]
     ]
 }
