@@ -11,10 +11,22 @@
 
 void CopyMem(const void * source, void * dest, size_t byteSize)
 {
-    memmove(dest, source, byteSize);
+    if (dest < source) {
+        const char *s = source;
+        char *d = dest;
+        while (byteSize--)
+            *d++ = *s++;
+    }
+    else if (byteSize != 0)
+    {
+        const char *s = source + byteSize;
+        char *d = dest + byteSize;
+        while (byteSize--)
+            *--d = *--s;
+    }
 }
 
 void CopyMemQuick(const void * source, void * dest, size_t byteSize)
 {
-    memmove(dest, source, byteSize);
+    CopyMem(source, dest, byteSize);
 }
