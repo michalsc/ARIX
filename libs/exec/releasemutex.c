@@ -37,6 +37,16 @@
  *  SEE ALSO
  *      CreateMutex(), DeleteMutex(), AttemptMutex(), ObtainMutex()
  */
+
+int internalReleaseMutex(uint32_t *lock, struct Library *KernelBase)
+{
+    if (__sync_bool_compare_and_swap(lock, MUTEX_LOCKED, MUTEX_FREE))
+    {
+        return SC_futex(lock, FUTEX_WAKE, 1, NULL, NULL, 0);
+    }
+    return 0;
+}
+
 int ReleaseMutex(struct Mutex *m)
 {
     D(bug("[EXEC] ReleaseMutex(%p)\n", m));
@@ -46,6 +56,7 @@ int ReleaseMutex(struct Mutex *m)
         int err;
 
         /* Release the mutex right now. */
+        #if 0
         if (__sync_bool_compare_and_swap(&m->m_Lock, MUTEX_LOCKED, MUTEX_FREE))
         {
             /* If mutex is free send Wake signal to one waiting for the same mutex */
@@ -56,6 +67,13 @@ int ReleaseMutex(struct Mutex *m)
                 return FALSE;
             }
         }
+        #else
+        if ((err = internalReleaseMutex(&m->m_Lock, KernelBase)) < 0)
+        {
+            bug("[EXEC] Error releasing futex with err=%d\n", -err);
+            return FALSE;
+        }
+        #endif
     }
     else
     {
