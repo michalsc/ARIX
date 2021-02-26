@@ -12,6 +12,7 @@
 #include <sys/socket.h>
 #include <utility/hooks.h>
 #include <clib/exec_protos.h>
+#include <proto/kernel.h>
 #include <sys/types.h>
 #include <sys/un.h>
 #include <unistd.h>
@@ -29,11 +30,7 @@ void Spawn(struct Hook * spawnHook)
 {
     if (spawnHook)
     {
-#ifndef SYS_fork
-        pid_t pid = (pid_t)syscall(SYS_clone, SIGCHLD, 0);
-#else
-        pid_t pid = (pid_t)syscall(SYS_fork);
-#endif
+        pid_t pid = SC_clone(SIGCHLD, 0, NULL, 0, NULL);
 
         if (pid > 0)
         {
