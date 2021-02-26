@@ -20,13 +20,11 @@ add_dependencies(exec
     kernel.includes
 )
 
-import_library(libc "c")
 import_library(dl "dl")
-import_library(cpp "stdc++")
 import_library(gcc "gcc")
 
 target_link_libraries(exec PRIVATE 
-    libc dl cpp gcc kernel tinystl)
+    dl gcc kernel tinystl)
 
 install(TARGETS exec DESTINATION ARIX/Libs)
 

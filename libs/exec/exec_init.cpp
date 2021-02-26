@@ -160,6 +160,42 @@ void __attribute__((destructor)) ExecDestroy()
     tlsf_destroy(local_memory_pool);
 }
 
+extern "C" {
+    void * memset(void *s, int c, size_t n);
+    int strcmp(const char *s1, const char *s2);
+    long unsigned int strlen(const char *s);
+}
+
+void * __attribute__((optimize("-fno-tree-loop-distribute-patterns"))) memset(void *s, int c, size_t n)
+{
+    char * dst = (char *)s;
+    while (n--)
+        *dst++ = (char)c;
+
+    return s;
+}
+
+int __attribute__((optimize("-fno-tree-loop-distribute-patterns")))
+strcmp(const char *s1, const char *s2)
+{
+    while (*s1 == *s2++) {
+        if (*s1++ == 0) {
+            return 0;
+        }
+    }
+    return (*(const unsigned char *)s1 - *(const unsigned char *)(s2 - 1));
+}
+
+long unsigned int __attribute__((optimize("-fno-tree-loop-distribute-patterns"))) strlen(const char *s)
+{
+    long unsigned int len = 0;
+    if (s) {
+        while (*s++)
+            len++;
+    }
+    return len;
+}
+
 int __syscall_error(int err)
 {
     return err;
