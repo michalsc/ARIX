@@ -35,7 +35,7 @@ void Spawn(struct Hook * spawnHook)
         if (pid > 0)
         {
             /* Regenerate random seed and start time */
-            syscall(SYS_clock_gettime, CLOCK_REALTIME, &StartTime);
+            SC_clock_gettime(CLOCK_REALTIME, &StartTime);
             D(bug("[EXEC] Spawn(): Start time: %ld.%09ld\n", StartTime.tv_sec, StartTime.tv_nsec));
             RandomNumberGenerator::seed();
             InitializeIDSeq();
@@ -49,9 +49,9 @@ void Spawn(struct Hook * spawnHook)
                     struct sockaddr_un name;
                     ID *sock_id = (ID *)&name.sun_path[1];
 
-                    syscall(SYS_close, port->mp_Socket);
+                    SC_close(port->mp_Socket);
 
-                    port->mp_Socket = syscall(SYS_socket, AF_UNIX, SOCK_DGRAM, 0);
+                    port->mp_Socket = SC_socket(AF_UNIX, SOCK_DGRAM, 0);
 
                     // If socket failed return NULL.
                     if (port->mp_Socket < 0)
@@ -60,8 +60,8 @@ void Spawn(struct Hook * spawnHook)
                     }
 
                     // Put the socket in non-blocking mode.
-                    int flags = syscall(SYS_fcntl, port->mp_Socket, F_GETFL);
-                    syscall(SYS_fcntl, port->mp_Socket, F_SETFL, flags | O_NONBLOCK);
+                    int flags = SC_fcntl(port->mp_Socket, F_GETFL, 0);
+                    SC_fcntl(port->mp_Socket, F_SETFL, flags | O_NONBLOCK);
 
                     name.sun_family = AF_UNIX;
                     name.sun_path[0] = 0;
@@ -85,7 +85,7 @@ void Spawn(struct Hook * spawnHook)
                                port->mp_ID.raw >> 24, (port->mp_ID.raw >> 16) & 0xff, port->mp_ID.raw & 0xffff));
 
                         // Try to bind socket to the ID in unix socket namespace.
-                        err = syscall(SYS_bind, port->mp_Socket, (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(ID));
+                        err = SC_bind(port->mp_Socket, (struct sockaddr *)&name, offsetof(struct sockaddr_un, sun_path) + 1 + sizeof(ID));
                     } while (err != 0);
                 }
             }
