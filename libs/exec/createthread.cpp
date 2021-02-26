@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <utility/hooks.h>
 #include <clib/exec_protos.h>
+#include <proto/kernel.h>
 #include <sys/types.h>
 #include <sys/un.h>
 #include <sched.h>
@@ -28,7 +29,7 @@
 #include "exec_intern.h"
 #include "exec_debug.h"
 
-void __thread_bootstrap(void *arg);
+void __attribute__((noreturn)) __thread_bootstrap(void *arg);
 
 void CreateThread(struct TagItem *tags)
 {
@@ -54,12 +55,17 @@ void CreateThread(struct TagItem *tags)
     /* From this point on lock globally as long as the TagList is in use */
     ObtainMutex(&thread_sync_lock);
 
-    int ret = clone((int (*)(void*))__thread_bootstrap, stack,
-        CLONE_VM | CLONE_THREAD | CLONE_SIGHAND | CLONE_FS | CLONE_FILES | CLONE_IO, // CLONE_PARENT,
-        tempTag);
+    int ret;
+    if ((ret = SC_clone(CLONE_VM | CLONE_THREAD | CLONE_SIGHAND | CLONE_FS | CLONE_FILES | CLONE_IO,
+        stack, NULL, 0, NULL)) == 0) {
+        __thread_bootstrap(tempTag);
+    }
 }
 
-void __thread_bootstrap(void *arg)
+#define TEMP_SMP_SIZE 1024
+ULONG __attribute__((aligned(64))) temp_smp[TEMP_SMP_SIZE];
+
+void __attribute__((noreturn)) __thread_bootstrap(void *arg)
 {
     struct TagItem *tags = static_cast<struct TagItem *>(arg);
     struct TagItem *t = NULL;
@@ -80,14 +86,14 @@ void __thread_bootstrap(void *arg)
     t = LibFindTagItem(TASKTAG_NAME, tags);
     if (t != NULL)
     {
-        syscall(SYS_prctl, PR_SET_NAME, t->ti_Data);
+        SC_prctl(PR_SET_NAME, t->ti_Data, 0, 0, 0);
     }
 
     /* Done with TagList, release thread synchronization lock */
     ReleaseMutex(&thread_sync_lock);
 
     D(bug("[EXEC] CreateThread(): inside bootstrap\n"));
-    D(bug("[EXEC] pid=%d, tid=%d\n", syscall(SYS_getpid), syscall(SYS_gettid)));
+    D(bug("[EXEC] pid=%d, tid=%d\n", SC_getpid(), SC_gettid()));
 
     switch(highest_arg)
     {
@@ -123,9 +129,41 @@ void __thread_bootstrap(void *arg)
     D(bug("[EXEC] Finishing thread\n"));
 
     APTR ssp = (APTR)tags[0].ti_Data;
-    long __attribute__((noreturn)) (*sc)(long, ...) = (long (*)(long, ...))&syscall;
 
     FreeVec(tags);
+
+    /* Obtain thread sync mutex in order to perform a stack switch to a common thread exit stack */
+    ObtainMutex(&thread_sync_lock);
+
+#ifdef __aarch64__
+
+    extern struct Library *KernelBase;
+
+    asm volatile(
+        "   mov sp, %[stack] \n"    // Switch to temporary stack
+        "   mov x0, %[ssp] \n"      // Free the stack which was assigned to the thread
+        "   bl FreeVec \n"
+        "   mov x0, %[lock] \n"     // From now on it is not allowed to use stack!
+        "   mov x1, %[kernelBase] \n "
+        "   bl internalReleaseMutex \n"
+        "   ldr x1, [%[lvo], #%[exit]] \n" 
+        "   mov x0, xzr \n"
+        "   br x1 \n"
+    :
+    :   [lock]"r"(&thread_sync_lock.m_Lock),
+        [ssp]"r"(ssp),
+        [kernelBase]"r"(KernelBase),
+        [lvo]"r"(KernelBase->lib_LVOTable),
+        [exit]"i"(offsetof(struct KernelBaseLVO, SC_exit)),
+        [stack]"r"(&temp_smp[TEMP_SMP_SIZE-16])
+    :"x0","x1","x2","x3","x4","x5","x6","x7",
+     "x9","x10","x11","x12","x13","x14","x15","x16","x8");
+
+#else
+
+    long __attribute__((noreturn)) (*sc)(long, ...) = (long (*)(long, ...))&syscall;
+
+    
     /*
         This is wrong. First is the stack cleaned up, then the thread exits eventually fetching return
         address from the (already deallocated) stack. Hopefully fixed with __builtin_return_address...
@@ -136,5 +174,7 @@ void __thread_bootstrap(void *arg)
     FreeVec(ssp);
 
     /* Get out of here... */
-    syscall(SYS_exit, 0);
+    SC_exit(0);
+#endif
+    while(1);
 }
