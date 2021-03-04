@@ -73,6 +73,9 @@ jobs:
         name: arix-archive
         path: ${{github.workspace}}/ARIX-aarch64.tgz
     
+    - name: List
+      run: ls -la ${{github.workspace}}/
+
     - name: Release
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
