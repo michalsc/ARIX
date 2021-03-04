@@ -64,7 +64,7 @@ jobs:
         retention-days: 5
 
   deploy:
-    need: build
+    needs: build
     steps:  
     - name: Download Artifact
       uses: actions/download-artifact@v2
