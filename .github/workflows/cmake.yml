@@ -38,8 +38,8 @@ jobs:
       # and build directories, but this is only available with CMake 3.13 and higher.  
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
       run: |
-        cmake --echo $GITHUB_WORKSPACE
-        cmake --echo ${{github.workspace}}
+        echo $GITHUB_WORKSPACE
+        echo ${{github.workspace}}
 
     - name: Configure CMake
       # Use a bash shell so we can use the same syntax for environment variable
