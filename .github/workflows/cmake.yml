@@ -54,13 +54,13 @@ jobs:
     - name: Archive
       working-directory: ${{github.workspace}}/install
       shell: bash
-      run: tar czvf ./ARIX.tgz ./ARIX ./initrd ./vmlinuz
+      run: tar czvf ./ARIX-aarch64.tgz ./ARIX ./initrd ./vmlinuz
     
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
         name: arix-archive
-        path: ${{github.workspace}}/install/ARIX.tgz
+        path: ${{github.workspace}}/install/ARIX-aarch64.tgz
         retention-days: 5
 
   deploy:
@@ -73,9 +73,6 @@ jobs:
         name: arix-archive
         path: ${{github.workspace}}
     
-    - name: List
-      run: ls -la ${{github.workspace}}/
-
     - name: Release
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
