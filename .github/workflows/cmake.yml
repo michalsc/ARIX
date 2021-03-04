@@ -71,11 +71,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: arix-archive
-        path: ARIX-aarch64.tgz
+        path: ${{github.workspace}}/ARIX-aarch64.tgz
     
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        files: ARIX-aarch64.tgz
+        files: ${{github.workspace}}/ARIX-aarch64.tgz
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
