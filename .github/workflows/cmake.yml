@@ -50,3 +50,31 @@ jobs:
       shell: bash
       # Create ARIX directory structure and generate initrd file
       run: cmake --install .
+    
+    - name: Archive
+      working-directory: ${{github.workspace}}/install
+      shell: bash
+      run: tar czvf ./ARIX.tgz ./ARIX ./initrd ./vmlinuz
+    
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: arix-archive
+        path: ${{github.workspace}}/install/ARIX.tgz
+        retention-days: 5
+
+  deploy:
+    need: build
+    steps:  
+    - name: Download Artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: arix-archive
+        path: ARIX-aarch64.tgz
+    
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ARIX-aarch64.tgz
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
