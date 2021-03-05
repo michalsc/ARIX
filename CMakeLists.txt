@@ -14,7 +14,7 @@ find_program(CPIO cpio REQUIRED)
 find_program(GZIP gzip REQUIRED)
 find_program(FIND find REQUIRED)
 
-set(SUPPORTED_ARCHS "aarch64")
+set(SUPPORTED_ARCHS "aarch64" "x86_64")
 set(ARCH ${CMAKE_SYSTEM_PROCESSOR} CACHE STRING "One of target machines: ${SUPPORTED_ARCHS}")
 set_property(CACHE ARCH PROPERTY STRINGS ${SUPPORTED_ARCHS})
 
