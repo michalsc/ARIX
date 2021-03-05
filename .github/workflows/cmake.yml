@@ -68,7 +68,7 @@ jobs:
         retention-days: 5
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: build
     steps:  
     - name: Download Artifact
