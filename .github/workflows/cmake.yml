@@ -14,6 +14,10 @@ jobs:
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: ubuntu-20.04
 
+    strategy:
+      matrix:
+        arch: [ aarch64, x86_64 ]
+
     steps:
     - uses: actions/checkout@v2
       with: 
@@ -37,7 +41,7 @@ jobs:
       # Note the current convention is to use the -S and -B options here to specify source 
       # and build directories, but this is only available with CMake 3.13 and higher.  
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install -DCMAKE_MODULE_PATH=${{github.workspace}}/cmake -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/cmake/toolchains/aarch64-linux-gnu.cmake
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install -DCMAKE_MODULE_PATH=${{github.workspace}}/cmake -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/cmake/toolchains/${{ matrix.arch }}-linux-gnu.cmake
 
     - name: Build
       working-directory: ${{github.workspace}}/build
@@ -54,13 +58,13 @@ jobs:
     - name: Archive
       working-directory: ${{github.workspace}}/install
       shell: bash
-      run: tar czvf ./ARIX-aarch64.tgz ./ARIX ./initrd ./vmlinuz
+      run: tar czvf ./ARIX-${{ matrix.arch }}.tgz ./ARIX ./initrd ./vmlinuz
     
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
         name: arix-archive
-        path: ${{github.workspace}}/install/ARIX-aarch64.tgz
+        path: ${{github.workspace}}/install/ARIX-${{ matrix.arch }}.tgz
         retention-days: 5
 
   deploy:
@@ -71,12 +75,12 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: arix-archive
-        path: ${{github.workspace}}
+        path: ${{github.workspace}}/uploads
     
     - name: Release
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: ${{github.workspace}}/ARIX-aarch64.tgz
+        files: ${{github.workspace}}/uploads/**
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
