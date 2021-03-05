@@ -1,6 +1,7 @@
 name: CMake Nightly Build
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: "0 20 * * *"
 
@@ -84,5 +85,6 @@ jobs:
       with:
         tag_name: nightly
         files: ${{github.workspace}}/uploads/**
+        prerelease: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
