@@ -88,7 +88,7 @@ jobs:
           upload_url: https://uploads.github.com/repos/michalsc/ARIX/releases/39641136/assets{?name,label} # find out this value by opening https://api.github.com/repos/<owner>/<repo>/releases in your browser and copy the full "upload_url" value including the {?name,label} part
           release_id: 39641136 # same as above (id can just be taken out the upload_url, it's used to find old releases)
           asset_path: ${{github.workspace}}/uploads/ARIX-aarch64.tgz # path to archive to upload
-          asset_name: ARIX-aarch64.tgz # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
+          asset_name: ARIX-aarch64-$$.tgz # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
           asset_content_type: application/zip # required by GitHub API
           max_releases: 7 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
 
@@ -100,7 +100,7 @@ jobs:
           upload_url: https://uploads.github.com/repos/michalsc/ARIX/releases/39641136/assets{?name,label} # find out this value by opening https://api.github.com/repos/<owner>/<repo>/releases in your browser and copy the full "upload_url" value including the {?name,label} part
           release_id: 39641136 # same as above (id can just be taken out the upload_url, it's used to find old releases)
           asset_path: ${{github.workspace}}/uploads/ARIX-aarch64.tgz # path to archive to upload
-          asset_name: ARIX-x86_64.tgz # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
+          asset_name: ARIX-x86_64-$$.tgz # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
           asset_content_type: application/zip # required by GitHub API
           max_releases: 7 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
 
