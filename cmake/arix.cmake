@@ -73,18 +73,20 @@ function(arix_finish TARGET)
     if(${PROJECT_TYPE} STREQUAL "library")
         build_headers()
         add_custom_command(
-            OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version.script
+            TARGET ${TARGET} PRE_LINK
             COMMAND ${CMAKE_COMMAND} -E echo "{ global: ${GLOBAL_SYMBOLS}; local: ${LOCAL_SYMBOLS}; };" > ${CMAKE_CURRENT_BINARY_DIR}/version.script
             VERBATIM
         )
         target_sources(${TARGET} PRIVATE
             ${CMAKE_CURRENT_BINARY_DIR}/__base_file
-            ${CMAKE_CURRENT_BINARY_DIR}/version.script
         )
         add_dependencies(${TARGET}
             ${PROJECT_NAME}.includes
         )
     endif()
+    add_dependencies(${TARGET}
+        includes
+    )
 endfunction(arix_finish)
 
 function(import_library LIB LIBNAME)
