@@ -28,6 +28,7 @@ add_library(kernel.static STATIC
     sc_prctl sc_clone
 )
 set_target_properties(kernel.static PROPERTIES OUTPUT_NAME kernel)
+add_dependencies(kernel.static kernel.includes)
 
 install(TARGETS kernel DESTINATION ARIX/Libs)
 install(TARGETS kernel.static DESTINATION ARIX/Development/lib)
