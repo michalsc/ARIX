@@ -28,6 +28,6 @@ set_property(GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS TRUE)
 
 set(CMAKE_CXX_LINK_EXECUTABLE  "<CMAKE_CXX_COMPILER> <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> -Wl,-unresolved-symbols=ignore-in-shared-libs <LINK_LIBRARIES>")
 set(CMAKE_C_LINK_EXECUTABLE    "<CMAKE_C_COMPILER> <FLAGS> <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> -Wl,-unresolved-symbols=ignore-in-shared-libs <LINK_LIBRARIES>")
-set(CMAKE_CXX_CREATE_SHARED_LIBRARY "<CMAKE_CXX_COMPILER> -shared -nodefaultlibs <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> -Wl,-soname,<TARGET> -Wl,--version-script=version.script -fvisibility=hidden <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
-set(CMAKE_C_CREATE_SHARED_LIBRARY "<CMAKE_C_COMPILER> -shared -nodefaultlibs <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> -Wl,-soname,<TARGET> -Wl,--version-script=version.script -fvisibility=hidden <OBJECTS> -o <TARGET> <LINK_LIBRARIES>  ")
+set(CMAKE_CXX_CREATE_SHARED_LIBRARY "<CMAKE_CXX_COMPILER> -shared -nodefaultlibs <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> -Wl,-soname,<TARGET> -Wl,--version-script=<CMAKE_CURRENT_BINARY_DIR>/version.script -fvisibility=hidden <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+set(CMAKE_C_CREATE_SHARED_LIBRARY "<CMAKE_C_COMPILER> -shared -nodefaultlibs <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> -Wl,-soname,<TARGET> -Wl,--version-script=<CMAKE_CURRENT_BINARY_DIR>/version.script -fvisibility=hidden <OBJECTS> -o <TARGET> <LINK_LIBRARIES>  ")
 
